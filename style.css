@@ -643,7 +643,7 @@ button:hover svg {
 }
 .czaty-bottom {
     height: var(--right-bottom-height);
-    width: calc(100%);
+    width: calc(100% - var(--left-width));
     top: calc(100% - var(--right-bottom-height));
     left: var(--left-width);
     position: absolute;
@@ -891,7 +891,7 @@ button:hover svg {
 }
 
 form{
-    width: 100%;
+    width: 80%;
     height: 100%;
     top: 50%;
     left: 0;
