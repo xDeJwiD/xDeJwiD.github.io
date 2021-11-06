@@ -84,7 +84,7 @@ a {
     --left-width: 350px;
 
     /* WYSOKOŚĆ TOP PANELU */
-    --menu-top-height: 10%;
+    --menu-top-height: 10vh;
     
     /* WYSOKOŚĆ PRAWEGO TOOLBARA */
     --right-bottom-height: 8%;
@@ -147,12 +147,15 @@ a {
 #left-top {
     top: 0px;
     width: calc(100% - .5rem);
-    height: calc(var(--menu-top-height) - 2*.25rem);
-    position: relative;
+    height: calc(var(--menu-top-height) - 2 *.25rem);
+    position: absolute;
     z-index: 12;
     background-color: rgb(43, 43, 43);
     padding: .25rem;
     transition: ease-in-out .4s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #left-top h1 {
@@ -185,7 +188,7 @@ a {
 }
 
 #left-mid {
-    top: var(--menu-top-height) - .25rem;
+    top: var(--menu-top-height);
     width: 100%;
     height: calc(100% - var(--menu-top-height) - var(--right-bottom-height));
     position: absolute;
@@ -211,10 +214,9 @@ svg {
 }
 
 .mess {
-    width: 5rem;
-    height: 5rem;
-    
-    
+    position: relative;
+    width: 10vh;
+    height: 10vh;
 }
 
 
@@ -581,7 +583,7 @@ button:hover svg {
 }
 .czaty-top h3 {
     position: absolute;
-    top: 40%;
+    top: 50%;
     left: 6rem;
     font-size: 2rem;
     color: white;
@@ -620,6 +622,13 @@ button:hover svg {
     top: 50%;
     margin: 0 10px;
 }
+.czaty-top .avatar {
+    top: 50%;
+    position: absolute;
+    transform: translate(0%, -50%);
+    height: 8vh;
+    width: 8vh;
+}
 .czaty-mid {
     top: var(--menu-top-height);
     left: var(--left-width);
@@ -634,7 +643,7 @@ button:hover svg {
 }
 .czaty-bottom {
     height: var(--right-bottom-height);
-    width: calc(100% - var(--left-width));
+    width: calc(100%);
     top: calc(100% - var(--right-bottom-height));
     left: var(--left-width);
     position: absolute;
@@ -894,7 +903,7 @@ form{
     width: calc(70% - 90px - 40px);
     height: 70%;
     top: 50%;
-    left: 70px;
+    left: 1%;
     transform: translate(0%, -50%);
     border: none;
     border-radius: 50px;
@@ -1255,10 +1264,9 @@ form{
 
     
     #imput {
-        width: calc(65% - 90px - 40px);
+        width: calc(65% - 90px);
         height: 70%;
         top: 50%;
-        left: 70px;
         transform: translate(0%, -50%);
         border: none;
         border-radius: 50px;
@@ -1266,14 +1274,14 @@ form{
         color: rgb(237, 237, 237);
         font-size: .9rem;
         position: absolute;  
-        padding: 0px 60px 0px 20px;
+        padding: 0px 20px 0px 20px;
         border-inline-start-color: rgb(255, 0, 0);
         transition: ease-in-out .4s;
         outline-style: none;
     }
 
     .bi-emoji-smile {
-        left: 64%;
+        left: 54%;
         width: 30px;
         height: 30px;
     }
@@ -1406,7 +1414,7 @@ form{
 
 @media (max-width:888px) {
     .s, .d {
-        max-width: 300px;
+        max-width: 80%;
     }
     /* .input {
         transition: ease-in-out .4s;
@@ -1439,6 +1447,7 @@ form{
         position: relative;
         background-color: rgb(39, 0, 61);
     }
+    
 
 
 
@@ -1454,7 +1463,9 @@ form{
         top: calc(100% - var(--right-bottom-height));
     }
 
-
+    .czaty-top .avatar {
+        display: none;
+    }
 
     .czaty-mid .info .avatar {
         --avatar: 110px;
@@ -1505,8 +1516,8 @@ form{
 
     .czaty-top h3 {
         position: absolute;
-        top: 40%;
-        left: 6rem;
+        top: 50%;
+        left: 1%;
         font-size: 1.1rem;
         transform: translate(0%, -50%);
     }
@@ -1542,3 +1553,4 @@ form{
 }
 
 
+@media (max-height:1440px) {
