@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria</title>
+    <link rel="icon" href="../Mess_animacja_2/1.png">
+    <link rel="stylesheet" href="galeria.css">
+</head>
+<body>
+    <div class="tabContainer1">
+        <a href="../index.html" class="back">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up-short" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
+            </svg>
+            <p>Strona główna</p>
+        </a>
+        <div class="buttonContainer">
+            <div class="mini-galeria">
+                <button onclick="showPanel(0, 'transparent')" class="galeria-btn">
+                    <p>Galeria</p>
+                </button>
+                <button onclick="showPanel(1, 'transparent')" class="moje-zdjecia-btn">
+                    <p>Moje zdjecia</p>
+                </button>
+                <button onclick="showPanel(2, 'transparent')" class="zainteresowania-btn">
+                    <p>Zainteresowania</p>
+                </button>
+                <button onclick="showPanel(3, 'transparent')" class="inne-btn">
+                    <p>Inne</p>
+                </button>
+            </div>            
+        </div>
+    </div>
+
+
+
+
+    <div class="tabContainer2">
+        <div class="tabPanel"> <!-- GALERIA -->
+            <div class="top" id="galeria-top">
+                <h1>Wybierz folder</h1>
+            </div>
+            <div class="mid" id="galeria-mid">
+                <div class="folder"></div>
+                <div class="folder"></div>
+                <div class="folder"></div>
+                <div class="folder"></div>
+                <div class="folder"></div>
+                <div class="folder"></div>
+                <div class="folder"></div>
+                
+            </div>
+        </div>
+        <div class="tabPanel"> <!-- MOJE ZDJECIA -->
+            <div class="top" id="library-page-top">
+                cos pejdż
+            </div>
+            <div class="mid" id="library-page-mid">
+                c
+            </div>
+        </div>
+        <div class="tabPanel"> <!-- ZAINTERESOWANIA -->
+            <div class="top" id="library-page-top">
+                cos pejdż
+            </div>
+            <div class="mid" id="library-page-mid">
+                e
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <script src="./galeria.js"></script>
+</body>
+</html>
