@@ -16,6 +16,8 @@
 body {
     overflow: hidden;
     background-color: rgb(26, 26, 26);
+    height: 100vh;
+    width: 100vw;
 }
 
 ::-webkit-scrollbar-button {
@@ -87,7 +89,7 @@ a {
     --menu-top-height: 10vh;
     
     /* WYSOKOŚĆ PRAWEGO TOOLBARA */
-    --right-bottom-height: 8%;
+    --right-bottom-height: 10vh;
 
     /* WIELKOSC AVATARÓW */
     --avatar: 60px;
@@ -215,8 +217,8 @@ svg {
 
 .mess {
     position: relative;
-    width: 10vh;
-    height: 10vh;
+    width: 8vh;
+    height: 8vh;
 }
 
 
@@ -257,12 +259,12 @@ svg {
 
 
 .bi-images {
-    left: calc(75% + 60px);
+    left: calc(65% + 60px);
     transition: ease-in-out .4s;
 }
 
 .bi-volume-up-fill {
-    left: calc(70% + 60px);
+    left: calc(55% + 60px);
     transition: ease-in-out .4s;
 }
 
@@ -1350,13 +1352,17 @@ form{
     }
 
     .bi-images {
-        left: calc(90%);
+        right: calc(70%);
         transition: ease-in-out .4s;
+        width: 5vh;
+        height: 5vh;
     }
     
     .bi-volume-up-fill {
-        left: calc(78%);
+        left: calc(55%);
         transition: ease-in-out .4s;
+        width: 5vh;
+        height: 5vh;
     }
     
     .s, .d {
