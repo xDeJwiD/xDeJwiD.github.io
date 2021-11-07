@@ -732,7 +732,7 @@ button:hover svg {
 }
 
 #prof1 {
-    background-image: url(./Zdjecia/Snapchat-1029847379.jpg);
+    background-image: url(./Zdjecia/Avatary/20211019_122556.jpg);
 }
 
 #prof2 {
@@ -841,6 +841,40 @@ button:hover svg {
     background-color: rgb(26, 26, 26);
 }
 
+
+
+
+
+#czatdar-top {
+    background-color: rgb(55, 55, 55)
+}
+#czatdar-mid {
+    background-image: linear-gradient(rgba(191, 191, 191, 0.501), rgba(97, 97, 97, 0.501));
+}
+#czatdar-mid .s, #czatdar-mid a{
+    background-color: rgb(255, 255, 255);
+    color: black;
+    
+}
+#czatdar-mid .d {
+    background-color: rgb(26, 26, 26);
+    color: rgb(255, 255, 255);
+}
+#czatdar-mid .d a {
+    color: white;
+}
+#czatdar-bottom {
+    background-color: rgb(26, 26, 26);
+}
+
+
+
+
+
+
+
+
+
 .s {
     max-width: 900px;
     min-width: 20px;
@@ -947,12 +981,32 @@ form{
     transition: ease-in-out .4s;
 }
 
-
-
-
-
-
-
+.s .s {
+   background-color: transparent;
+}
+.soc-icons, .soc-icons svg{
+    position: relative;
+    margin: 20px;
+}
+.soc-icons svg{
+    width: 4rem;
+    height: 4rem;
+}
+.fb {
+    color: rgb(62, 62, 255);
+}
+.snp {
+    color: yellow;
+}
+.ig {
+    color: rgb(182, 34, 211);
+}
+.stm {
+    color: rgb(99, 99, 99);
+}
+.dc {
+    color: rgb(129, 110, 255);
+}
 
 
 
