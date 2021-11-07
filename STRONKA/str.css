@@ -14,7 +14,7 @@ body {
 .header {
     height: 10%;
     width: 100%;
-    background-color: wheat;
+    background-color: rgba(245, 222, 179, 0.427);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -24,7 +24,7 @@ body {
 .left {
     width: 10%;
     height: 90%;
-    background-color: violet;
+    background-color: rgba(238, 130, 238, 0.425);
     position: absolute;
     float: left;
     top: 10%;
@@ -45,9 +45,66 @@ ul li:hover, ol li:hover a {
 }
 .mid {
     left: 10%;
-    background-color: royalblue;
+    background-color: rgba(65, 105, 225, 0.425);
     height: 90%;
     width: 80%;
     position: absolute;
     top: 10%;
+}
+.mid img {
+    width: 600px;
+}
+table, th, tr, td {
+    border: 2px black solid;
+    border-collapse: collapse;
+}
+td {
+    text-align: center;
+}
+table {
+    background-color: seashell;
+    filter: blur(5px);
+    transition: ease-in-out .3s;
+}
+th, td {
+    padding: 5px;
+}
+th:hover, td:hover {
+    background-color: rgb(186, 186, 186);
+}
+table:hover {
+    filter: blur(0px);
+}
+
+.right {
+    width: 10%;
+    height: 90%;
+    background-color: rgba(224, 197, 64, 0.466);
+    position: absolute;
+    top: 10%;
+    left: 90%;
+    color: white;
+}
+.animacja {
+    width: 100px;
+    height: 100px;
+    background-color: rgb(255, 38, 0);
+    border-radius: 40rem;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: calc(0% + 50px);
+    animation: kulko 2s infinite alternate linear;
+}
+
+@keyframes kulko {
+    from {
+        top: calc(0% + 50px);
+        background-color: chartreuse;
+    }
+    to {
+        top: calc(100% - 50px);
+        background-color: rgb(255, 0, 183);
+    }
+    
 }
