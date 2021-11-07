@@ -851,10 +851,10 @@ button:hover svg {
 
 
 #czatdar-top {
-    background-color: rgb(55, 55, 55)
+    background-color: rgb(111, 188, 255)
 }
 #czatdar-mid {
-    background-image: linear-gradient(rgba(191, 191, 191, 0.501), rgba(97, 97, 97, 0.501));
+    background-image: linear-gradient(rgba(89, 164, 255, 0.501), rgba(97, 97, 97, 0.501));
 }
 #czatdar-mid .s, #czatdar-mid a{
     background-color: rgb(255, 255, 255);
