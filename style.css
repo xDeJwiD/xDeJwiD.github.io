@@ -652,6 +652,7 @@ button:hover svg {
     background-color: rgb(26, 26, 26);
     z-index: 12;
     transition: ease-in-out .4s;
+    overflow: hidden;
 }
 
 .czaty-mid .info{
@@ -959,7 +960,7 @@ form{
     height: 100px;
     position: absolute;
     left: 50%;
-    top: 85%;
+    top: 75%;
     transform: translate(-50%, -50%);
     z-index: 30;
     text-align: center;
@@ -1051,7 +1052,7 @@ form{
     height: 100px;
     position: absolute;
     left: 50%;
-    top: 85%;
+    top: 75%;
     transform: translate(-50%, -50%);
     z-index: 30;
     text-align: center;
@@ -1119,6 +1120,14 @@ form{
 #muzyka-playlisty a:hover, #muzyka-playlisty a:active {
     background-size: 300%;
     background-position: right;
+}
+#muzyka-playlisty h4 {
+    position: absolute;
+    top: 66%;
+    font-size: .9rem;
+    color: white;
+    transform: translate(-50%, -50%);
+    left: 50%;
 }
 
 
@@ -1541,12 +1550,18 @@ form{
     }
     .czaty-top .a {
         right: 5rem;
+        width: 4vh;
+        height: 5vh;
     }
     .czaty-top .b {
         right: 2rem;
+        width: 4vh;
+        height: 5vh;
     }
     .czaty-top .c {
         right: -1rem;
+        width: 4vh;
+        height: 5vh;
     }
     .czaty-top svg:hover {
         position: absolute;
