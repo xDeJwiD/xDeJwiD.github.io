@@ -150,6 +150,7 @@ a {
     top: 0px;
     width: calc(100% - .5rem);
     height: calc(var(--menu-top-height) - 2 *.25rem);
+    min-height: 20px;
     position: absolute;
     z-index: 12;
     background-color: rgb(43, 43, 43);
@@ -192,7 +193,7 @@ a {
 #left-mid {
     top: var(--menu-top-height);
     width: 100%;
-    height: calc(100% - var(--menu-top-height) - var(--right-bottom-height));
+    height: calc(100% - var(--menu-top-height));
     position: absolute;
     background-color: rgb(43, 43, 43);
     overflow: auto;
@@ -201,6 +202,7 @@ a {
 }
 #left-bottom {
     height: calc(var(--right-bottom-height));
+    min-height: 40px;
     width: 100%;
     top: calc(100% - var(--right-bottom-height));
     position: absolute;
@@ -261,11 +263,15 @@ svg {
 .bi-images {
     left: calc(65% + 60px);
     transition: ease-in-out .4s;
+    min-height: 30px;
+    min-width: 30px;
 }
 
 .bi-volume-up-fill {
     left: calc(55% + 60px);
     transition: ease-in-out .4s;
+    min-height: 30px;
+    min-width: 30px;
 }
 
 .bi-gear-fill {
@@ -574,6 +580,7 @@ button:hover svg {
     left: var(--left-width);
     width: calc(100% - 2.2rem - var(--left-width));
     height: calc(var(--menu-top-height) - 2.2rem);
+    min-height: 20px;
     position: absolute;
     background-color: rgb(28, 28, 28);
     box-shadow: rgba(0, 0, 0, 0.207) 0px 10px 10px;
@@ -586,7 +593,8 @@ button:hover svg {
 .czaty-top h3 {
     position: absolute;
     top: 50%;
-    left: 6rem;
+    left: 15vh;
+    margin-left: 2vw;
     font-size: 2rem;
     color: white;
     transform: translate(0%, -50%);
@@ -609,12 +617,18 @@ button:hover svg {
 }
 .czaty-top .a {
     right: 14rem;
+    min-width: 18px;
+    min-height: 18px;
 }
 .czaty-top .b {
     right: 7rem;
+    min-width: 18px;
+    min-height: 18px;
 }
 .czaty-top .c {
     right: 0rem;
+    min-width: 18px;
+    min-height: 18px;
 }
 .czaty-top svg:hover {
     position: absolute;
@@ -630,6 +644,8 @@ button:hover svg {
     transform: translate(0%, -50%);
     height: 8vh;
     width: 8vh;
+    min-height: 18px;
+    min-width: 18px;
 }
 .czaty-mid {
     top: var(--menu-top-height);
@@ -645,8 +661,10 @@ button:hover svg {
 }
 .czaty-bottom {
     height: var(--right-bottom-height);
+    min-height: 40px;
     width: calc(100% - var(--left-width));
-    top: calc(100% - var(--right-bottom-height));
+    /* top: calc(100% - var(--right-bottom-height)); */
+    bottom: 0;
     left: var(--left-width);
     position: absolute;
     background-color: rgb(26, 26, 26);
@@ -905,8 +923,9 @@ form{
 #imput {
     width: calc(70% - 90px - 40px);
     height: 70%;
+    min-height: 30px;
     top: 50%;
-    left: 1%;
+    left: 3%;
     transform: translate(0%, -50%);
     border: none;
     border-radius: 50px;
@@ -1574,4 +1593,8 @@ form{
 }
 
 
-@media (max-height:1440px) {
+@media (max-height:555px) {
+    .mess {
+        display: none;
+    }
+}
