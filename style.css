@@ -758,6 +758,11 @@ button:hover svg {
     background-position: center;
     background-size: 240%;
 }
+#prof-dariusz {
+    background: url(./Zdjecia/Zrzut\ ekranu\ 2021-11-07\ 234340.png);
+    background-position: center;
+    background-size: 140%;
+}
 
 #czat1-top {
     background-color: rgb(163, 74, 163);
