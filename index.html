@@ -21,6 +21,7 @@
             flex-wrap: wrap;
             justify-content: center;
             align-items: center;
+            transition: transform ease-in-out .2s, background-color ease-in-out .5s, color ease-in-out .5s;
         }
         #top {
             width: 100%;
@@ -28,6 +29,7 @@
             position: relative;
             background-color: var(--col1);
             margin-bottom: 40px;
+            transition: transform ease-in-out .2s, background-color ease-in-out .5s, color ease-in-out .5s;
         }
 
         #mid {
@@ -46,11 +48,13 @@
                         inset -15px -15px 20px 5px rgb(255, 255, 255);
             overflow-y: auto;
             z-index: 100;
-            
+            transition: transform ease-in-out .2s, background-color ease-in-out .5s, color ease-in-out .5s, box-shadow ease-in-out .5s;
         }
 
         :root {
             --col1: rgb(232, 232, 232);
+
+            --col2: rgb(39, 39, 39);
         }
 
 
@@ -69,9 +73,17 @@
             text-align: center;
             box-shadow:  10px 10px 20px 5px rgba(0, 0, 0, 0.297), 
                          -10px -10px 20px 5px rgb(255, 255, 255);
-            color: white;
+            color: var(--col2);
             z-index: 1;
-            
+            transition: transform ease-in-out .2s, background-color ease-in-out .5s, color ease-in-out .5s, box-shadow ease-in-out .5s;
+        }
+        a:hover {
+            transform: scale(1.03);
+            box-shadow:  10px 10px 20px 1px rgba(0, 0, 0, 0.297), 
+                         -10px -10px 20px 1px rgb(255, 255, 255);
+        }
+        a:hover .zdjecie{
+            filter: grayscale(0);
         }
         .zdjecie {
             width: calc(90% - 40px);
@@ -84,6 +96,16 @@
             border-radius: 40px;
             box-shadow: inset 15px 15px 20px 5px rgba(0, 0, 0, 0.297), 
                         inset -15px -15px 20px 5px rgb(255, 255, 255);
+            background-position: center;
+            background-size: cover;
+            filter: grayscale(1);
+            transition: transform ease-in-out .2s, background-color ease-in-out .5s, box-shadow ease-in-out .5s, filter ease-in-out .2s;
+        }
+        #zdjecie1 {
+            background-image: url(./str1.png);
+        }
+        #zdjecie2 {
+            background-image: url(./str2.png);
         }
         .content {
             position: absolute;
@@ -95,7 +117,35 @@
             flex-direction: column;
         }
 
-
+        body.dark-mode {
+            background-color: var(--col2);
+            color: rgb(39, 39, 39);
+        }
+        body.dark-mode #mid{
+            background-color: var(--col2);
+            color: white;
+            box-shadow: inset 15px 15px 20px 5px rgba(0, 0, 0, 0.734), 
+                        inset -15px -15px 20px 5px rgba(255, 255, 255, 0.213);
+        }
+        body.dark-mode #top{
+            background-color: rgb(39, 39, 39);
+            color: white;
+        }
+        body.dark-mode #mid a{
+            background-color: var(--col2);
+            box-shadow: 10px 10px 20px 5px rgba(0, 0, 0, 0.734), 
+                        -10px -10px 20px 5px rgba(255, 255, 255, 0.213);
+            color: white;
+        }
+        body.dark-mode #mid a:hover{
+            box-shadow:  10px 10px 20px 1px rgba(0, 0, 0, 0.734), 
+                         -10px -10px 20px 1px rgba(255, 255, 255, 0.213);
+        }
+        body.dark-mode #mid a .karta .zdjecie {
+            box-shadow: inset 15px 15px 20px 5px rgba(0, 0, 0, 0.734), 
+                        inset -15px -15px 20px 5px rgba(255, 255, 255, 0.213);
+            background-color: var(--col2);
+        }
 
 
 
@@ -104,37 +154,51 @@
 
 
     </style>
+
+
+
+<script>
+
+
+function myFunction() {
+  var element = document.body;
+  element.classList.toggle("dark-mode");
+}
+
+
+</script>
 </head>
 <body>
     <div id="top">
-
+        <button onclick="myFunction()">Toggle dark mode</button>
     </div>
 
     <div id="mid">
-        <a href="./Stronka1/index.html">
+        <a href="./Stronka1/index.html" target="_blank">
             <div class="karta">
                 <div class="zdjecie" id="zdjecie1"></div>
+                <div class="content">
+                    <h2>Moja stronka nr 1.</h2>
+                    <p>Rok 2019</p>
+                </div>
+            </div>
+        </a>
+        <a href="./Stronka2/index.html" target="_blank">
+            <div class="karta">
+                <div class="zdjecie" id="zdjecie2"></div>
                 <div class="content">
                     <h2>Moja stronka nr 2.</h2>
                     <p>Rok 2021</p>
                 </div>
             </div>
         </a>
-        <a href="./Stronka1/index.html">
+        <a href="./Stronka3/index.html" target="_blank">
             <div class="karta">
-                <div class="zdjecie" id="zdjecie1"></div>
+                <div class="zdjecie" id="zdjecie3"></div>
                 <div class="content">
-                    <h2>Moja stronka nr 2.</h2>
-                    <p>Rok 2021</p>
-                </div>
-            </div>
-        </a>
-        <a href="./Stronka1/index.html">
-            <div class="karta">
-                <div class="zdjecie" id="zdjecie1"></div>
-                <div class="content">
-                    <h2>Moja stronka nr 2.</h2>
-                    <p>Rok 2021</p>
+                    <h2>Moja stronka nr 3.</h2>
+                    <p>Rok 202x</p>
+                    <p>Jeszcze tu nic nie ma.</p>
                 </div>
             </div>
         </a>
