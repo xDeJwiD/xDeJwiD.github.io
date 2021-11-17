@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', Courier, monospace;
+}
+body {
+    background-color: black;
+}
+div {
+    width: 400px;
+    height: 400px;
+    background-color: aqua;
+    position: relative;
+    top: calc(50% - 150px);
+    left: calc(50% - 150px);
+    transform: skew(0deg, 20deg);
+    transition: ease-in-out .2s;
+
+}
+div:hover{
+    left: 30%;
+    z-index: 10;
+    box-shadow: 100px -50px 0px 10px red,
+                200px -150px 0px 10px blue,
+                300px -250px 0px 10px green;
+}
+.a {
+    background-color: chartreuse;
+}
+.b {
+    background-color: coral;
+}
+.c {
+    background-color: cyan;
+}
+.d {
+    background-color: pink;
+}
+.e {
+    background-color: yellow;
+}
