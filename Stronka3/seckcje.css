@@ -1,0 +1,58 @@
+:root {
+    --col1: rgb(0, 255, 255);
+    --col2: rgb(0, 255, 106);
+    --col3: rgb(128, 0, 255);
+    --col4: rgb(255, 0, 128);
+    --col5: rgb(251, 255, 0);
+    --col6: rgb(255, 0, 0);
+}
+
+
+
+
+
+
+
+
+
+
+#section1::before {
+    background-color: var(--col1);
+}
+#section2::before {
+    background-color: var(--col2);
+}
+#section3::before {
+    background-color: var(--col3);
+}
+#section4::before {
+    background-color: var(--col4);
+}
+#section5::before {
+    background-color: var(--col5);
+}
+#section6::before {
+    background-color: var(--col6);
+}
+
+
+
+
+#section1 .jsinfo h2::after {
+    background-color: var(--col1);
+}
+#section2 .jsinfo h2::after {
+    background-color: var(--col2);
+}
+#section3 .jsinfo h2::after {
+    background-color: var(--col3);
+}
+#section4 .jsinfo h2::after {
+    background-color: var(--col4);
+}
+#section5 .jsinfo h2::after {
+    background-color: var(--col5);
+}
+#section6 .jsinfo h2::after {
+    background-color: var(--col6);
+}
