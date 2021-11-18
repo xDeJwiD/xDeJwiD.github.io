@@ -53,17 +53,22 @@ body {
     color: white;
     margin-bottom: 20px;
 }
-#header button {
+#header .btn {
     width: auto;
     height: auto;
     outline: none;
-    border: 4px solid rgb(255, 255, 255);
+    border: 2px solid rgb(255, 255, 255);
     color: white;
     border-radius: .5rem;
     background-color: transparent;
-    font-size: 2rem;
+    font-size: 1.6rem;
     font-weight: 700;
-    padding: 10px;
+    padding: 10px 30px;
+    transition: .2s ease-in-out;
+}
+#header .btn:hover {
+    background-color: white;
+    color: var(--bgc);
 }
 .section {
     width: 100%;
@@ -91,8 +96,7 @@ body {
 }
 .jsinfo::before {
     content: '';
-    width: 10%;
-    
+    width: 10%; 
 }
 .jsinfo h2 {
     color: rgb(255, 255, 255);
@@ -121,6 +125,7 @@ body {
     background-color: rgb(80, 80, 80);
     float: left;
     padding: 10px;
+    box-shadow: inset 0px 15px 10px -10px black;
 }
 .jspreview {
     width: 30%;
@@ -128,8 +133,9 @@ body {
     background-color: rgb(30, 30, 30);
     float: left;
     box-shadow: inset 20px 10px 20px 5px black;
-    color: white;
-    text-shadow: 7px 7px 3px black;
+    color: rgb(218, 218, 218);
+    text-shadow: 7px 7px 2px rgb(0, 0, 0);
+    font-weight: 300;
     overflow-y: auto;
     overflow-x: hidden;
     overflow-wrap: break-word;

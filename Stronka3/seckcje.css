@@ -1,4 +1,10 @@
 :root {
+    --bgc: rgb(46, 46, 46);
+
+
+
+
+
     --col1: rgb(0, 255, 255);
     --col2: rgb(0, 255, 106);
     --col3: rgb(128, 0, 255);
@@ -55,4 +61,27 @@
 }
 #section6 .jsinfo h2::after {
     background-color: var(--col6);
+}
+
+
+
+
+
+#section1 .js {
+    background: linear-gradient(var(--col1), transparent);
+}
+#section2 .js {
+    background: linear-gradient(var(--col2), transparent);
+}
+#section3 .js {
+    background: linear-gradient(var(--col3), transparent);
+}
+#section4 .js {
+    background: linear-gradient(var(--col4), transparent);
+}
+#section5 .js {
+    background: linear-gradient(var(--col5), transparent);
+}
+#section6 .js {
+    background: linear-gradient(var(--col6), transparent);
 }
