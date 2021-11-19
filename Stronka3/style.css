@@ -32,6 +32,8 @@
 
     --bgc: rgb(46, 46, 46);
 
+    --hackc: rgb(27, 132, 27);
+    
     --hh: 10vh;
 }
 
@@ -52,6 +54,7 @@ body {
     padding: 20px;
     color: white;
     margin-bottom: 20px;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
 }
 #header .btn {
     width: auto;
@@ -76,6 +79,7 @@ body {
     position: relative;
     background-color: var(--ebgc);
     margin-bottom: 20px;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
 }
 .section::before {
     content: '';
@@ -84,6 +88,7 @@ body {
     position: absolute;
     top: -20px;
     left: 0;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
 }
 .jsinfo {
     width: 40%;
@@ -93,10 +98,12 @@ body {
     box-shadow: inset 20px 20px 20px 5px black;
     text-align: center;
     padding: 20px;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
 }
 .jsinfo::before {
     content: '';
     width: 10%; 
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
 }
 .jsinfo h2 {
     color: rgb(255, 255, 255);
@@ -107,6 +114,7 @@ body {
     left: 0%;
     z-index: 20;
     line-height: 3rem;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
 }
 .jsinfo h2::after {
     border-radius: 0 0 20px 0;
@@ -118,6 +126,7 @@ body {
     top: 0;
     z-index: -1;
     box-shadow: 15px 15px 10px 1px black;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
 }
 .js {
     width: 30%;
@@ -126,6 +135,7 @@ body {
     float: left;
     padding: 10px;
     box-shadow: inset 0px 15px 10px -10px black;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
 }
 .jspreview {
     width: 30%;
@@ -133,7 +143,7 @@ body {
     background-color: rgb(30, 30, 30);
     float: left;
     box-shadow: inset 20px 10px 20px 5px black;
-    color: rgb(218, 218, 218);
+    color: rgb(255, 255, 255);
     text-shadow: 7px 7px 2px rgb(0, 0, 0);
     font-weight: 300;
     overflow-y: auto;
@@ -141,4 +151,49 @@ body {
     overflow-wrap: break-word;
     white-space: pre-wrap;
     padding: 20px;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
+}
+
+.dark-mode {
+    background-color: black;
+}
+.dark-mode #header {
+    background-color: rgba(0, 137, 0, 0.53);
+    color: black;
+}
+.dark-mode #header button {
+    border-color: black;
+    color: black;
+}
+.dark-mode #header .btn:hover {
+    background-color: black;
+    color: var(--hackc);
+}
+.dark-mode .section h2 {
+    color: black;
+}
+.dark-mode {
+    background-color: rgb(35, 35, 35);
+}
+.dark-mode .section .jsinfo, .dark-mode .section .jspreview {
+    background-color: black;
+    color: rgb(48, 199, 48);
+}
+
+.hack {
+    display: flex;
+    align-items: center;
+}
+.hack input {
+    font-weight: 900;
+    width: 15px;
+    height: 15px;
+    margin: 10px;
+    border-radius: 3rem;
+    background: blue;
+}
+
+.hack #Hackermode:checked {
+    color: rgb(149, 255, 0);
+    font-weight: 700;
 }

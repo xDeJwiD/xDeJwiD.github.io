@@ -1,8 +1,9 @@
 :root {
     --bgc: rgb(46, 46, 46);
 
-
-
+    --hackc: rgb(27, 132, 27);
+    --hackb: black;
+    --hackbg: rgb(0, 121, 8);
 
 
     --col1: rgb(0, 255, 255);
@@ -84,4 +85,94 @@
 }
 #section6 .js {
     background: linear-gradient(var(--col6), transparent);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.dark-mode #section1::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section2::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section3::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section4::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section5::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section6::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+
+
+
+
+.dark-mode #section1 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section2 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section3 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section4 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section5 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section6 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+
+
+
+
+
+.dark-mode #section1 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section2 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section3 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section4 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section5 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section6 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
 }

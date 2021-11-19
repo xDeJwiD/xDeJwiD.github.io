@@ -7,17 +7,31 @@
     <title>Test</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="seckcje.css">
+
+
+
+    <script>
+        function DarkMode() {
+            var element = document.body;
+            element.classList.toggle("dark-mode");
+}
+    </script>
 </head>
 <body>
     <div id="header">
         <h1>Strona z JavaScriptami</h1>
-        <div class="mode">
-            <button>HeCkEr mOdE</button>
+        <div class="hack">
+            <input type="checkbox" id="Hackermode" onclick="DarkMode()">
+            <label for="Hacker Mode">Hacker Mode</label>
         </div>
         <button class="btn">
             Autor
         </button>
     </div>
+
+
+
+
     <div class="section" id="section1">
         <div class="jsinfo">
             <h2>JavaScript nr 1</h2>
@@ -27,7 +41,7 @@
             var element = document.getElementById("box");
 
 element.scrollIntoView();
-element.scrollIntoView(false);
+            element.scrollIntoView(false);
 element.scrollIntoView({block: "end"});
 element.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
 var element = document.getElementById("box");
