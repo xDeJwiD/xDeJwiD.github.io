@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="seckcje.css">
     <link rel="stylesheet" href="wysokosci.css">
-
+    <script src="js.js"></script>
 
 
     <script>
@@ -30,8 +30,8 @@
         </button>
     </div>
 
-    <!-- <div id="przeladowanie">
-        <button onClick="window.location.reload();">Refresh Page</button>
+    <div id="reload">
+        <button onClick="window.location.reload();">Odśwież skrypty</button>
         <script>
             const reloadtButton = document.querySelector("#reload");
             // Reload everything:
@@ -41,8 +41,7 @@
             // Event listeners for reload
             reloadButton.addEventListener("click", reload, false);
         </script>
-    </div> -->
-
+    </div>
 
 
     <div class="section" id="section1">
@@ -125,15 +124,12 @@ function fontSize() {
             <h4>function</h4>
         </div>
         <div class="js">
-            <p>Funkcja która wykonuje działanie i podaje wynik</p>
-        
-            <p id="funk">s</p>
-        
+            <button type="button" onclick="test()">Klik</button>
+            
             <script>
-                function funkcja(p1, p2) {
-                    return p1 * p2;
+                function test() {
+                    window.alert('Taka funkcja przykladowa se, bo wszystko w sumie tu jest funkcją ')
                 }
-                document.getElementById("funk").innerHTML = funckja(3, 3);
             </script>
         </div>
         <div class="jspreview">    
@@ -145,6 +141,7 @@ function fontSize() {
             <h4>onclick</h4>
         </div>
         <div class="js">
+            <button type="button" onclick="style='display: none;'">Ale checa</button>
         </div>
         <div class="jspreview">
         </div>
@@ -155,6 +152,12 @@ function fontSize() {
             <h4>document.write()</h4>
         </div>
         <div class="js">
+            <button type="button" onclick="checa()">Kliknij aby zobaczyc zdjęcia</button>
+
+            <script>
+                function checa() {
+                    document.write('<body style="background-color:black;"><h1 style="font-size:5rem;color:white;">error 404</h1><div id="checa"><button style="padding:10px; border: 3px white solid; color:white; background-color:transparent; cursor:pointer;" onClick="window.location.reload();">Kliknij, aby wrócić :)</button></div></body>')}
+            </script>
         </div>
         <div class="jspreview">    
         </div>
@@ -165,6 +168,13 @@ function fontSize() {
             <h4>window.alert()</h4>
         </div>
         <div class="js">
+            <button type="button" onclick="test1()">Klik</button>
+            
+            <script>
+                function test1() {
+                    window.alert('Juz wyżej był ten przykład ale jeszcze raz żeby nie było :)')
+                }
+            </script>
         </div>
         <div class="jspreview">    
         </div>
@@ -175,6 +185,7 @@ function fontSize() {
             <h4>console.log()</h4>
         </div>
         <div class="js">
+            <button onclick="console.log('A jednak :O')">Kliknij, a nic sie nie stanie</button>
         </div>
         <div class="jspreview">    
         </div>
@@ -185,6 +196,26 @@ function fontSize() {
             <h4>konkatenacja</h4>
         </div>
         <div class="js">
+            <div id="przyciski">
+                <button type="button" onclick="dodawanie()">+</button>
+                <button type="button" onclick="odejmowanie()">-</button>
+                <button type="button" onclick="mnożenie()">*</button>
+                <button type="button" onclick="dzielenie()">/</button>
+                <button type="button" onclick="potegowanie()">^</button>
+                <button type="button" onclick="modulo()">%</button>
+                <button type="button" onclick="inkrementacja()">++</button>
+                <button type="button" onclick="dekrementacja()">--</button>
+            </div>
+            <br>
+            <input id="liczbajeden" type="number" placeholder="Wprowadź liczbę 1">
+            <br>
+            <input id="liczbadwa" type="number" placeholder="Wprowadź liczbę 2">
+            <br>
+            <p>
+                <span>Wynik =</span> <span id="wynik+"></span>
+            </p>
+
+            <p class="by">* stowrzył Dominik Piękoś *</p>
         </div>
         <div class="jspreview">    
         </div>
@@ -209,7 +240,7 @@ function fontSize() {
         <div class="jspreview">    
         </div>
     </div>
-    <div class="section" id="section13">
+    <!-- <div class="section" id="section13">
         <div class="jsinfo">
             <h2>JavaScript nr 13</h2>
             <h4>operatory arytmetyczne (+,-,*,**,/,%,++,--)</h4>
@@ -218,7 +249,7 @@ function fontSize() {
         </div>
         <div class="jspreview">    
         </div>
-    </div>
+    </div> -->
     <div class="section" id="section14">
         <div class="jsinfo">
             <h2>JavaScript nr 14</h2>
