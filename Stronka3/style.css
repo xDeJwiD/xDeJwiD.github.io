@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('http://fonts.cdnfonts.com/css/matrix');
 
 * {
     margin: 0;
@@ -88,10 +89,10 @@ body {
     position: absolute;
     top: -20px;
     left: 0;
-    transition: color .2s ease-in-out, background-color .2s ease-in-out;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out, box-shadow 1s ease-out;
 }
 .jsinfo {
-    width: 40%;
+    width: 25%;
     height: 100%;
     background-color: transparent;
     float: left;
@@ -114,6 +115,16 @@ body {
     left: 0%;
     z-index: 20;
     line-height: 3rem;
+}
+.jsinfo h4 {
+    color: rgb(255, 255, 255);
+    position: relative;
+    padding: 10px 30px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    line-height: 3rem;
     transition: color .2s ease-in-out, background-color .2s ease-in-out;
 }
 .jsinfo h2::after {
@@ -126,19 +137,38 @@ body {
     top: 0;
     z-index: -1;
     box-shadow: 15px 15px 10px 1px black;
-    transition: color .2s ease-in-out, background-color .2s ease-in-out;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out, box-shadow 1s ease-out;
 }
 .js {
-    width: 30%;
+    width: 40%;
     height: 100%;
     background-color: rgb(80, 80, 80);
     float: left;
     padding: 10px;
     box-shadow: inset 0px 15px 10px -10px black;
     transition: color .2s ease-in-out, background-color .2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.js {
+    font-weight: 600;
+    color: white;
+}
+.js button {
+    background-color: rgba(0, 0, 0, 0.461);
+    color: black;
+    padding: 20px;
+    margin: 10px;
+    border: rgb(255, 255, 255) 3px solid;
+    border-radius: .5rem;
+    font-weight: 500;
+    color: white;
+    cursor: pointer;
 }
 .jspreview {
-    width: 30%;
+    width: 35%;
     height: 100%;
     background-color: rgb(30, 30, 30);
     float: left;
@@ -175,11 +205,20 @@ body {
 .dark-mode {
     background-color: rgb(35, 35, 35);
 }
-.dark-mode .section .jsinfo, .dark-mode .section .jspreview {
+.dark-mode .section .jsinfo, .dark-mode .section .jspreview{
     background-color: black;
     color: rgb(48, 199, 48);
 }
-
+.dark-mode .section .jsinfo h4 {
+    color: rgb(48, 199, 48);
+}
+.dark-mode .section .js {
+    color: black;
+}
+.dark-mode .section .js button {
+    border: rgb(48, 199, 48) 3px solid;
+    color: rgb(48, 199, 48);
+}
 .hack {
     display: flex;
     align-items: center;
@@ -196,4 +235,23 @@ body {
 .hack #Hackermode:checked {
     color: rgb(149, 255, 0);
     font-weight: 700;
+}
+
+.dark-mode * {
+    font-family: 'Matrix', sans-serif;
+}
+
+
+
+#section3 {
+    height: 400px;
+}
+#section4 {
+    height: 600px;
+}
+#section4 .js {
+    width: 5%;
+}
+#section4 .jspreview {
+    width: 70%;
 }

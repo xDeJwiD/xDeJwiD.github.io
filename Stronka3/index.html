@@ -7,6 +7,7 @@
     <title>Test</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="seckcje.css">
+    <link rel="stylesheet" href="wysokosci.css">
 
 
 
@@ -29,81 +30,266 @@
         </button>
     </div>
 
+    <!-- <div id="przeladowanie">
+        <button onClick="window.location.reload();">Refresh Page</button>
+        <script>
+            const reloadtButton = document.querySelector("#reload");
+            // Reload everything:
+            function reload() {
+                reload = location.reload();
+            }
+            // Event listeners for reload
+            reloadButton.addEventListener("click", reload, false);
+        </script>
+    </div> -->
 
 
 
     <div class="section" id="section1">
         <div class="jsinfo">
             <h2>JavaScript nr 1</h2>
+            <h4>getElementById()</h4>
         </div>
-        <div class="js"></div>
+        <div class="js">
+            <button onclick="document.getElementById('test1').innerHTML = 'Brawo'">Kliknij tutaj aby pokazać tekst.</button>
+            <p id="test1"></p>
+
+        </div>
         <div class="jspreview">
-            var element = document.getElementById("box");
-
-element.scrollIntoView();
-            element.scrollIntoView(false);
-element.scrollIntoView({block: "end"});
-element.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
-var element = document.getElementById("box");
-
-element.scrollIntoView();
-element.scrollIntoView(false);
-element.scrollIntoView({block: "end"});
-element.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
-var element = document.getElementById("box");
-
-element.scrollIntoView();
-element.scrollIntoView(false);
-element.scrollIntoView({block: "end"});
-element.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
-var element = document.getElementById("box");
-
-element.scrollIntoView();
-element.scrollIntoView(false);
-element.scrollIntoView({block: "end"});
-element.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
-sdsadsa
-
-s
-
-
+            
+&lt;button onclick="document.getElementById('test1').innerHTML = 'Brawo'">Kliknij tutaj aby pokazać tekst.</button>
+<br>
+&lt;p id="test1"></p>
+            
         </div>
     </div>
     <div class="section" id="section2">
         <div class="jsinfo">
             <h2>JavaScript nr 2</h2>
+            <h4>style.fontSize</h4>
         </div>
-        <div class="js"></div>
-        <div class="jspreview">c</div>
+        <div class="js">
+            <p id="test2">Przykładowy tekst.</p>
+
+        <button type="button" onclick="fontSize()">Wiekszy tekst (klik)</button>
+ 
+        <script>
+        function fontSize() {
+         document.getElementById("test2").style.fontSize = "x-large";
+        }
+        </script>
+        </div>
+        <div class="jspreview">
+function fontSize() {
+    document.getElementById("test2").style.fontSize = "x-large";
+}
+        </div>
     </div>
     <div class="section" id="section3">
         <div class="jsinfo">
             <h2>JavaScript nr 3</h2>
+            <h4>style.display</h4>
         </div>
-        <div class="js"></div>
-        <div class="jspreview">c</div>
+        <div class="js">
+            <p>Kliknij aby usunąć klocek:</p>
+        
+            <button onclick="klocek()">Usuń!</button>
+        
+            <div id="klocek" style="width: 200px; height: 200px; background-color: brown; display: flex; align-items: center; justify-content: center;">
+                Klocek
+            </div>
+        
+            <script>
+                function klocek() {
+                    document.getElementById("klocek").style.display = "none";
+                }
+            </script>
+        </div>
+        <div class="jspreview">    
+        </div>
     </div>
     <div class="section" id="section4">
         <div class="jsinfo">
             <h2>JavaScript nr 4</h2>
+            <h4>gdzie wstawiamy skrypty?</h4>
         </div>
-        <div class="js"></div>
-        <div class="jspreview">c</div>
+        <div class="js">
+        </div>
+        <div class="jspreview">
+            ty no nie wiem
+        </div>
     </div>
     <div class="section" id="section5">
         <div class="jsinfo">
             <h2>JavaScript nr 5</h2>
+            <h4>function</h4>
         </div>
-        <div class="js"></div>
-        <div class="jspreview">c</div>
+        <div class="js">
+            <p>Funkcja która wykonuje działanie i podaje wynik</p>
+        
+            <p id="funk">s</p>
+        
+            <script>
+                function funkcja(p1, p2) {
+                    return p1 * p2;
+                }
+                document.getElementById("funk").innerHTML = funckja(3, 3);
+            </script>
+        </div>
+        <div class="jspreview">    
+        </div>
     </div>
     <div class="section" id="section6">
         <div class="jsinfo">
             <h2>JavaScript nr 6</h2>
+            <h4>onclick</h4>
         </div>
-        <div class="js"></div>
-        <div class="jspreview">c</div>
+        <div class="js">
+        </div>
+        <div class="jspreview">
+        </div>
     </div>
+    <div class="section" id="section7">
+        <div class="jsinfo">
+            <h2>JavaScript nr 7</h2>
+            <h4>document.write()</h4>
+        </div>
+        <div class="js">
+        </div>
+        <div class="jspreview">    
+        </div>
+    </div>
+    <div class="section" id="section8">
+        <div class="jsinfo">
+            <h2>JavaScript nr 8</h2>
+            <h4>window.alert()</h4>
+        </div>
+        <div class="js">
+        </div>
+        <div class="jspreview">    
+        </div>
+    </div>
+    <div class="section" id="section9">
+        <div class="jsinfo">
+            <h2>JavaScript nr 9</h2>
+            <h4>console.log()</h4>
+        </div>
+        <div class="js">
+        </div>
+        <div class="jspreview">    
+        </div>
+    </div>
+    <div class="section" id="section10">
+        <div class="jsinfo">
+            <h2>JavaScript nr 10</h2>
+            <h4>konkatenacja</h4>
+        </div>
+        <div class="js">
+        </div>
+        <div class="jspreview">    
+        </div>
+    </div>
+    <div class="section" id="section11">
+        <div class="jsinfo">
+            <h2>JavaScript nr 11</h2>
+            <h4>deklaracja zmiennych let, var i const</h4>
+        </div>
+        <div class="js">
+        </div>
+        <div class="jspreview">    
+        </div>
+    </div>
+    <div class="section" id="section12">
+        <div class="jsinfo">
+            <h2>JavaScript nr 12</h2>
+            <h4>komentarze</h4>
+        </div>
+        <div class="js">
+        </div>
+        <div class="jspreview">    
+        </div>
+    </div>
+    <div class="section" id="section13">
+        <div class="jsinfo">
+            <h2>JavaScript nr 13</h2>
+            <h4>operatory arytmetyczne (+,-,*,**,/,%,++,--)</h4>
+        </div>
+        <div class="js">
+        </div>
+        <div class="jspreview">    
+        </div>
+    </div>
+    <div class="section" id="section14">
+        <div class="jsinfo">
+            <h2>JavaScript nr 14</h2>
+            <h4>skrócone np. x+=1;</h4>
+        </div>
+        <div class="js">
+        </div>
+        <div class="jspreview">    
+        </div>
+    </div>
+    <div class="section" id="section15">
+        <div class="jsinfo">
+            <h2>JavaScript nr 15</h2>
+            <h4>operatory porównania (==,===,!=,!==,>,<,>=,<=)</h4>
+        </div>
+        <div class="js">
+        </div>
+        <div class="jspreview">    
+        </div>
+    </div>
+    <div class="section" id="section16">
+        <div class="jsinfo">
+            <h2>JavaScript nr 16</h2>
+            <h4>operatory logiczne (&&, ||, !)</h4>
+        </div>
+        <div class="js">
+        </div>
+        <div class="jspreview">    
+        </div>
+    </div>
+    <div class="section" id="section17">
+        <div class="jsinfo">
+            <h2>JavaScript nr 17</h2>
+            <h4>typeof()</h4>
+        </div>
+        <div class="js">
+        </div>
+        <div class="jspreview">    
+        </div>
+    </div>
+    <div class="section" id="section18">
+        <div class="jsinfo">
+            <h2>JavaScript nr 18</h2>
+            <h4>typy zmiennych</h4>
+        </div>
+        <div class="js">
+        </div>
+        <div class="jspreview">    
+        </div>
+    </div>
+    <div class="section" id="section19">
+        <div class="jsinfo">
+            <h2>JavaScript nr 19</h2>
+            <h4>funkcja z parametrami</h4>
+        </div>
+        <div class="js">
+        </div>
+        <div class="jspreview">    
+        </div>
+    </div>
+    <div class="section" id="section20">
+        <div class="jsinfo">
+            <h2>JavaScript nr 20</h2>
+            <h4>zmienna obiektowa</h4>
+        </div>
+        <div class="js">
+        </div>
+        <div class="jspreview">    
+        </div>
+    </div>
+    
 
     
 </body>
