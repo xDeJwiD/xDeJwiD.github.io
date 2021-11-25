@@ -195,6 +195,7 @@ body {
 .js {
     font-weight: 600;
     color: white;
+    text-shadow: 0px 0px 10px black;
 }
 .js button {
     background-color: rgba(0, 0, 0, 0.461);
@@ -352,7 +353,7 @@ p.by {
     color: white;
 }
 .section .js p {
-    font-weight: 200;
+    font-weight: 400;
 }
 
 .sbody {
