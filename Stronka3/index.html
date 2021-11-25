@@ -25,8 +25,13 @@
             <input type="checkbox" id="Hackermode" onclick="DarkMode()">
             <label for="Hacker Mode">Hacker Mode</label>
         </div>
-        <button class="btn">
+        <button class="btn" onclick="autor()">
             Autor
+            <script>
+                function autor() {
+                    window.alert('AUTOREM JEST DAWID SZYMANOWSKI 3TI')
+                }
+            </script>
         </button>
     </div>
 
@@ -220,7 +225,7 @@ function fontSize() {
         <div class="jspreview">    
         </div>
     </div>
-    <div class="section" id="section11">
+    <!-- <div class="section" id="section11">
         <div class="jsinfo">
             <h2>JavaScript nr 11</h2>
             <h4>deklaracja zmiennych let, var i const</h4>
@@ -229,7 +234,7 @@ function fontSize() {
         </div>
         <div class="jspreview">    
         </div>
-    </div>
+    </div> -->
     <div class="section" id="section12">
         <div class="jsinfo">
             <h2>JavaScript nr 12</h2>
@@ -237,20 +242,60 @@ function fontSize() {
         </div>
         <div class="js">
         </div>
-        <div class="jspreview">    
+        <div class="jspreview">
+// function klocek() {
+//     document.getElementById("klocek").style.display = "none";
+// }
+
+
+LUB
+
+
+&lt;!-- &lt;script>
+                function klocek() {
+                    document.getElementById("klocek").style.display = "none";
+                }
+&lt;/script> -->
         </div>
     </div>
-    <!-- <div class="section" id="section13">
+    <div class="section" id="section13">
         <div class="jsinfo">
             <h2>JavaScript nr 13</h2>
             <h4>operatory arytmetyczne (+,-,*,**,/,%,++,--)</h4>
         </div>
         <div class="js">
+            <p>Operatory arytmetyczne występujące w java scriptcie to:</p>
+            <ul>
+                <li>
+                    <p>+ - dodawanie</p>
+                </li>
+                <li>
+                    <p>- - odejmowanie</p>
+                </li>
+                <li>
+                    <p>* - mnożenie</p>
+                </li>
+                <li>
+                    <p>** - potęgowanie</p>
+                </li>
+                <li>
+                    <p>/ - dzielenie</p>
+                </li>
+                <li>
+                    <p>% - modulo czyli reszta z dzielenia</p>
+                </li>
+                <li>
+                    <p>++ - inkrementacja, dodaje 1 do operatora</p>
+                </li>
+                <li>
+                    <p>-- - dekrementacja, oddejmuje 1 od operatora</p>
+                </li>
+            </ul>
         </div>
         <div class="jspreview">    
         </div>
-    </div> -->
-    <div class="section" id="section14">
+    </div>
+    <!-- <div class="section" id="section14">
         <div class="jsinfo">
             <h2>JavaScript nr 14</h2>
             <h4>skrócone np. x+=1;</h4>
@@ -259,13 +304,45 @@ function fontSize() {
         </div>
         <div class="jspreview">    
         </div>
-    </div>
+    </div> -->
     <div class="section" id="section15">
         <div class="jsinfo">
             <h2>JavaScript nr 15</h2>
             <h4>operatory porównania (==,===,!=,!==,>,<,>=,<=)</h4>
         </div>
         <div class="js">
+            <p>Operatory porównania to:</p>
+            <ul>
+                <li>
+                    <p>== - równa się</p>
+                </li>
+                <li>
+                    <p>=== - równa wartość i równy typ</p>
+                </li>
+                <li>
+                    <p>!= - nie równe</p>
+                </li>
+                <li>
+                    <p>!== - nie równa wartość bądź nie równy typ</p>
+                </li>
+                <li>
+                    <p>> - większe niż</p>
+                </li>
+                <li>
+                    <p>
+                        < - mniejsze niż</p>
+                </li>
+                <li>
+                    <p>>= - większe bądź równe</p>
+                </li>
+                <li>
+                    <p>
+                        <= - mniejsze niż bądź równe</p>
+                </li>
+                <li>
+                    <p>? - skrócony if</p>
+                </li>
+            </ul>
         </div>
         <div class="jspreview">    
         </div>
@@ -276,8 +353,46 @@ function fontSize() {
             <h4>operatory logiczne (&&, ||, !)</h4>
         </div>
         <div class="js">
+            <p>Operatory logiczne to:</p>
+            <ul>
+                <li>
+                    <p>&& - and</p>
+                </li>
+                <li>
+                    <p>|| - or</p>
+                </li>
+                <li>
+                    <p>! - not</p>
+                </li>
+            </ul>
         </div>
-        <div class="jspreview">    
+        <div class="jspreview">
+&lt;script>
+    let x = 6;
+    let y = 3;
+
+    document.getElementById("demo").innerHTML =
+        (x < 10 && y > 1) + "&lt;br>" +
+        (x < 10 && y < 1);
+&lt;/script>
+&lt;script>
+    let x = 6;
+    let y = 3;
+
+    document.getElementById("demo").innerHTML =
+        (x == 5 || y == 5) + "&lt;br>" +
+        (x == 6 || y == 0) + "&lt;br>" +
+        (x == 0 || y == 3) + "&lt;br>" +
+        (x == 6 || y == 3);
+&lt;/script>
+&lt;script>
+    let x = 6;
+    let y = 3;
+
+    document.getElementById("demo").innerHTML =
+        !(x === y) + "&lt;br>" +
+        !(x > y);
+&lt;/script>
         </div>
     </div>
     <div class="section" id="section17">
@@ -286,8 +401,17 @@ function fontSize() {
             <h4>typeof()</h4>
         </div>
         <div class="js">
+            <p id="typ"></p>
+            <script>
+                document.getElementById('typ').innerHTML =
+                    typeof "tekst tu jest raczej" + "<br>" + typeof 2137;
+            </script>
         </div>
-        <div class="jspreview">    
+        <div class="jspreview">   
+
+    document.getElementById('typ').innerHTML =
+        typeof "tekst tu jest raczej" + "&lt;br>" + typeof 2137;
+
         </div>
     </div>
     <div class="section" id="section18">
@@ -296,6 +420,30 @@ function fontSize() {
             <h4>typy zmiennych</h4>
         </div>
         <div class="js">
+            <p>Typy zmiennych to:</p>
+            <ul>
+                <li>
+                    <p>String - słowa</p>
+                </li>
+                <li>
+                    <p>Numbers - liczby</p>
+                </li>
+                <li>
+                    <p>Booleans - true / false</p>
+                </li>
+                <li>
+                    <p>Arrays - tablica, np: czipsy = ["Lays", "Ziemniaczki", "Cheetos"]</p>
+                </li>
+                <li>
+                    <p>Objects - ludzie = {firstName:"John", lastName:"Doe", age:96, eyeColor:"violet"}</p>
+                </li>
+                <li>
+                    <p>Undefined - nieokreślone, cat = undefined. Wartość zmiennej cat jest undefined</p>
+                </li>
+                <li>
+                    <p>Empty - puste, Let dog = "", wartość zmiennej dog to string</p>
+                </li>
+            </ul>
         </div>
         <div class="jspreview">    
         </div>
@@ -307,10 +455,16 @@ function fontSize() {
         </div>
         <div class="js">
         </div>
-        <div class="jspreview">    
+        <div class="jspreview">
+function dod(a, b) {
+    return a + b;
+}
+            
+console.log( dod(2, 3) ); //5
+console.log( dod(4, 3) ); //7
         </div>
     </div>
-    <div class="section" id="section20">
+    <!-- <div class="section" id="section20">
         <div class="jsinfo">
             <h2>JavaScript nr 20</h2>
             <h4>zmienna obiektowa</h4>
@@ -318,6 +472,136 @@ function fontSize() {
         <div class="js">
         </div>
         <div class="jspreview">    
+        </div>
+    </div> -->
+    <div class="section" id="section21">
+        <div class="jsinfo">
+            <h2>JavaScript nr 21</h2>
+            <h4>zdarzenia</h4>
+        </div>
+        <div class="js">
+            <ul>
+                <li>
+                    <p onchange="style='color:red;'">onchange - Element został zmieniony.</p>
+                </li>
+                <li>
+                    <p onclick="style='color:red;'">onclick - Użytkownik kliknął na element.</p>
+                </li>
+                <li>
+                    <p ondblclick="style='color:red;'">ondblclick - Użytkownik kliknął na element dwa razy.</p>
+                </li>
+                <li>
+                    <p onmouseover="style='color:red;'">onmouseover - Kursor myszy najechał na element.</p>
+                </li>
+                <li>
+                    <p onmouseout="style='color:red;'">onmouseout - Kursor myszy zjechał z elementu.</p>
+                </li>
+                <li>
+                    <p onkeydown="style='color:red;'">onkeydown - Użytkownik wcisnął klawisz na klawiaturze.</p>
+                </li>
+                <li>
+                    <p onload="style='color:red;'">onload - Przeglądarka skończyła łądować strone.</p>
+                </li>
+                <li>
+                    <p ondrag="style='color:red;'">ondrag - Na dragach.</p>
+                </li>
+                <li>
+                    <p onvolumechange="style='color:red;'">onvolumechange - Przy zmianie głośności.</p>
+                </li>
+            </ul>
+        </div>
+        <div class="jspreview">
+&lt;p onclick="style='color:red;'">onclick - Użytkownik kliknął na element.</p>
+&lt;p ondblclick="style='color:red;'">ondblclick - Użytkownik kliknął na element dwa razy.</p>
+&lt;p onmouseover="style='color:red;'">onmouseover - Kursor myszy najechał na element.</p>
+&lt;p onmouseout="style='color:red;'">onmouseout - Kursor myszy zjechał z elementu.</p>
+        </div>
+    </div>
+    <div class="section" id="section22">
+        <div class="jsinfo">
+            <h2>JavaScript nr 22</h2>
+            <h4>string length</h4>
+        </div>
+        <div class="js">
+            <p id="jd"></p>
+            <script>
+                let text = "ciekawe ile te zdanie ma liter wyrazor itd bardzo jestem ciekawy";
+                document.getElementById("jd").innerHTML = text.length;
+            </script>
+        </div>
+        <div class="jspreview">
+&lt;script>
+    let text = "ciekawe ile te zdanie ma liter wyrazor itd bardzo jestem ciekawy";
+    document.getElementById("jd").innerHTML = text.length;
+&lt;/script>
+        </div>
+    </div>
+    <div class="section" id="section23">
+        <div class="jsinfo">
+            <h2>JavaScript nr 23</h2>
+            <h4>\"</h4>
+            <p>Ponieważ stringa wpisujemy między "", jest problem z cytatami itd. Aby tego uniknąć wykorzystujemy \"</p>
+        </div>
+        <div class="js">
+            <br>
+            <p id="cos"></p>
+            <script>
+                let a = "Hello It\'s' Dawid\'s Page";
+                document.getElementById("cos").innerHTML = a;
+            </script>
+        </div>
+        <div class="jspreview">
+&lt;script>
+    let a = "Hello It\'s' Dawid\'s Page";
+    document.getElementById("cos").innerHTML = a;
+&lt;/script>
+        </div>
+    </div>
+    <div class="section" id="section24">
+        <div class="jsinfo">
+            <h2>JavaScript nr 24</h2>
+            <h4>slice(), substring(), substr()</h4>
+        </div>
+        <div class="js">
+            <p>Metoda slice() pozwala na wycięcie części stringa jako nowy string. Trzeba podać wartość początkową i
+                końcową. Uwaga! Liczenie zaczyna się od zera i liczy się każdy znak nawet spacja. Można uzywać
+                negatywnych wartości</p>
+                <br>
+            <p>Metoda substring() działa tak samo jak slice() z tą róznicą że nie przyjmuje negatywnych wartości</p>
+            <br>
+            <p>Metoda substr() działa tak samo jak slice() z tą różnicą że druga wartość jaką podajemy to długość
+                wyciętego elementu</p>
+        </div>
+        <div class="jspreview">
+&lt;script>
+    let str = "Arbuz, Grejfrut, Kiwi";
+    document.getElementById("pies").innerHTML = str.slice(7, 12);
+&lt;/script>
+        </div>
+    </div>
+    <div class="section" id="section25">
+        <div class="jsinfo">
+            <h2>JavaScript nr 25</h2>
+            <h4>indexOf(), search()</h4>
+        </div>
+        <div class="js">
+            <p>Metoda indexOf() pozwala na wyszukiwanie w stringu pierwszego podanego elementu. Podaje on wtedy
+            początkową jego wartość. Można dodać też drugą wartość by szukało od danego miejsca.</p>
+            <br>
+            <p>Metoda search() działa tak samo jak indexOf(). Jednak te dwie metody róznią się od siebie. Search() nie
+            przyjmuje drugiej wartości.</p>
+            <br>
+            <p id="koko"></p>
+            <script>
+                let elo = "No tak \'śrenio\' bym powiedział, tak średnio";
+                document.getElementById("koko").innerHTML = elo.indexOf("średnio");
+            </script>
+        </div>
+        <div class="jspreview">   
+&lt;script>
+    let elo = "No tak \'śrenio\' bym powiedział, tak \'średnio'\";
+    document.getElementById("koko").innerHTML = elo.indexOf("średnio");
+&lt;/script> 
         </div>
     </div>
     
