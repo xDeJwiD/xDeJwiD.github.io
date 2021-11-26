@@ -51,11 +51,10 @@
             width: 40px;
             height: 40px;
             color: black;
-            transition: transform ease-in-out .5s, background-color ease-in-out .5s, color ease-in-out .5s;
+            transition: background-color ease-in-out .5s, color ease-in-out .5s;
         }
         body.dark-mode #top svg {
             color: white;
-            transform: rotate(180deg);
         }
         
 
@@ -83,6 +82,8 @@
             --col1: rgb(232, 232, 232);
 
             --col2: rgb(39, 39, 39);
+
+            -col3: black;
         }
 
 
@@ -184,17 +185,77 @@
             box-shadow:  10px 10px 20px 1px rgba(0, 0, 0, 0.734), 
                          -10px -10px 20px 1px rgba(255, 255, 255, 0.213);
         }
+        body.dark-mode .butony{
+            background-color: var(--col2);
+            box-shadow:  10px 10px 20px 1px rgba(0, 0, 0, 0.734), 
+                         -10px -10px 20px 1px rgba(255, 255, 255, 0.213);
+        }
+        
+
+
+
+        body.neon-mode #top {
+            background-color: var(--col3);
+        }
+        body.neon-mode #mid {
+            box-shadow: 0 0 0 0 white, 
+                        0 0 0 0 white;
+        }
+        body.neon-mode {
+            background-color: var(--col3);
+            color: rgb(39, 39, 39);
+        }
+        body.neon-mode #mid{
+            background-color: var(--col3);
+            color: white;
+        }
+        body.neon-mode #top{
+            background-color: var(--col3);
+            color: white;
+            border: 3px white solid;
+            box-shadow: 0 0 15px 10px rgb(0, 251, 255), 
+                        inset 0 0 15px 10px rgb(0, 251, 255);
+        }
+        body.neon-mode #mid a{
+            background-color: var(--col3);
+            border: 3px white solid;
+            box-shadow: 0 0 15px 10px rgb(0, 251, 255), 
+                        inset 0 0 15px 10px rgb(0, 251, 255);
+            color: white;
+        }
+        body.neon-mode #mid a:hover{
+            box-shadow: 0 0 0 0 white, 
+                        0 0 0 0 white;
+        }
+        body.neon-mode #mid a .karta .zdjecie {
+            box-shadow: 0 0 0 0 white, 
+                        0 0 0 0 white;
+            background-color: var(--col3);
+        }
+
+        body.neon-mode .box{
+            background-color: var(--col3);
+            box-shadow: 0 0 0 0 white, 
+                        0 0 0 0 white;
+            color: white;
+        }
+        body.neon-mode .butony{
+            background-color: var(--col3);
+            box-shadow: 0 0 0 0 white, 
+                        0 0 0 0 white;
+            color: white;
+        }
         .box {
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: space-evenly;
             align-items: center;
             margin: 10px;
             font-weight: 700;
             width: fit-content;
             height: max-content;
             background-color: var(--col1);
-            padding: 10px;
+            padding: 20px;
             line-height: 1.3rem;
             border-radius: 20rem;
             box-shadow:  10px 10px 20px 1px rgba(0, 0, 0, 0.297), 
@@ -202,13 +263,58 @@
             transition: transform ease-in-out .2s, background-color ease-in-out .5s, box-shadow ease-in-out .5s, filter ease-in-out .2s;
 
         }
-        #CounterVisitor {
-            font-size: 2.4rem;
+        .butony {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+            align-items: center;
+            margin: 10px;
+            font-weight: 700;
+            width: fit-content;
+            height: 70%;
+            background-color: var(--col1);
+            padding: 5px;
+            line-height: 1rem;
+            border-radius: 20rem;
+            box-shadow:  10px 10px 20px 1px rgba(0, 0, 0, 0.297), 
+                         -10px -10px 20px 1px rgb(255, 255, 255);
+            transition: transform ease-in-out .2s, background-color ease-in-out .5s, box-shadow ease-in-out .5s, filter ease-in-out .2s;
+
+        }
+        #counter {
+            font-size: 1.7rem;
+        }
+
+        .btn {
+            font-weight: 600;
+            line-height: .8rem;
+        }
+        body.dark-mode .btn {
+            font-weight: 600;
+            line-height: .8rem;
+            color: white;
+        }
+
+        .darkk svg{
+            transform: rotate(180deg);
+        }
+        body.dark-mode .darkk>svg{
+            color: white;
+            transform: rotate(0deg);
+        }
+
+        .neonn svg{
+            transform: rotate(180deg);
+        }
+        body.neon-mode .neonn>svg{
+            color: white;
+            transform: rotate(0deg);
         }
 
 
-
-
+        body.neon-mode {
+            background-color: rgb(0, 0, 0);
+        }
 
     </style>
 
@@ -220,6 +326,13 @@
 function DarkMode() {
   var element = document.body;
   element.classList.toggle("dark-mode");
+  element.classList.remove("neon-mode");
+}
+
+function NeonMode() {
+  var element = document.body;
+  element.classList.toggle("neon-mode");
+  element.classList.remove("dark-mode");
 }
 
 
@@ -227,9 +340,16 @@ function DarkMode() {
 </head>
 <body>
     <div id="top">
-        <!-- <div class="box">
-            <div id="CounterVisitor"></div>
-            <h5>ludzi tu było</h5>
+        <div class="box">
+            <div id="counter">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <h5 style="font-size: 1.1rem;">ludzi tu było</h5>
             
             <script>
             var n = localStorage.getItem('on_load_counter');
@@ -248,22 +368,26 @@ function DarkMode() {
             }
             
             </script>
-        </div> -->
+        </div>
 
-        <div class="counter">
-            <span>0</span>
-            <span>0</span>
-            <span>0</span>
-            <span>0</span>
-            <span>0</span>
-            <span>0</span>
+        
+        
+        <div class="butony">
+            <!-- <button onclick="NeonMode()" class="neonn btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-toggle-on" viewBox="0 0 16 16">
+                    <path d="M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10H5zm6 9a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/>
+                </svg>
+                Cos Mode
+            </button> -->
+            <button onclick="DarkMode()" class="darkk btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-toggle-on" viewBox="0 0 16 16">
+                    <path d="M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10H5zm6 9a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/>
+                </svg>
+                  Dark Mode
+            </button>
+            
         </div>
         
-        <button onclick="DarkMode()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-circle-half" viewBox="0 0 16 16">
-                <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
-            </svg>
-        </button>
         
     </div>
 
