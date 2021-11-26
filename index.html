@@ -34,7 +34,7 @@
             background-color: var(--col1);
             margin-bottom: 40px;
             display: flex;
-            justify-content: right;
+            justify-content: space-between;
             align-items: center;
             transition: transform ease-in-out .2s, background-color ease-in-out .5s, color ease-in-out .5s;
         }
@@ -109,6 +109,7 @@
             transform: scale(1.03);
             box-shadow:  10px 10px 20px 1px rgba(0, 0, 0, 0.297), 
                          -10px -10px 20px 1px rgb(255, 255, 255);
+            color: black;
         }
         a:hover .zdjecie{
             filter: grayscale(0);
@@ -178,7 +179,32 @@
             background-color: var(--col2);
         }
 
-        
+        body.dark-mode .box{
+            background-color: var(--col2);
+            box-shadow:  10px 10px 20px 1px rgba(0, 0, 0, 0.734), 
+                         -10px -10px 20px 1px rgba(255, 255, 255, 0.213);
+        }
+        .box {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 10px;
+            font-weight: 700;
+            width: fit-content;
+            height: max-content;
+            background-color: var(--col1);
+            padding: 10px;
+            line-height: 1.3rem;
+            border-radius: 20rem;
+            box-shadow:  10px 10px 20px 1px rgba(0, 0, 0, 0.297), 
+                         -10px -10px 20px 1px rgb(255, 255, 255);
+            transition: transform ease-in-out .2s, background-color ease-in-out .5s, box-shadow ease-in-out .5s, filter ease-in-out .2s;
+
+        }
+        #CounterVisitor {
+            font-size: 2.4rem;
+        }
 
 
 
@@ -201,11 +227,44 @@ function DarkMode() {
 </head>
 <body>
     <div id="top">
+        <!-- <div class="box">
+            <div id="CounterVisitor"></div>
+            <h5>ludzi tu było</h5>
+            
+            <script>
+            var n = localStorage.getItem('on_load_counter');
+            
+            if (n === null) {
+              n = 0;
+            }
+            n++;
+            
+            localStorage.setItem("on_load_counter", n);
+            
+            nums = n.toString().split('').map(Number);
+            document.getElementById('CounterVisitor').innerHTML = '';
+            for (var i of nums) {
+              document.getElementById('CounterVisitor').innerHTML += '<span class="counter-item">' + i + '</span>';
+            }
+            
+            </script>
+        </div> -->
+
+        <div class="counter">
+            <span>0</span>
+            <span>0</span>
+            <span>0</span>
+            <span>0</span>
+            <span>0</span>
+            <span>0</span>
+        </div>
+        
         <button onclick="DarkMode()">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-circle-half" viewBox="0 0 16 16">
                 <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
             </svg>
         </button>
+        
     </div>
 
     <div id="mid">
@@ -240,7 +299,6 @@ function DarkMode() {
         </a>
         
     </div>
-
-    
+    <script src="./counter.js"></script>
 </body>
 </html>
