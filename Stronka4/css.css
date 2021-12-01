@@ -1,0 +1,36 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    cursor: none;
+}
+
+body {
+    background-color: black;
+}
+
+#kolo{
+    position: absolute;
+    top:50%;
+    left:50%;
+    height: 20px;
+    width:20px;
+    transform: translate(-50%,-50%);
+    background:rgb(255, 255, 255);
+    border-radius: 50%;
+    transition:0;
+    z-index: 1000;
+}
+
+#no {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    left: 0px;
+    top: 70%;
+    background-color: violet;
+}
+
+.onDrag {
+    background-color: yellow;
+}

@@ -12,6 +12,7 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap');
+        
         * {
             margin: 0;
             padding: 0;
@@ -100,11 +101,12 @@
             padding: 20px;
             border-radius: 50px;
             text-align: center;
+            border: 0px white solid;
             box-shadow:  10px 10px 20px 5px rgba(0, 0, 0, 0.297), 
                          -10px -10px 20px 5px rgb(255, 255, 255);
             color: var(--col2);
             z-index: 1;
-            transition: transform ease-in-out .2s, background-color ease-in-out .5s, color ease-in-out .5s, box-shadow ease-in-out .5s;
+            transition: transform ease-in-out .2s, background-color ease-in-out .5s, color ease-in-out .5s, box-shadow ease-in-out .5s, filter ease-in-out .5s;
         }
         a:hover {
             transform: scale(1.03);
@@ -157,6 +159,7 @@
         body.dark-mode #mid{
             background-color: var(--col2);
             color: white;
+            
             box-shadow: inset 15px 15px 20px 5px rgba(0, 0, 0, 0.734), 
                         inset -15px -15px 20px 5px rgba(255, 255, 255, 0.213);
         }
@@ -169,6 +172,7 @@
             box-shadow: 10px 10px 20px 5px rgba(0, 0, 0, 0.734), 
                         -10px -10px 20px 5px rgba(255, 255, 255, 0.213);
             color: white;
+            transition: transform ease-in-out .2s, background-color ease-in-out .5s, box-shadow ease-in-out .5s, filter ease-in-out .2s;
         }
         body.dark-mode #mid a:hover{
             box-shadow:  10px 10px 20px 1px rgba(0, 0, 0, 0.734), 
@@ -213,8 +217,8 @@
             background-color: var(--col3);
             color: white;
             border: 3px white solid;
-            box-shadow: 0 0 15px 10px rgb(0, 251, 255), 
-                        inset 0 0 15px 10px rgb(0, 251, 255);
+            box-shadow: 0 0 15px 10px rgb(204, 123, 255), 
+                        inset 0 0 15px 10px rgb(204, 123, 255);
         }
         body.neon-mode #mid a{
             background-color: var(--col3);
@@ -224,13 +228,17 @@
             color: white;
         }
         body.neon-mode #mid a:hover{
-            box-shadow: 0 0 0 0 white, 
-                        0 0 0 0 white;
+            background-color: var(--col3);
+            border: 3px white solid;
+            box-shadow: 0 0 25px 20px rgb(0, 251, 255), 
+                        inset 0 0 25px 20px rgb(0, 251, 255);
+            color: white;
         }
         body.neon-mode #mid a .karta .zdjecie {
-            box-shadow: 0 0 0 0 white, 
-                        0 0 0 0 white;
             background-color: var(--col3);
+            border: 3px white solid;
+            box-shadow: 0 0 15px 10px rgb(0, 251, 255), 
+                        inset 0 0 15px 10px rgb(0, 251, 255);
         }
 
         body.neon-mode .box{
@@ -306,11 +314,55 @@
         .neonn svg{
             transform: rotate(180deg);
         }
-        body.neon-mode .neonn>svg{
+        body.neon-mode .neonn{
             color: white;
             transform: rotate(0deg);
         }
+        body.neon-mode .neonn svg {
+            filter: invert(1);
+        }
+        body.neon-mode button {
+            color: white;
+        }
+        body.neon-mode button svg {
+            filter: invert(1);
+        }
 
+        body.neon-mode #mid a:nth-child(1) {
+            box-shadow: 0 0 15px 10px rgb(0, 251, 255), 
+                        inset 0 0 15px 10px rgb(0, 251, 255);
+        }
+        body.neon-mode #mid a:nth-child(1):hover {
+            box-shadow: 0 0 25px 20px rgb(0, 251, 255), 
+                        inset 0 0 25px 20px rgb(0, 251, 255);
+        }
+        body.neon-mode #mid a:nth-child(1) .karta .zdjecie {
+            background-color: var(--col3);
+            border: 3px white solid;
+            box-shadow: 0 0 15px 10px rgb(0, 251, 255), 
+                        inset 0 0 15px 10px rgb(0, 251, 255);
+        }
+
+        body.neon-mode #mid a:nth-child(2) {
+            box-shadow: 0 0 15px 10px rgb(128, 255, 0), 
+                        inset 0 0 15px 10px rgb(128, 255, 0);
+        }
+        body.neon-mode #mid a:nth-child(2):hover {
+            box-shadow: 0 0 25px 20px rgb(128, 255, 0), 
+                        inset 0 0 25px 20px rgb(128, 255, 0);
+        }
+
+        body.neon-mode #mid a:nth-child(3) {
+            box-shadow: 0 0 15px 10px rgb(255, 0, 225), 
+                        inset 0 0 15px 10px rgb(255, 0, 225);
+        }
+        body.neon-mode #mid a:nth-child(3):hover {
+            box-shadow: 0 0 25px 20px rgb(255, 0, 225), 
+                        inset 0 0 25px 20px rgb(255, 0, 225);
+        }
+
+
+    
 
         body.neon-mode {
             background-color: rgb(0, 0, 0);
@@ -371,6 +423,7 @@ function NeonMode() {
         </div>
 
         
+        <a href="./Stronka4/index.html" style="width: 10px;height: 100%;box-shadow: none;"></a>
         
         <div class="butony">
             <!-- <button onclick="NeonMode()" class="neonn btn">
