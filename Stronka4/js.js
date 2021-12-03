@@ -15,87 +15,17 @@ document.onmouseout = (event) => {
     kolo.style.top = "50%";
 }
 
+document.getElementById("pole")
+function cos() {
+  var div = document.createElement('div');
+     div.style.backgroundColor = "pink";
+     div.style.position = "absolute";
+     div.style.transform = "translate(-50%, -50%)"
+     div.style.left = kolo.style.left;
+     div.style.top = kolo.style.top;
+     div.style.height = "10px";
+     div.style.width = "10px";
+     div.style.borderRadius = "50rem"
 
-
-
-
-
-
-
-
-
-var kolo;
-window.onload=function(){
-  var no = document.getElementById("no");
-  kolo = document.getElementById("kolo");
-  
-  initDrag({
-    element: kolo,
-    start: function(){addShadow();},
-    drag: function(){isCollapsed(kolo, no);},
-    stop: function(){removeShadow();}
-  });
-}
-
-function isCollapsed(kolo, no){
-  var object_1 = kolo.getBoundingClientRect();
-  var object_2 = no.getBoundingClientRect();
-  
-  if (object_1.left < object_2.left + object_2.width  && object_1.left + object_1.width  > object_2.left &&
-		object_1.top < object_2.top + object_2.height && object_1.top + object_1.height > object_2.top) {
-    no.classList.add("collide");
-  }
-  else{
-    no.classList.remove("collide");
-  }
-}
-
-
-function addShadow(){
-  kolo.classList.add("onDrag");
-}
-
-function removeShadow(){
-  kolo.classList.remove("onDrag");
-}
-
-function initDrag(options){
-  var element = options.element;
-  var mousedown, mouseup, mousemove,
-      dragStart, initX, initY,
-      offsetLeft, offsetTop;
-  
-  function mouseMove(ev){
-    if(dragStart){
-      var newX = offsetLeft + (ev.pageX - initX);
-      var newY = offsetTop + (ev.pageY - initY);
-
-      element.style.top = newY+"px";
-      element.style.left = newX+"px";
-      
-      options.drag.call();
-    }
-  }
-  
-  function mouseUp(ev){
-    dragStart = false;
-    document.removeEventListener("mousemove", mouseMove, false);
-    document.removeEventListener("mouseup", mouseUp, false);
-    
-    options.stop.call();
-  }
-  
-  function mouseDown(ev){
-    initX = ev.pageX;
-    initY = ev.pageY;
-    dragStart = true;
-    offsetLeft = element.offsetLeft;
-    offsetTop = element.offsetTop;
-    document.addEventListener("mousemove", function(ev){mouseMove(ev)}, false);
-    document.addEventListener("mouseup", function(ev){mouseUp(ev)}, false);
-    
-    options.start.call();
-  }
-  
-  element.addEventListener("mousedown", function(ev){mouseDown(ev)}, false);
-}
+     document.getElementsByTagName('body')[0].appendChild(div);
+};
