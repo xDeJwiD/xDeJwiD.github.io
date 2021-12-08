@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skrypt</title>
+    <link rel="stylesheet" href="css.css">
+    <script src="skrypot.js"></script>
+</head>
+<body>
+    <div class="main">
+        <h4>Wybierz opcje i podaj dane byku</h4>
+        <input type="text" placeholder="Imię" id="imie" class="cs">
+        <input type="text" placeholder="Nazwisko" id="nazw" class="cs">
+        <input type="email" placeholder="E-mail" id="mail" class="cs">
+        <select id="sele">
+            <option>Naprawa komputera</option>
+            <option>Czyszczenie komputera</option>
+            <option>Wymiana komputera</option>
+            <option>Odwirusowywanie komputera</option>
+        </select>
+        <button type="button" onclick="siem()">Wyślij</button>
+        <p id="test"></p>
+    </div>
+</body>
+</html>
