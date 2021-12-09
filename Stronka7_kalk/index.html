@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skrypt</title>
+    <link rel="stylesheet" href="css.css">
+    <script src="skrypot.js"></script>
+</head>
+<body>
+    <div id="kalk">
+        <div class="row">
+            <!-- <div class="wynik"></div> -->
+
+            <input type="number">
+            <input>
+            <input type="number">
+        </div>
+        <div class="row">
+            <button value="7" onclick="liczba(7)">7</button>
+            <button value="8" onclick="liczba(8)">8</button>
+            <button value="9" onclick="liczba(9)">9</button>
+            <button value="" onclick="liczba()">+</button>
+        </div>
+        <div class="row">
+            <button value="4" onclick="liczba(4)">4</button>
+            <button value="5" onclick="liczba(5)">5</button>
+            <button value="6" onclick="liczba(6)">6</button>
+            <button value="" onclick="liczba()">-</button>
+        </div>
+        <div class="row">
+            <button value="1" onclick="liczba(1)">1</button>
+            <button value="2" onclick="liczba(2)">2</button>
+            <button value="3" onclick="liczba(3)">3</button>
+            <button value="" onclick="liczba()">x</button>
+        </div>
+        <div class="row">
+            <button id="zero" value="7" onclick="liczba(0)">0</button>
+            <button id="rown" value="" onclick="liczba()">=</button>
+            <button id="dzie" value="" onclick="liczba()">/</button>
+        </div>
+    </div>
+</body>
+</html>
