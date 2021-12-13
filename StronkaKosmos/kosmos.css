@@ -1,0 +1,29 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    background: black;
+    overflow: hidden;
+}
+i {
+    position: absolute;
+    aspect-ratio: 1;
+    border-radius: 20px;
+    background-color: white;
+    /* background: linear-gradient(transparent, white); */
+    animation: rain 5s infinite linear;
+    z-index: 2;
+}
+
+
+@keyframes rain {
+    0% {
+        transform: translateY(-10px);
+    }
+    100% {
+        transform: translateY(calc(100vh + 10px));
+    }
+}
+

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="kosmos.css">
+    <title>Cosmos</title>
+</head>
+<body>
+
+    <script>
+        function stars(){
+            var amount = 300;
+            var body = document.querySelector('body');
+            var i = 0;
+
+            while(i < amount){
+                var drop = document.createElement('i');
+
+                var size = Math.random() * 5;
+                var posx = Math.floor(Math.random() * window.innerWidth);
+                var delay = Math.random() * -20;
+                var duration = Math.random() * 5;
+
+                drop.style.width = 0.2 + size+'px';
+                drop.style.left = posx+'px';
+                drop.style.animationDelay = delay+'s';
+                drop.style.animationDuration = 3 + duration+'s';
+                body.appendChild(drop);
+                i++
+            }
+        }
+
+        
+
+        stars()
+    </script>
+
+</body>
+</html>
