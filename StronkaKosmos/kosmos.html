@@ -9,33 +9,24 @@
 </head>
 <body>
 
-    <script>
-        function stars(){
-            var amount = 300;
-            var body = document.querySelector('body');
-            var i = 0;
+    
 
-            while(i < amount){
-                var drop = document.createElement('i');
 
-                var size = Math.random() * 5;
-                var posx = Math.floor(Math.random() * window.innerWidth);
-                var delay = Math.random() * -20;
-                var duration = Math.random() * 5;
+    <div id="gwiazdy">
+        <script src="kosmos.js"></script>
+    </div>
 
-                drop.style.width = 0.2 + size+'px';
-                drop.style.left = posx+'px';
-                drop.style.animationDelay = delay+'s';
-                drop.style.animationDuration = 3 + duration+'s';
-                body.appendChild(drop);
-                i++
-            }
-        }
 
-        
 
-        stars()
-    </script>
 
+
+    <div id="menu">
+        <ul>
+            <li><button>Amogus</button></li>
+            <li><button>Help</button></li>
+            <li><button>Contact</button></li>
+            <li><button><a  target="_blank" href="https://www.facebook.com/grzesiek.sus.12">Sus</a></button></li>
+        </ul>
+    </div>
 </body>
 </html>
