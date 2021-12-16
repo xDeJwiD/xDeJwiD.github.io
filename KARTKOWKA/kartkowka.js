@@ -2,27 +2,15 @@ var przelacznik = 0;
 
 function liczba(ile) {
     if (przelacznik == 0) {
-        pole1.value += ile;
+        document.kalk.pole1.value += ile;
     }
     if (przelacznik == 1) {
-        pole3.value += ile;
+        document.kalk.pole1.value += ile;
     }
 }
 
 function znak(zn) {
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    pole2.value = zn;
+    document.kalk.pole2.value = zn;
     przelacznik = 1;
 }
 
