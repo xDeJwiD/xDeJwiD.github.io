@@ -63,14 +63,36 @@ function DarkMode() {
     </div>
 
     <div id="mid">
-        <a href="./Stronka1/index.html" target="_blank" class="strona">
-            <div class="karta">
-                <div class="content">
-                    <h2>Moja stronka nr 1.</h2>
-                    <p>Rok 2019</p>
+        <a id="btn_official" onclick="show()" draggable="false">Gotowe strony</a>
+
+        <div id="sec">
+            <a href="./Stronka1/index.html" target="_blank" class="strona" draggable="false">
+                <div class="karta">
+                    <div class="content">
+                        <h2>Moja stronka nr 1.</h2>
+                        <p>Rok 2019</p>
+                    </div>
                 </div>
-            </div>
-        </a>
+            </a>
+
+        </div>
+
+
+
+
+
+
+        <script>
+            function show() {
+                var x = document.getElementById("sec");
+                if (x.style.display === "block") {
+                    x.style.display = "none";
+                } else {
+                    x.style.display = "block";
+                }
+            }
+        </script>
+        
         
     </div>
     <script src="./counter.js"></script>

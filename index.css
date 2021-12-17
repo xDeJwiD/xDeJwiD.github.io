@@ -69,16 +69,52 @@ body {
 .strona::before {
     content: '';
     position: absolute;
-    width: 1rem;
-    height: 150%;
+    width: 4rem;
+    height: 200%;
     top: 50%;
-    left: calc(1rem - 50%);
+    left: calc(1rem - 75%);
     background-color: rgba(255, 255, 255, 0.872);
-    transform: rotate(30deg) translateY(-50%);
+    transform: rotate(30deg) translateY(-60%);
     transition: left .3s ease;
     z-index: 0;
 }
 
 .strona:hover::before {
     left: 100%;
+}
+
+#sec {
+    width: max-content;
+    height: max-content;
+    background-color: transparent;
+    display: none;
+}
+
+#btn_official {
+    color: black;
+    background-color: rgba(255, 255, 255, 0.386);
+    backdrop-filter: blur(2px);
+    min-width: 20%;
+    width: max-content;
+    height: max-content;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 20px;
+    padding: 20px;
+    border-radius: 1rem;
+    text-align: center;
+    z-index: 1;
+    transition: outline .05s linear;
+    overflow: hidden;
+    outline: 0rem white solid;
+}
+
+#btn_official::selection {
+    display: none;
+}
+
+.box #counter::selection, .box #counter span::selection, .box h5::selection {
+    background-color: transparent;
 }
