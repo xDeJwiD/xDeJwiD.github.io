@@ -187,6 +187,7 @@ ul li::before {
   'g g s'
   'g g s'
   'i z z';
+  z-index: 100;
 }
 
 .main a {
@@ -201,6 +202,8 @@ ul li::before {
   font-weight: 700;
   transition: ease-in-out .2s;
   border-radius: 1rem;
+  backdrop-filter: blur(4px);
+  
 }
 
 .grid1 {
@@ -225,3 +228,36 @@ ul li::before {
     background-color: #332838;
     color: #ffffff;
 }
+
+
+/* .background {
+    background-color: aqua;
+    width: 200px;
+    height: 200px;
+    border-radius: 100rem;
+    position: absolute;
+    z-index: 1;
+} */
+
+
+
+
+
+/* i {
+    position: absolute;
+    aspect-ratio: 1;
+    border-radius: 20px;
+    background-color: white;
+    animation: rain 5s infinite linear;
+    z-index: 2;
+}
+
+
+@keyframes rain {
+    0% {
+        transform: translateY(-10px);
+    }
+    100% {
+        transform: translateY(calc(100vh + 10px));
+    }
+} */
