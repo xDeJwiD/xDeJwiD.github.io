@@ -95,6 +95,14 @@ function DarkMode() {
         
         
     </div>
+
+    <div id="copy"><p>&copy; Dawid Szymanowski <span id="roczek"></span></p>
+    
+        <script>
+            const y = new Date();
+            document.getElementById("roczek").innerHTML = ' ' + y.getFullYear();
+        </script>
+    </div>
     <script src="./counter.js"></script>
 </body>
 </html>
