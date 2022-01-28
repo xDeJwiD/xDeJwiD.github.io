@@ -1,23 +1,73 @@
+// KOLORY TLA PO NAJECHANIU -------------------------------------------------------------
+function cyan() {
+    document.querySelector('body').style.backgroundColor = 'var(--maincyan)';
+}
 
-// function stars() {
-//     var amount = 300;
-//     var body = document.getElementById('gwiazdy');
-//     var i = 0;
+function gold() {
+    document.querySelector('body').style.backgroundColor = 'var(--maingold)';
+}
 
-//     while (i < amount) {
-//         var drop = document.createElement('i');
+function normal() {
+    document.querySelector('body').style.backgroundColor = 'var(--mainpink)';
+}
+// ----------------------------------------------------------------------------------------
 
-//         var size = Math.random() * 5;
-//         var posx = Math.floor(Math.random() * window.innerWidth);
-//         var delay = Math.random() * -20;
-//         var duration = Math.random() * 5;
+// KAFELKA Z GRAMI ------------------------------------------------------------------------
+function gry() {
+    document.querySelector('.section-games-panel').classList.remove('hidden');
+    document.querySelector('.gry').classList.add('hidden');
+}
 
-//         drop.style.width = 0.2 + size + 'px';
-//         drop.style.left = posx + 'px';
-//         drop.style.animationDelay = delay + 's';
-//         drop.style.animationDuration = 3 + duration + 's';
-//         body.appendChild(drop);
-//         i++
-//     }
-// }
-// stars()
+function niegry() {
+    document.querySelector('.section-games-panel').classList.add('hidden');
+    document.querySelector('.gry').classList.remove('hidden');
+}
+// ----------------------------------------------------------------------------------------
+
+// ZARTY ----------------------------------------------------------------------------------
+function joke() {
+    // document.getElementById("joke-panel").classList.remove('hidden')
+    document.querySelector('#joke-panel').classList.remove('hidden');
+}
+
+function niejoke() {
+    // document.getElementById("joke-panel").classList.remove('hidden')
+    document.querySelector('#joke-panel').classList.add('hidden');
+}
+// ----------------------------------------------------------------------------------------
+
+// LOGIN ----------------------------------------------------------------------------------
+function login() {
+    document.querySelector('#login-panel').classList.remove('hidden');
+    // document.querySelector('body').style.backgroundColor = 'var(--maincyan)';
+}
+
+function nielogin() {
+    document.querySelector('#login-panel').classList.add('hidden');
+    // document.querySelector('body').style.backgroundColor = 'var(--mainpink)';
+}
+// ----------------------------------------------------------------------------------------
+
+// REGISTER -------------------------------------------------------------------------------
+function register() {
+    document.querySelector('#register-panel').classList.remove('hidden');
+}
+
+function nieregister() {
+    document.querySelector('#register-panel').classList.add('hidden');
+}
+// ----------------------------------------------------------------------------------------
+
+// NIE MAM KONTA --------------------------------------------------------------------------
+function niemamkonta() {
+    document.querySelector('#login-panel').classList.add('hidden');
+    document.querySelector('#register-panel').classList.remove('hidden');
+}
+// ----------------------------------------------------------------------------------------
+
+// MAM JEDNAK KONTO -----------------------------------------------------------------------
+function mamjednakkonto() {
+    document.querySelector('#login-panel').classList.remove('hidden');
+    document.querySelector('#register-panel').classList.add('hidden');
+}
+// ----------------------------------------------------------------------------------------

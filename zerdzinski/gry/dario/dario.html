@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pl" onkeydown="jumping()">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dario: The Game</title>
+    <link rel="stylesheet" href="dario.css">
+
+</head>
+
+<body>
+
+    <div class="hello ">
+        <h1>Wybierz poziom trudności:</h1>
+        <button class="easy" onmouseenter="bg(1)" onmouseleave="bg(0)" onclick="level(1)">Łatwy</button>
+        <button class="medium" onmouseenter="bg(2)" onmouseleave="bg(0)" onclick="level(2)">Średni</button>
+        <button class="hard" onmouseenter="bg(3)" onmouseleave="bg(0)" onclick="level(3)">Trudny</button>
+    </div>
+
+
+    <div class="bsod hidden">
+        <div class="div1">
+            <h1>:)</h1>
+            <p>Your computer has virus and needs to restart. We won't restart for you.</p>
+        </div>
+        <div class="div2">
+            <div class="qr"></div>
+            <div class="info">
+                <p>For more information please contact our Indian IT specialists</p>
+                <p>If you call a support person, give them this info.</p>
+                <p>Card code: IM_UNDER_THE_WATER</p>
+            </div>
+            <a onclick="bsodoff()" id="skip">
+                <p>उस बकवास को छोड़ दो</p>
+            </a>
+        </div>
+    </div>
+    <div class="ad1 ad close">
+        <div class="pasek">
+            <div class="ikony">
+                <ul>
+                    <li>
+                        <a onclick="">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-dash-lg" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8Z" />
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a onclick="winmax(1)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707zm0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707zm-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707z" />
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a onclick="winclose(1)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-x-lg" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M13.854 2.146a.5.5 0 0 1 0 .708l-11 11a.5.5 0 0 1-.708-.708l11-11a.5.5 0 0 1 .708 0Z" />
+                                <path fill-rule="evenodd"
+                                    d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z" />
+                            </svg>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="ring1">
+            <div class="ring2">
+                <div class="ring3">
+                     
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ad2 ad close">
+        <div class="pasek">
+            <div class="ikony">
+                <ul>
+                    <li>
+                        <a onclick="">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-dash-lg" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8Z" />
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a onclick="winmax(2)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707zm0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707zm-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707z" />
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a onclick="winclose(2)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-x-lg" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M13.854 2.146a.5.5 0 0 1 0 .708l-11 11a.5.5 0 0 1-.708-.708l11-11a.5.5 0 0 1 .708 0Z" />
+                                <path fill-rule="evenodd"
+                                    d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z" />
+                            </svg>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="ad3 ad close">
+        <div class="pasek">
+            <div class="ikony">
+                <ul>
+                    <li>
+                        <a onclick="">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-dash-lg" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8Z" />
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a onclick="winmax(3)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707zm0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707zm-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707z" />
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a onclick="winclose(3)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-x-lg" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M13.854 2.146a.5.5 0 0 1 0 .708l-11 11a.5.5 0 0 1-.708-.708l11-11a.5.5 0 0 1 .708 0Z" />
+                                <path fill-rule="evenodd"
+                                    d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z" />
+                            </svg>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="ad4 ad close">
+        <div class="pasek">
+            <div class="ikony">
+                <ul>
+                    <li>
+                        <a onclick="">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-dash-lg" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8Z" />
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a onclick="winmax(3)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707zm0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707zm-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707z" />
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a onclick="winclose(3)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-x-lg" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M13.854 2.146a.5.5 0 0 1 0 .708l-11 11a.5.5 0 0 1-.708-.708l11-11a.5.5 0 0 1 .708 0Z" />
+                                <path fill-rule="evenodd"
+                                    d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z" />
+                            </svg>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="rick">
+            <div class="fake">
+                <div class="tyty"></div>
+                <div class="tyty"></div>
+                <div class="tyty"></div>
+                <div class="tyty"></div>
+            </div>
+            <div class="video-section">
+                <video src="./Rick Astley - Never Gonna Give You Up (Official Music Video).mp4" preload="auto" id="vid"></video>
+                <div class="tytv"></div>
+                <div class="tytv"></div>
+                <div class="tytv">
+                    <div class="tytx"></div>
+                    <div class="tytx"></div>
+                    <div class="tytx"></div>
+                    <div class="tytx"></div>
+                </div>
+                <div class="tytv"></div>
+            </div>
+            <div class="playlist-section">
+                <div class="next">
+                    <div class="mini"></div>
+                    <div class="tyt"></div>
+                    <div class="tyt"></div>
+                </div>
+                <div class="next">
+                    <div class="mini"></div>
+                    <div class="tyt"></div>
+                    <div class="tyt"></div>
+                </div>
+                <div class="next">
+                    <div class="mini"></div>
+                    <div class="tyt"></div>
+                    <div class="tyt"></div>
+                </div>
+                <div class="next">
+                    <div class="mini"></div>
+                    <div class="tyt"></div>
+                    <div class="tyt"></div>
+                </div>
+                <div class="next">
+                    <div class="mini"></div>
+                    <div class="tyt"></div>
+                    <div class="tyt"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="wrapper">
+        <div id="game" class="ruch">
+            <div id="dariusz"></div>
+            <div id="block" class="block hidden"></div>
+            <div id="portal" class="portal hidden"></div>
+        </div>
+        <h1>Wynik:</h1>
+        <h2 class="score">0</h2>
+    </div>
+</body>
+<script src="dario.js"></script>
+
+
+</html>
