@@ -41,11 +41,11 @@ var isDead = 0;
 
 
 //      EASY                   MEDIUM                    HARD                
-var easyPortal1 = 1000; var mediumPortal1 = 1000; var hardPortal1 = 1000;
-var easyPortal2 = 2000; var mediumPortal2 = 2000; var hardPortal2 = 2000;
-var easyPortal3 = 3000; var mediumPortal3 = 3000; var hardPortal3 = 3000;
-var easyPortal4 = 4000; var mediumPortal4 = 4000; var hardPortal4 = 4000;
-var easyPortal5 = 5000; var mediumPortal5 = 5000; var hardPortal5 = 5000;
+var easyPortal1 = 1000; var mediumPortal1 = 1000; var hardPortal1 = 500;
+var easyPortal2 = 2000; var mediumPortal2 = 2000; var hardPortal2 = 1000;
+var easyPortal3 = 3000; var mediumPortal3 = 3000; var hardPortal3 = 1500;
+var easyPortal4 = 4000; var mediumPortal4 = 4000; var hardPortal4 = 2000;
+var easyPortal5 = 5000; var mediumPortal5 = 5000; var hardPortal5 = 2500;
 
 
 

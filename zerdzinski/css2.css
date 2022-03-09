@@ -1,0 +1,139 @@
+@import url("https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@100;300;400;500;700;800;900&family=Varela+Round&display=swap');
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    list-style: none;
+    text-decoration: none;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+}
+
+body {
+    background-color: rgb(11, 0, 21);
+}
+
+:root {
+
+    --blocked: rgb(80, 0, 172);
+
+    --not-blocked: rgb(119, 0, 255);
+
+}
+
+
+#left-panel {
+    background: linear-gradient(45deg, rgb(30, 0, 55), rgb(52, 0, 95));
+    width: 7rem;
+    height: calc(100% - 2 * 20px);
+    position: absolute;
+    margin: 20px;
+    padding: 10px;
+    border-radius: 1.3em;
+    transition: ease-in-out .5s;
+
+    overflow-x: hidden;
+}
+#left-panel > * {
+    margin-bottom: 10px;
+}
+
+#left-panel.max {
+    width: 20rem;
+}
+#left-panel.max #minmax {
+    left: 100%;
+    width: 25%;
+    transform: translateX(-100%);
+}
+#left-panel.max #categories ul li a > p {
+    display: block;
+    position: absolute;
+}
+#left-panel.max #categories ul li a > svg {
+    transform: translate(-300%, 0%);
+}
+
+#left-panel #categories ul li a > p {
+    display: none;
+    position: absolute;
+}
+
+#categories ul li a svg {
+    position: relative;
+    transition: transform ease-in-out .6s;
+}
+
+#categories ul li a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: left;
+    padding: 20px 10px;
+    margin: 10px 0px;
+    border-radius: 1.1rem;
+    font-size: 1.2rem;
+    line-height: 1.2rem;
+    font-weight: 700;
+    color: rgb(119, 0, 255);
+    transition: ease-in-out .1s;
+}
+#categories ul li a p {
+    margin-left: 100px;
+}
+#categories ul li {
+    line-height: 1.5rem;
+    width: 100%;
+}
+#categories ul li a svg, #minmax svg {
+    width: 30px;
+    height: 30px;
+}
+#categories ul {
+    margin: auto auto;
+}
+
+#categories ul li:hover a{
+
+    background-color: rgb(119, 0, 255);
+    color: black;
+}
+
+#minmax {
+    width: 100%;
+    height: 4rem;
+    left: 0;
+    position: relative;
+    background: var(--not-blocked);
+    border-radius: 1.1em;
+    transition: ease-in-out .5s, background ease .2s;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+#logo {
+    width: 100%;
+    height: 5rem;
+    /* background-color: rgb(111, 111, 111); */
+    border-radius: 1.1em;
+    transition: ease-in-out .5s;
+}
+
+#categories {
+    width: 100%;
+    background-color: transparent;
+    margin-top: 30px;
+}
+
+#categories ul li{
+    font-size: 1.2rem;
+}
+
+.hidden {
+    display: none;
+}
