@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Żerdziński</title>
     <link rel="stylesheet" href="css2.css">
+    <!-- <link rel="stylesheet" href="shop.css"> -->
 </head>
 
 <body>
@@ -35,7 +36,7 @@
             <ul>
                 <hr class="hr">
                 <li>
-                    <a href="">
+                    <a onclick="rightPanel(1)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-house" viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
@@ -48,7 +49,7 @@
                 </li>
                 <hr class="hr">
                 <li>
-                    <a href="">
+                    <a onclick="rightPanel(2)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-basket3" viewBox="0 0 16 16">
                             <path
@@ -59,7 +60,7 @@
                 </li>
                 <hr class="hr">
                 <li>
-                    <a href="">
+                    <a onclick="rightPanel(3)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-controller" viewBox="0 0 16 16">
                             <path
@@ -72,7 +73,7 @@
                 </li>
                 <hr class="hr">
                 <li>
-                    <a href="">
+                    <a onclick="rightPanel(4)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-chat-square-text" viewBox="0 0 16 16">
                             <path
@@ -106,17 +107,21 @@
     </div>
 
     <div id="right-panel">
-        <div class="home">
+        <div class="home ">
             <h3 class="h-top">Quick access</h3>
             <div class="top-scroll-gradient"></div>
             <div class="top">
-
                 <div class="scroll">
                     <div></div>
                     <div></div>
                     <div></div>
                     <div></div>
                     <div></div>
+                    <!-- <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div> -->
                 </div>
             </div>
             <!-- <div class="bottom">
@@ -139,97 +144,61 @@
                 <div></div>
             </div>
         </div>
-        <!-- <div class="bottom-scroll-gradient"></div> -->
-    </div>
 
-    <script>
-        var lpanel = document.querySelector('#left-panel');
-        var minmax = document.querySelector('#minmax');
-        var acc = document.querySelector('#account');
-        var blocked = 0;
+        <div class="shop hidden">
+            <div class="look">
+                <h1 class="nagl">Steal his look: </h1>
+                <div class="look-flex">
+                    <div class="karta">
+                        <div class="karta-hover ciuch1">
+                            <div class="info">
+                                <p>koszulka TommyHeilhitler&trade;</p>
+                                <p>199$</p>
+                            </div>
+                        </div>
+                        <div class="kup">
+                            <a class="kup-btn">Kup</a>
+                            <!-- <a class="kup-koszyk">Dodaj do koszyka</a> -->
+                        </div>
+                    </div>
+                    <div class="karta">
+                        <div class="karta-hover ciuch2">
+                            <div class="info">
+                                <p>spodnie BikStar&trade;</p>
+                                <p>95$</p>
+                            </div>
+                        </div>
+                        <div class="kup">
+                            <a class="kup-btn">Kup</a>
+                            <!-- <a class="kup-koszyk">Dodaj do koszyka</a> -->
+                        </div>
+                    </div>
+                    <div class="karta">
+                        <div class="karta-hover ciuch3">
+                            <div class="info">
+                                <p>buty Tinderland&trade;</p>
+                                <p>329$</p>
+                            </div>
+                        </div>
+                        <div class="kup">
+                            <a class="kup-btn">Kup</a>
+                            <!-- <a class="kup-koszyk">Dodaj do koszyka</a> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            <!-- <div class="bottom-scroll-gradient"></div> -->
+        </div>
 
-        const scrollContainer1 = document.querySelector("#right-panel .top");
-        const scrollContainer2 = document.querySelector("#right-panel .bottom");
+        <div class="games hidden">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
 
-        scrollContainer1.addEventListener("wheel", (evt) => {
-            evt.preventDefault();
-            scrollContainer1.scrollLeft += evt.deltaY * 3;
-            return;
-        });
-        // scrollContainer2.addEventListener("wheel", (evt) => {
-        //     evt.preventDefault();
-        //     scrollContainer2.scrollLeft += evt.deltaY * 3;
-        //     return;
-        // });
-
-        setInterval(() => {
-            if (window.innerWidth <= 800) {
-                lpanel.classList.remove('max');
-                minmax.style.background = 'var(--blocked)';
-                minmax.disabled = true;
-                document.querySelector('.bi-arrow-bar-right').classList.add('hidden');
-                document.querySelector('.bi-unlock-fill').classList.add('hidden');
-                document.querySelector('.bi-lock-fill').classList.remove('hidden');
-            }
-            if (window.innerWidth >= 800 && lpanel.classList != 'max') {
-                minmax.style.background = 'var(--not-blocked)';
-                minmax.disabled = false;
-                document.querySelector('.bi-arrow-bar-right').classList.remove('hidden');
-                document.querySelector('.bi-unlock-fill').classList.add('hidden');
-                document.querySelector('.bi-lock-fill').classList.add('hidden');
-            }
-        }, 10);
-
-        function maxed(x) {
-
-
-            if (lpanel.classList != 'max' && x == 0) {
-                lpanel.classList.add('max');
-                blocked = 0;
-                document.querySelector('.bi-arrow-bar-right').classList.add('hidden');
-                document.querySelector('.bi-unlock-fill').classList.remove('hidden');
-                document.querySelector('.bi-lock-fill').classList.add('hidden');
-                return;
-            }
-            if (lpanel.classList == 'max' && blocked == 0 && x == 0) {
-                blocked = 1;
-                minmax.style.background = 'var(--blocked)';
-                document.querySelector('.bi-arrow-bar-right').classList.add('hidden');
-                document.querySelector('.bi-unlock-fill').classList.add('hidden');
-                document.querySelector('.bi-lock-fill').classList.remove('hidden');
-                return;
-            }
-            if (lpanel.classList == 'max' && blocked == 1 && x == 0) {
-                blocked = 0;
-                minmax.style.background = 'var(--not-blocked)';
-                document.querySelector('.bi-arrow-bar-right').classList.add('hidden');
-                document.querySelector('.bi-unlock-fill').classList.remove('hidden');
-                document.querySelector('.bi-lock-fill').classList.add('hidden');
-            }
-
-
-            //      ACCOUNT
-            if (lpanel.classList != 'max' && x == 1 && blocked != 1) {
-                lpanel.classList.add('max');
-                document.querySelector('.bi-arrow-bar-right').classList.add('hidden');
-                document.querySelector('.bi-unlock-fill').classList.remove('hidden');
-                document.querySelector('.bi-lock-fill').classList.add('hidden');
-                return;
-            }
-        }
-
-        function maxedOnLeave() {
-            if (lpanel.classList == 'max' && blocked != 1) {
-                lpanel.classList.remove('max');
-                minmax.style.background = 'var(--not-blocked)';
-                document.querySelector('.bi-arrow-bar-right').classList.remove('hidden');
-                document.querySelector('.bi-unlock-fill').classList.add('hidden');
-                document.querySelector('.bi-lock-fill').classList.add('hidden');
-                acc.classList.remove('max');
-            }
-        }
-    </script>
+        <script src="./v2.js"></script>
 </body>
 
 </html>

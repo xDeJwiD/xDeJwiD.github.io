@@ -1,0 +1,329 @@
+.look, .items {
+    /* background-color: #e01a4f; */
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow-wrap: break-word;
+    overflow: visible;
+}
+
+.look .nagl {
+    font-size: 3rem;
+    color: #e01a4f;
+    font-weight: 700;
+}
+
+.look-flex {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: auto;
+    gap: 1rem;
+    padding: 4rem;
+    background-color: rgba(224, 26, 79, 0.249);
+    border-radius: 1rem;
+}
+
+.look-flex::before {
+    content: '';
+    position: absolute;
+    width: 120%;
+    height: 5px;
+    background-color: #ffffff;
+    box-shadow: #e01a4f 0px 0px 40px 20px;
+    transform: rotate(10deg);
+}
+
+.look-flex::after {
+    content: '';
+    position: absolute;
+    width: 120%;
+    height: 5px;
+    background-color: #ffffff;
+    box-shadow: #e01a4f 0px 0px 40px 20px;
+    transform: rotate(-20deg);
+}
+
+.karta {
+    width: 20rem;
+    /* background-color: #f15946; */
+    height: 500px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    overflow: visible;
+}
+
+.karta-hover {
+    width: 100%;
+    height: 500px;
+    background-color: #201723;
+    z-index: 100;
+    position: absolute;
+    transition: ease-in-out .2s;
+    border-radius: 1rem;
+    overflow: visible;
+}
+
+.karta-hover::after {
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    /* background-color: #e01a4f77; */
+    border-radius: 1rem;
+    transition: ease-in-out .4s;
+}
+
+.karta:hover .karta-hover {
+    transform: translate(0%, -10%);
+    border-radius: 1rem 1rem 0 0;
+}
+
+.karta:hover .info {
+    color: #e01a4f;
+    transition: ease-in-out .2s;
+    border-radius: 0 0 0 0;
+}
+
+.karta-hover:hover::after {
+    background-color: transparent;
+    transition: ease-in-out .2s;
+}
+
+.kup {
+    position: absolute;
+    z-index: 2;
+    height: 10%;
+    width: 100%;
+    background-color: #e01a4f;
+    border-radius: 0 0 1rem 1rem;
+    bottom: 0;
+    display: flex;
+
+    font-size: 1.1rem;
+}
+
+.kup-btn {
+    border-radius: 0 0 0 1rem;
+    background-color: #e01a4f;
+}
+
+.kup-koszyk {
+    border-radius: 0 0 1rem 0;
+    background-color: #ffffff;
+}
+
+.kup a {
+    width: 50%;
+    position: relative;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    color: #0c090d;
+    font-weight: 700;
+    transition: ease-in-out .3s;
+}
+
+.kup a:hover {
+    background-color: rgba(0, 0, 0, 0.228);
+    color: #ffffff;
+    cursor: pointer;
+    transition: ease-in-out .2s;
+}
+
+.info {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    background-color: #39283f;
+    padding: 20px;
+    border-radius: 0 0 1rem 1rem;
+    color: #ffffff;
+    transition: ease-in-out .4s;
+    z-index: 30;
+}
+.info p:nth-child(1) {
+    font-weight: 700;
+}
+
+.ciuch1 {
+    background-image: url(./koszulka.jpg);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.ciuch2 {
+    background-image: url(./spodnie.jpg);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.ciuch3 {
+    background-image: url(./buty.jpg);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.items .nagl {
+    font-size: 3rem;
+    color: #f9c22e;
+    font-weight: 700;
+}
+
+.items-flex {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: auto;
+    gap: 1rem;
+    padding: 4rem;
+    background-color: #f9c32e77;
+    border-radius: 1rem;
+}
+
+.items-flex::before {
+    content: '';
+    position: absolute;
+    width: 120%;
+    height: 5px;
+    background-color: #ffffff;
+    box-shadow: #f9c22e 0px 0px 40px 20px;
+    transform: rotate(10deg);
+}
+
+.items-flex::after {
+    content: '';
+    position: absolute;
+    width: 120%;
+    height: 5px;
+    background-color: #ffffff;
+    box-shadow: #f9c22e 0px 0px 40px 20px;
+    transform: rotate(-20deg);
+}
+
+.items .karta {
+    width: 20rem;
+    /* background-color: #f15946; */
+    height: 500px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    overflow: visible;
+}
+
+.items .karta-hover {
+    width: 100%;
+    height: 500px;
+    background-color: #544419;
+    z-index: 100;
+    position: absolute;
+    transition: ease-in-out .2s;
+    border-radius: 1rem;
+    overflow: visible;
+}
+
+.items .karta-hover::after {
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    /* background-color: #f9c32e84; */
+    border-radius: 1rem;
+    transition: ease-in-out .4s;
+}
+
+.items .karta:hover .karta-hover {
+    transform: translate(0%, -10%);
+    border-radius: 1rem 1rem 0 0;
+}
+
+.items .karta:hover .info {
+    color: #f9c22e;
+    transition: ease-in-out .2s;
+    border-radius: 0 0 0 0;
+}
+
+.items .karta-hover:hover::after {
+    background-color: transparent;
+    transition: ease-in-out .2s;
+}
+
+.items .kup {
+    position: absolute;
+    z-index: 2;
+    height: 10%;
+    width: 100%;
+    background-color: #f9c22e;
+    border-radius: 0 0 1rem 1rem;
+    bottom: 0;
+    display: flex;
+
+    font-size: 1.1rem;
+}
+
+.items .kup-btn {
+    border-radius: 0 0 0 1rem;
+    background-color: #f9c22e;
+}
+
+.items .kup-koszyk {
+    border-radius: 0 0 1rem 0;
+    background-color: #ffffff;
+}
+
+.items .kup a {
+    width: 50%;
+    position: relative;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    color: #2d291d;
+    font-weight: 700;
+    transition: ease-in-out .3s;
+}
+
+.items .kup a:hover {
+    background-color: rgba(0, 0, 0, 0.228);
+    color: #ffffff;
+    cursor: pointer;
+    transition: ease-in-out .2s;
+}
+
+.items .info {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    background-color: #322d20;
+    padding: 20px;
+    border-radius: 0 0 1rem 1rem;
+    color: #ffffff;
+    transition: ease-in-out .4s;
+    z-index: 30;
+}
