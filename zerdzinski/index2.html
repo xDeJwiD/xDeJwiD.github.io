@@ -11,28 +11,29 @@
 
 <body>
     <div id="left-panel" class="" onmouseleave="maxedOnLeave()">
-        <div id="minmax" onclick="maxed()">
+        <button disabled="false" id="minmax" onclick="maxed(0)">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                 class="bi bi-arrow-bar-right" viewBox="0 0 16 16">
                 <path fill-rule="evenodd"
                     d="M6 8a.5.5 0 0 0 .5.5h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L12.293 7.5H6.5A.5.5 0 0 0 6 8zm-2.5 7a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5z" />
             </svg>
 
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-unlock-fill hidden"
-                viewBox="0 0 16 16">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-unlock-fill hidden" viewBox="0 0 16 16">
                 <path
                     d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2z" />
             </svg>
 
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock-fill hidden"
-                viewBox="0 0 16 16">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-lock-fill hidden" viewBox="0 0 16 16">
                 <path
                     d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
             </svg>
-        </div>
+        </button>
         <div id="logo"></div>
         <div id="categories">
             <ul>
+                <hr class="hr">
                 <li>
                     <a href="">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -45,6 +46,7 @@
                         <p class="">Home</p>
                     </a>
                 </li>
+                <hr class="hr">
                 <li>
                     <a href="">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -55,6 +57,7 @@
                         <p class="">Shop</p>
                     </a>
                 </li>
+                <hr class="hr">
                 <li>
                     <a href="">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -67,7 +70,7 @@
                         <p class="">Games</p>
                     </a>
                 </li>
-                <!-- <li><a href="">Blog</a></li> -->
+                <hr class="hr">
                 <li>
                     <a href="">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -80,20 +83,108 @@
                         <p class="">Info</p>
                     </a>
                 </li>
+                <hr class="hr">
             </ul>
         </div>
+        <div id="account" class="" onclick="maxed(1)">
+            <div class="profile-img">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person"
+                    viewBox="0 0 16 16">
+                    <path
+                        d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
+                </svg>
+            </div>
+            <div class="profile-name">
+                Nickname
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-arrow-up-short" viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                    d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z" />
+            </svg>
+        </div>
+    </div>
 
+    <div id="right-panel">
+        <div class="home">
+            <h3 class="h-top">Quick access</h3>
+            <div class="top-scroll-gradient"></div>
+            <div class="top">
+
+                <div class="scroll">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+            <!-- <div class="bottom">
+                <div class="scroll">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div> -->
+            <h3 class="h-bottom">Interesting</h3>
+            <div class="bottom">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+        <!-- <div class="bottom-scroll-gradient"></div> -->
     </div>
 
     <script>
         var lpanel = document.querySelector('#left-panel');
         var minmax = document.querySelector('#minmax');
+        var acc = document.querySelector('#account');
         var blocked = 0;
 
-        function maxed() {
+
+        const scrollContainer1 = document.querySelector("#right-panel .top");
+        const scrollContainer2 = document.querySelector("#right-panel .bottom");
+
+        scrollContainer1.addEventListener("wheel", (evt) => {
+            evt.preventDefault();
+            scrollContainer1.scrollLeft += evt.deltaY * 3;
+            return;
+        });
+        // scrollContainer2.addEventListener("wheel", (evt) => {
+        //     evt.preventDefault();
+        //     scrollContainer2.scrollLeft += evt.deltaY * 3;
+        //     return;
+        // });
+
+        setInterval(() => {
+            if (window.innerWidth <= 800) {
+                lpanel.classList.remove('max');
+                minmax.style.background = 'var(--blocked)';
+                minmax.disabled = true;
+                document.querySelector('.bi-arrow-bar-right').classList.add('hidden');
+                document.querySelector('.bi-unlock-fill').classList.add('hidden');
+                document.querySelector('.bi-lock-fill').classList.remove('hidden');
+            }
+            if (window.innerWidth >= 800 && lpanel.classList != 'max') {
+                minmax.style.background = 'var(--not-blocked)';
+                minmax.disabled = false;
+                document.querySelector('.bi-arrow-bar-right').classList.remove('hidden');
+                document.querySelector('.bi-unlock-fill').classList.add('hidden');
+                document.querySelector('.bi-lock-fill').classList.add('hidden');
+            }
+        }, 10);
+
+        function maxed(x) {
 
 
-            if (lpanel.classList != 'max') {
+            if (lpanel.classList != 'max' && x == 0) {
                 lpanel.classList.add('max');
                 blocked = 0;
                 document.querySelector('.bi-arrow-bar-right').classList.add('hidden');
@@ -101,7 +192,7 @@
                 document.querySelector('.bi-lock-fill').classList.add('hidden');
                 return;
             }
-            if (lpanel.classList == 'max' && blocked == 0) {
+            if (lpanel.classList == 'max' && blocked == 0 && x == 0) {
                 blocked = 1;
                 minmax.style.background = 'var(--blocked)';
                 document.querySelector('.bi-arrow-bar-right').classList.add('hidden');
@@ -109,13 +200,22 @@
                 document.querySelector('.bi-lock-fill').classList.remove('hidden');
                 return;
             }
-            else {
+            if (lpanel.classList == 'max' && blocked == 1 && x == 0) {
                 blocked = 0;
                 minmax.style.background = 'var(--not-blocked)';
                 document.querySelector('.bi-arrow-bar-right').classList.add('hidden');
                 document.querySelector('.bi-unlock-fill').classList.remove('hidden');
                 document.querySelector('.bi-lock-fill').classList.add('hidden');
-                
+            }
+
+
+            //      ACCOUNT
+            if (lpanel.classList != 'max' && x == 1 && blocked != 1) {
+                lpanel.classList.add('max');
+                document.querySelector('.bi-arrow-bar-right').classList.add('hidden');
+                document.querySelector('.bi-unlock-fill').classList.remove('hidden');
+                document.querySelector('.bi-lock-fill').classList.add('hidden');
+                return;
             }
         }
 
@@ -126,9 +226,38 @@
                 document.querySelector('.bi-arrow-bar-right').classList.remove('hidden');
                 document.querySelector('.bi-unlock-fill').classList.add('hidden');
                 document.querySelector('.bi-lock-fill').classList.add('hidden');
+                acc.classList.remove('max');
             }
         }
     </script>
 </body>
 
 </html>
+
+
+
+
+
+<!-- 
+    
+    radnom number picker
+    czy w tesli dzisiaj jest internet?
+
+    yt downloader
+
+    co to za flaga / co to za panstwo gra
+
+
+
+
+
+
+
+
+
+
+
+
+    https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/color
+
+ -->
