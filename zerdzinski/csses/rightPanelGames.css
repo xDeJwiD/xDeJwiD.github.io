@@ -1,0 +1,166 @@
+
+
+/* ==================================================================== */
+
+/* | */
+
+/* | */
+
+/* ============================  GAMES  ============================== */
+
+/* | */
+
+/* | */
+
+/* ==================================================================== */
+
+/* | */
+
+.games {
+    /* background-color: var(--main-darker); */
+    width: 100%;
+    height: auto;
+    min-height: 100%;
+    border-radius: 1.3rem;
+    /* display: flex; */
+    flex-direction: column;
+    justify-content: center;
+  
+    filter: opacity(0);
+    animation: appear 1s;
+    animation-delay: .2s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+  }
+  .games div {
+    transition: ease-in-out .5s;
+  }
+  
+  .games>div:nth-child(1) {
+    height: 50%;
+    width: calc(100% - 2 * 10px);
+    top: 0;
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+  }
+  .games>div:nth-child(2) {
+    height: 50%;
+    width: calc(100% - 2 * 10px);
+    top: 50%;
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+  }
+  
+  
+  .games>div:nth-child(1)>div:nth-child(1) {
+    height: 100%;
+    width: 40%;
+    top: 0;
+    left: 0;
+    position: absolute;
+    background-color: var(--main-darker);
+    border-radius: 1.3rem 0 0 0;
+  
+    filter: opacity(0);
+    animation: appear 1s;
+    animation-delay: .2s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+  }
+  .games>div:nth-child(1)>div:nth-child(2) {
+    height: 100%;
+    width: 60%;
+    top: 0;
+    left: 40%;
+    position: absolute;
+    background-color: var(--main-dark);
+    border-radius: 0 1.3rem 0 0;
+  
+    filter: opacity(0);
+    animation: appear 1s;
+    animation-delay: .4s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+  }
+  
+  .games>div:nth-child(2)>div:nth-child(1) {
+    height: 100%;
+    width: 60%;
+    top: 0;
+    left: 0;
+    position: absolute;
+    background-color: var(--main-dark);
+    border-radius: 0 0 0 1.3rem;
+  
+    filter: opacity(0);
+    animation: appear 1s;
+    animation-delay: .6s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+  }
+  .games>div:nth-child(2)>div:nth-child(2) {
+    height: 100%;
+    width: 40%;
+    top: 0;
+    left: 60%;
+    position: absolute;
+    background-color: var(--main-darker);
+    border-radius: 0 0 1.3rem 0;
+  
+    filter: opacity(0);
+    animation: appear 1s;
+    animation-delay: .8s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+  }
+  
+  /* ============= */
+  
+  @media (max-width: 1000px) {
+    .games>div:nth-child(1)>div:nth-child(1) {
+      height: 50%;
+      width: 100%;
+      top: 50%;
+      left: 0;
+      position: absolute;
+      background-color: var(--main-darker);
+      border-radius: 0 0 0 0;
+    }
+    .games>div:nth-child(1)>div:nth-child(2) {
+      height: 50%;
+      width: 100%;
+      top: 0%;
+      left: 0%;
+      position: absolute;
+      background-color: var(--main-dark);
+      border-radius: 1.3rem 1.3rem 0 0;
+    }
+    
+    .games>div:nth-child(2)>div:nth-child(1) {
+      height: 50%;
+      width: 100%;
+      top: 0%;
+      left: 0;
+      position: absolute;
+      background-color: var(--main-dark);
+      border-radius: 0 0 0 0;
+    }
+    .games>div:nth-child(2)>div:nth-child(2) {
+      height: 50%;
+      width: 100%;
+      top: 50%;
+      left: 0%;
+      position: absolute;
+      background-color: var(--main-darker);
+      border-radius: 0 0 1.3rem 1.3rem;
+    }
+  }
+  
+  
+  
+  
+  
+  
+  

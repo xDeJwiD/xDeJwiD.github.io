@@ -6,8 +6,60 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Żerdziński</title>
+   
     <link rel="stylesheet" href="css2.css">
+    <link rel="stylesheet" href="./csses/leftPanel.css">
+    <link rel="stylesheet" href="./csses/rightPanel.css">
+    <link rel="stylesheet" href="./csses/rightPanelShop.css">
+    <link rel="stylesheet" href="./csses/rightPanelGames.css">
+    <link rel="stylesheet" href="./csses/rightPanelInfo.css">
+    <link rel="stylesheet" href="./csses/rightPanelLogin.css">
     <!-- <link rel="stylesheet" href="shop.css"> -->
+
+    <style>
+        :root {
+            /* --panel: rgb(24, 0, 43); */
+
+            /* linear-gradient(45deg, rgb(30, 0, 55), rgb(52, 0, 95)) */
+
+            /* --main-accent: rgb(52, 0, 95); */
+
+            --bg: rgb(22, 22, 22);
+
+            --main: rgb(208, 255, 0);
+
+            --main-dark: rgb(70, 70, 70);
+
+            --main-darker: rgb(34, 34, 34);
+
+            --main-sdarker: rgb(208, 255, 0);
+
+            --main-text: rgb(208, 255, 0);
+
+            --main-left-acc: rgb(34, 34, 34);
+
+            --main-left-list: rgb(208, 255, 0);
+
+            --blocked: rgb(146, 179, 0);
+
+            --not-blocked: rgb(208, 255, 0);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+
+        @keyframes appear {
+            0% {
+                filter: opacity(0);
+            }
+
+            100% {
+                filter: opacity(1);
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -98,6 +150,9 @@
             <div class="profile-name">
                 Nickname
             </div>
+            <div class="profile-login">
+                <a onclick="rightPanel(6)">Login</a>
+            </div>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                 class="bi bi-arrow-up-short" viewBox="0 0 16 16">
                 <path fill-rule="evenodd"
@@ -107,7 +162,7 @@
     </div>
 
     <div id="right-panel">
-        <div class="home ">
+        <div class="home hidden">
             <h3 class="h-top">Quick access</h3>
             <div class="top-scroll-gradient"></div>
             <div class="top">
@@ -151,7 +206,7 @@
                 <div class="look-flex">
                     <div class="karta">
                         <div class="karta-hover ciuch1">
-                            <div class="info">
+                            <div class="sinfo">
                                 <p>koszulka TommyHeilhitler&trade;</p>
                                 <p>199$</p>
                             </div>
@@ -163,7 +218,7 @@
                     </div>
                     <div class="karta">
                         <div class="karta-hover ciuch2">
-                            <div class="info">
+                            <div class="sinfo">
                                 <p>spodnie BikStar&trade;</p>
                                 <p>95$</p>
                             </div>
@@ -175,7 +230,7 @@
                     </div>
                     <div class="karta">
                         <div class="karta-hover ciuch3">
-                            <div class="info">
+                            <div class="sinfo">
                                 <p>buty Tinderland&trade;</p>
                                 <p>329$</p>
                             </div>
@@ -202,7 +257,85 @@
             </div>
         </div>
 
+        <div class="info hidden">
+            Tu cos bedzie kiedys
+            <br>
+            Jakies info czy cos
+        </div>
+
+        <div class="loginsec ">
+            <div class="logincont">
+
+                <form action="" autocomplete="off" translate="no" spellcheck="false" class="loginform">
+                    <h1>Log in</h1>
+                    <p>to your account</p>
+                    <div class="l">
+                        <label for="nick" class="" onclick="active(1)" onfocus="active(1)">Nickname</label>
+                        <input type="text" class="nick" id="nick" onclick="active(1)" onfocus="active(1)" required>
+                    </div>
+                    <div class="p">
+                        <label for="pass" class="" onclick="active(2)" onfocus="active(2)">Password</label>
+                        <!-- <button>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-eye" viewBox="0 0 16 16">
+                                <path
+                                    d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z" />
+                                <path
+                                    d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z" />
+                            </svg>
+                        </button> -->
+                        <input type="password" class="pass" id="pass" onclick="active(2)" onfocus="active(2)" required>
+                    </div>
+                    <input type="submit" value="Login">
+                    <a onclick="noaccount(1)">Nie mam konta</a>
+                </form>
+            </div>
+            <div class="registercont hidden">
+
+                <form action="" autocomplete="off" translate="no" spellcheck="false" class="registerform">
+                    <h1>Create</h1>
+                    <p>a new account</p>
+                    <div class="l">
+                        <label for="rnick" class="" onclick="active(3)" onfocus="active(3)">Nickname</label>
+                        <input type="text" class="rnick" id="rnick" onclick="active(3)" onfocus="active(3)" required>
+                    </div>
+                    <div class="p">
+                        <label for="rpass" class="" onclick="active(4)" onfocus="active(4)">Password</label>
+                        <input type="password" class="rpass" id="rpass" onclick="active(4)" onfocus="active(4)"
+                            required>
+                    </div>
+                    <div class="p">
+                        <label for="rrpass" class="" onclick="active(5)" onfocus="active(5)">Password</label>
+                        <input type="password" class="rrpass" id="rrpass" onclick="active(5)" onfocus="active(5)"
+                            required>
+                    </div>
+                    <div class="themepicker">
+                        <h4 style="margin-bottom: 10px;">Choose theme</h4>
+                        <div class="themeslist">
+                            <div class="style1 theme themeSelected" onclick="themeSelect(1)"></div>
+                            <div class="style2 theme" onclick="themeSelect(2)"></div>
+                            <div class="style3 theme" onclick="themeSelect(3)"></div>
+                            <div class="style4 theme" onclick="themeSelect(4)"></div>
+                            <div class="style5 theme" onclick="themeSelect(5)"></div>
+                        </div>
+                        <div class="themeslist">
+                            <div class="style6 theme" onclick="themeSelect(6)" title="Ferrari Theme"></div>
+                            <div class="style7 theme" onclick="themeSelect(7)"></div>
+                            <div class="style8 theme" onclick="themeSelect(8)"></div>
+                            <div class="style9 theme" onclick="themeSelect(9)"></div>
+                            <div class="style10 theme" onclick="themeSelect(10)"></div>
+                        </div>
+                    </div>
+                    <input type="submit" value="Register">
+                </form>
+            </div>
+
+
+
+        </div>
+
         <script src="./v2.js"></script>
+        <script src="./colorPicker.js"></script>
 </body>
 
 </html>
