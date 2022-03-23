@@ -298,6 +298,7 @@
     transition: top ease-in-out 0.5s, color ease 0.2s;
     z-index: 10;
   
+    font-weight: 500;
     animation: nick .5s;
     animation-delay: 0s;
     animation-fill-mode: forwards;

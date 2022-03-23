@@ -16,7 +16,7 @@ var theme9 = document.querySelector('.style9');
 var theme10 = document.querySelector('.style10');
 
 
-
+themeSelect(1);
 
 function themeSelect(x) {
     for (var i = 0; i < themes.length; i++) {
@@ -141,6 +141,36 @@ function themeSelect(x) {
         root.style.setProperty('--not-blocked', 'rgb(208, 255, 0)');
     }
 
+    if (x == 9) {
+        theme9.classList.add('themeSelected');
+
+        root.style.setProperty('--bg', 'rgb(123, 81, 172)');
+        root.style.setProperty('--main', 'rgb(255, 241, 132)');
+        root.style.setProperty('--main-dark', 'rgb(189, 132, 255)');
+        root.style.setProperty('--main-darker', 'rgb(133, 92, 179)');
+        root.style.setProperty('--main-sdarker', 'rgb(109, 76, 146)');
+        root.style.setProperty('--main-text', 'rgb(255, 241, 132)');
+        root.style.setProperty('--main-left-acc', 'rgb(189, 132, 255)');
+        root.style.setProperty('--main-left-list', 'rgb(255, 241, 132)');
+        root.style.setProperty('--blocked', 'rgb(213, 201, 111)');
+        root.style.setProperty('--not-blocked', 'rgb(255, 241, 132)');
+    }
+
+    if (x == 10) {
+        theme10.classList.add('themeSelected');
+
+        root.style.setProperty('--bg', 'rgb(255, 255, 255)');
+        root.style.setProperty('--main', 'rgb(128, 128, 128)');
+        root.style.setProperty('--main-dark', 'rgb(220, 220, 220)');
+        root.style.setProperty('--main-darker', 'rgb(216, 216, 216)');
+        root.style.setProperty('--main-sdarker', 'rgb(186, 186, 186)');
+        root.style.setProperty('--main-text', 'rgb(82, 82, 82)');
+        root.style.setProperty('--main-left-acc', 'rgb(184, 184, 184)');
+        root.style.setProperty('--main-left-list', 'rgb(82, 82, 82)');
+        root.style.setProperty('--blocked', 'rgb(97, 97, 97)');
+        root.style.setProperty('--not-blocked', 'rgb(128, 128, 128)');
+    }
+    return;
 }
 
 

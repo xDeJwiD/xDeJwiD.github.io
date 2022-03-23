@@ -58,7 +58,7 @@
     position: relative;
   }
   
-  .look-flex::before {
+  /* .look-flex::before {
     content: '';
     position: absolute;
     width: 120%;
@@ -76,7 +76,7 @@
     background-color: #ffffff;
     box-shadow: var(--main) 0px 0px 40px 20px;
     transform: rotate(-20deg);
-  }
+  } */
   
   @keyframes laser1 {
     0% {

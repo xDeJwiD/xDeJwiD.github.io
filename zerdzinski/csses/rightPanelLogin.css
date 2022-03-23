@@ -25,7 +25,12 @@
 
     border-radius: 1.3rem;
     overflow: hidden;
-
+    
+    filter: opacity(0);
+    animation: appear 1s;
+    animation-delay: 0s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
 
 }
 
@@ -315,4 +320,30 @@ form input[type='submit']:hover {
     transform: rotate(-30deg) translate(-75%, -50%);
     background: rgb(208, 255, 0);
 }
+
+.style9 {
+    background: rgb(189, 132, 255);
+}
+.style9::after {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    transform: rotate(-30deg) translate(-75%, -50%);
+    background: rgb(255, 241, 132);
+}
+
+
+.style10 {
+    background: rgb(255, 255, 255);
+}
+.style10::after {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    transform: rotate(-30deg) translate(-75%, -50%);
+    background: rgb(128, 128, 128);
+}
+
 

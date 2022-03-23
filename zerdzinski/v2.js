@@ -65,18 +65,21 @@ function maxed(x) {
 
 
     //      ACCOUNT
-    if (lpanel.classList != 'max' && x == 1 && blocked != 1) {
+    if (lpanel.classList != 'max' && blocked != 2 && x == 1) {
+        blocked = 0;
         lpanel.classList.add('max');
         document.querySelector('.bi-arrow-bar-right').classList.add('hidden');
         document.querySelector('.bi-unlock-fill').classList.remove('hidden');
         document.querySelector('.bi-lock-fill').classList.add('hidden');
         return;
     }
+
 }
 
 function maxedOnLeave() {
     if (lpanel.classList == 'max' && blocked != 1) {
         lpanel.classList.remove('max');
+        blocked = 0;
         minmax.style.background = 'var(--not-blocked)';
         document.querySelector('.bi-arrow-bar-right').classList.remove('hidden');
         document.querySelector('.bi-unlock-fill').classList.add('hidden');
@@ -84,6 +87,9 @@ function maxedOnLeave() {
         acc.classList.remove('max');
     }
 }
+
+
+
 
 
 
@@ -131,6 +137,13 @@ function rightPanel(x) {
         login.classList.remove('hidden');
     }
 }
+
+
+
+
+
+
+
 
 // LOGIN
 var fornick = document.querySelector("#right-panel label[for='nick']");
