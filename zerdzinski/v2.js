@@ -145,6 +145,8 @@ function rightPanel(x) {
 
 
 
+
+
 // LOGIN
 var fornick = document.querySelector("#right-panel label[for='nick']");
 var nick = document.querySelector("#right-panel #nick");
@@ -266,7 +268,7 @@ var hidelogin = document.querySelector("#right-panel .logincont");
 var hideregister = document.querySelector("#right-panel .registercont");
 
 function noaccount(x) {
-    if (x==1){
+    if (x == 1) {
         hideregister.classList.remove('hidden');
         hideregister.classList.add('smooth');
         hidelogin.style.height = "0%";
@@ -275,4 +277,28 @@ function noaccount(x) {
             hidelogin.classList.add('hidden');
         }, 1100);
     }
+}
+
+
+
+
+var liczba1 = document.querySelector('.liczba1');
+var liczba2 = document.querySelector('.liczba2');
+
+function randomNr() {
+    n1 = Math.ceil(liczba1.value);
+    n2 = Math.floor(liczba2.value);
+    var rand;
+
+    if (liczba1.value != '' && liczba2.value != '') {
+        document.querySelector('#randomNumber').innerText = Math.floor((Math.random() * parseInt(n2)) + parseInt(n1));
+        rand = setInterval(() => {
+            document.querySelector('#randomNumber').innerText = Math.floor(Math.random() * (n2 - n1 + 1)) + n1;
+        }, 50);
+        setTimeout(() => {
+            window.clearInterval(rand);
+            return;
+        }, 1000);
+    }
+    return
 }
