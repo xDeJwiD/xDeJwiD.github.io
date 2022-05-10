@@ -219,7 +219,7 @@ h3 {
 .bottom {
   background: var(--main-accent);
   width: 100%;
-  height: calc(100% - 40px - 20px - 150px - 20px - 2rem);
+  height: calc(100% - 40px - 20px - 150px - 10px - 2rem);
   border-radius: 1.3rem;
   position: relative;
   padding: 0px 20px 0px 20px;
@@ -242,8 +242,8 @@ h3 {
   flex-grow: 1;
   flex-basis: 20rem;
   /* width: 300px; */
-  min-height: 300px;
-  height: calc(50% - 20px);
+  min-height: 290px;
+  height: calc(50% - 40px);
   position: relative;
   background-color: var(--main-dark);
   margin: 10px;
