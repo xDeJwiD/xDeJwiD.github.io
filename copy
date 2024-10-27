@@ -1,0 +1,485 @@
+// Zbieramy wszystkie sekcje i przyciski nawigacyjne
+const sections = document.querySelectorAll('.section');
+const navButtons = document.querySelectorAll('#wrapper-nav .btn');
+let currentIndex = 0;
+let isAnimating = false;
+
+// Funkcja animująca przewijanie sekcji
+function gotoSection(index, direction) {
+    if (isAnimating || index < 0 || index >= sections.length) return;
+
+    isAnimating = true;
+    const currentSection = sections[currentIndex];
+    const nextSection = sections[index];
+
+    // Ustawiamy sekcję na ekranie z góry lub dołu
+    nextSection.style.transform = `translateY(${direction === 'down' ? 100 : -100}%)`;
+    nextSection.style.zIndex = 1;
+    nextSection.style.transition = 'none'; // Wyłączamy przejście, żeby ustawić pozycję
+
+    // Przypisujemy klasę active od razu po kliknięciu
+    updateActiveButtonByIndex(index);
+
+    // Animujemy obie sekcje
+    setTimeout(() => {
+        nextSection.style.transition = 'transform 0.75s ease-in-out';
+        currentSection.style.transition = 'transform 0.75s ease-in-out';
+
+        currentSection.style.transform = `translateY(${direction === 'down' ? -100 : 100}%)`;
+        nextSection.style.transform = `translateY(0)`;
+
+        setTimeout(() => {
+            // Resetujemy po animacji
+            currentSection.style.zIndex = 0;
+            currentSection.style.transform = 'translateY(100%)';
+            currentIndex = index; // Aktualizujemy indeks po zakończeniu animacji
+            isAnimating = false; // Animacja zakończona
+
+            // Na koniec animacji jeszcze raz aktualizujemy klasę active
+            updateActiveButtonByIndex(currentIndex);
+        }, 750);
+    }, 20); // Krótkie opóźnienie, aby animacja się wykonała
+}
+
+// Funkcja aktualizująca klasę active na podstawie indeksu
+function updateActiveButtonByIndex(index) {
+    navButtons.forEach(button => button.classList.remove('active')); // Usuwamy klasę active ze wszystkich przycisków
+    navButtons[index].classList.add('active'); // Ustawiamy klasę active dla aktualnego przycisku
+}
+
+// Funkcja obsługująca przewijanie
+function handleScroll(event) {
+    if (isAnimating) return;
+
+    const delta = event.deltaY || event.touches[0].clientY;
+    if (delta > 0) {
+        // Przewijanie w dół
+        gotoSection(currentIndex + 1, 'down');
+    } else if (delta < 0) {
+        // Przewijanie w górę
+        gotoSection(currentIndex - 1, 'up');
+    }
+
+    // Wywołanie efektu paralaksy
+    handleParallax();
+}
+
+// Funkcja przypinająca sekcje do góry ekranu
+function pinSections() {
+    sections.forEach(section => {
+        section.style.position = 'fixed';
+        section.style.top = '0';
+        section.style.left = '0';
+        section.style.width = '100%';
+        section.style.height = '100vh';
+        section.style.zIndex = 0;
+        section.style.transform = 'translateY(100%)'; // Początkowa pozycja każdej sekcji
+    });
+
+    // Ustawienie pierwszej sekcji na ekranie
+    sections[0].style.transform = 'translateY(0)';
+    sections[0].style.zIndex = 1;
+}
+
+// Funkcja przewijająca do odpowiedniej sekcji
+function scrollToSection(event) {
+    event.preventDefault(); // Zapobiegamy domyślnemu działaniu linku
+    const targetId = event.target.getAttribute('href');
+    const targetIndex = Array.from(sections).findIndex(section => `#${section.id}` === targetId);
+
+    // Sprawdzamy, czy kliknięty przycisk jest już aktywny
+    if (targetIndex !== -1 && targetIndex !== currentIndex) {
+        // Ustawiamy klasę active na klikniętym przycisku od razu
+        updateActiveButtonByIndex(targetIndex); // Używamy nowej funkcji do aktualizacji przycisku
+        gotoSection(targetIndex, targetIndex > currentIndex ? 'down' : 'up');
+    }
+}
+
+// Nasłuchujemy kliknięć na przyciskach
+navButtons.forEach(button => {
+    button.addEventListener('click', scrollToSection);
+});
+
+// Inicjalizacja sekcji
+pinSections();
+
+
+
+// Nasłuchiwanie przewijania kółkiem myszy
+window.addEventListener('wheel', handleScroll);
+
+// Nasłuchiwanie dotyku na urządzeniach mobilnych
+window.addEventListener('touchstart', handleScroll);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const sections = document.querySelectorAll('.section');
+    const navButtons = document.querySelectorAll('#wrapper-nav .btn');
+    const videoElement = document.querySelector('.display video');
+    let currentIndex = 0;
+    let isAnimating = false;
+
+    const backgroundVideos = [
+        './img/vdo/Ksiezyc_6.mp4', // Sekcja 1
+        './img/vdo/Mars_5.mp4',    // Sekcja 2
+        './img/vdo/Oko_7.mp4'      // Sekcja 3
+    ];
+
+    function gotoSection(index, direction) {
+        if (isAnimating || index < 0 || index >= sections.length) return;
+
+        isAnimating = true;
+        const currentSection = sections[currentIndex];
+        const nextSection = sections[index];
+
+        updateActiveButtonByIndex(index);
+        nextSection.style.transform = `translateY(${direction === 'down' ? 100 : -100}%)`;
+        nextSection.style.zIndex = 1;
+        nextSection.style.transition = 'none'; // Wyłączamy przejście, żeby ustawić pozycję
+
+        setTimeout(() => {
+            nextSection.style.transition = 'transform 0.75s ease-in-out';
+            currentSection.style.transition = 'transform 0.75s ease-in-out';
+
+            currentSection.style.transform = `translateY(${direction === 'down' ? -100 : 100}%)`;
+            nextSection.style.transform = `translateY(0)`;
+
+            setTimeout(() => {
+                currentSection.style.zIndex = 0;
+                currentSection.style.transform = 'translateY(100%)';
+                currentIndex = index;
+                isAnimating = false;
+
+                // Zmieniamy wideo z efektem
+                changeVideo(currentIndex);
+                updateActiveButtonByIndex(currentIndex);
+            }, 750);
+        }, 20);
+    }
+
+    function updateActiveButtonByIndex(index) {
+        navButtons.forEach(button => button.classList.remove('active'));
+        navButtons[index].classList.add('active');
+    }
+
+    function changeVideo(index) {
+        if (videoElement) {
+            // Zmniejszamy przezroczystość do 0
+            videoElement.style.opacity = 0;
+
+            // Czekamy na zakończenie animacji wygaszania
+            setTimeout(() => {
+                // Zmieniamy źródło wideo
+                videoElement.src = backgroundVideos[index];
+                videoElement.load(); // Ładujemy nowe wideo
+
+                // Przywracamy przezroczystość do 1 po załadowaniu nowego wideo
+                videoElement.onloadeddata = () => {
+                    videoElement.style.opacity = 1;
+                };
+            }, 750); // Czas wygaszania, który powinien być taki sam jak czas przejścia
+        } else {
+            console.error("Element wideo nie został znaleziony.");
+        }
+    }
+
+    function handleScroll(event) {
+        if (isAnimating) return;
+
+        const delta = event.deltaY || event.touches[0].clientY;
+        if (delta > 0) {
+            gotoSection(currentIndex + 1, 'down');
+        } else if (delta < 0) {
+            gotoSection(currentIndex - 1, 'up');
+        }
+    }
+
+    function pinSections() {
+        sections.forEach(section => {
+            section.style.position = 'fixed';
+            section.style.top = '0';
+            section.style.left = '0';
+            section.style.width = '100%';
+            section.style.height = '100vh';
+            section.style.zIndex = 0;
+            section.style.transform = 'translateY(100%)';
+        });
+
+        sections[0].style.transform = 'translateY(0)';
+        sections[0].style.zIndex = 1;
+
+        changeVideo(0); // Ustawiamy wideo na pierwszej sekcji
+    }
+
+    function scrollToSection(event) {
+        event.preventDefault();
+        const targetId = event.target.getAttribute('href');
+        const targetIndex = Array.from(sections).findIndex(section => `#${section.id}` === targetId);
+
+        if (targetIndex !== -1 && targetIndex !== currentIndex) {
+            gotoSection(targetIndex, targetIndex > currentIndex ? 'down' : 'up');
+        }
+    }
+
+    navButtons.forEach(button => {
+        button.addEventListener('click', scrollToSection);
+    });
+
+    pinSections();
+
+    window.addEventListener('wheel', handleScroll);
+    window.addEventListener('touchstart', handleScroll);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const sections = document.querySelectorAll('.section');
+    const navButtons = document.querySelectorAll('#wrapper-nav .btn');
+    const videoElement = document.querySelector('.display video');
+    let currentIndex = 0;
+    let isAnimating = false;
+
+    const backgroundVideos = [
+        './img/vdo/Ksiezyc_6.mp4', // Sekcja 1
+        './img/vdo/Mars_5.mp4',    // Sekcja 2
+        './img/vdo/Oko_7.mp4'      // Sekcja 3
+    ];
+
+    function gotoSection(index, direction) {
+        if (isAnimating || index < 0 || index >= sections.length) return;
+
+        isAnimating = true;
+        const currentSection = sections[currentIndex];
+        const nextSection = sections[index];
+
+        // Przypisujemy klasę active od razu po kliknięciu lub scrollu
+        updateActiveButtonByIndex(index);
+
+        // Zmieniamy wideo z efektem
+        changeVideo(index); // Wygaszamy obecne wideo przed zmianą sekcji
+
+        nextSection.style.transform = `translateY(${direction === 'down' ? 100 : -100}%)`;
+        nextSection.style.zIndex = 1;
+        nextSection.style.transition = 'none'; // Wyłączamy przejście, żeby ustawić pozycję
+
+        setTimeout(() => {
+            nextSection.style.transition = 'transform 0.75s ease-in-out';
+            currentSection.style.transition = 'transform 0.75s ease-in-out';
+
+            currentSection.style.transform = `translateY(${direction === 'down' ? -100 : 100}%)`;
+            nextSection.style.transform = `translateY(0)`;
+
+            setTimeout(() => {
+                currentSection.style.zIndex = 0;
+                currentSection.style.transform = 'translateY(100%)';
+                currentIndex = index;
+                isAnimating = false;
+
+                // Upewniamy się, że klasa active jest przyznana
+                updateActiveButtonByIndex(currentIndex);
+            }, 750);
+        }, 20);
+    }
+
+    function updateActiveButtonByIndex(index) {
+        navButtons.forEach(button => button.classList.remove('active'));
+        navButtons[index].classList.add('active');
+    }
+
+    function changeVideo(index) {
+        if (videoElement) {
+            // Zmniejszamy przezroczystość do 0
+            videoElement.style.opacity = 0;
+
+            // Czekamy na zakończenie animacji wygaszania
+            setTimeout(() => {
+                // Zmieniamy źródło wideo
+                videoElement.src = backgroundVideos[index];
+                videoElement.load(); // Ładujemy nowe wideo
+
+                // Przywracamy przezroczystość do 1 po załadowaniu nowego wideo
+                videoElement.onloadeddata = () => {
+                    videoElement.style.opacity = 1;
+                };
+            }, 750); // Czas wygaszania, który powinien być taki sam jak czas przejścia
+        } else {
+            console.error("Element wideo nie został znaleziony.");
+        }
+    }
+
+    function handleScroll(event) {
+        if (isAnimating) return;
+
+        const delta = event.deltaY || event.touches[0].clientY;
+        if (delta > 0) {
+            gotoSection(currentIndex + 1, 'down');
+        } else if (delta < 0) {
+            gotoSection(currentIndex - 1, 'up');
+        }
+    }
+
+    function pinSections() {
+        sections.forEach(section => {
+            section.style.position = 'fixed';
+            section.style.top = '0';
+            section.style.left = '0';
+            section.style.width = '100%';
+            section.style.height = '100vh';
+            section.style.zIndex = 0;
+            section.style.transform = 'translateY(100%)';
+        });
+
+        sections[0].style.transform = 'translateY(0)';
+        sections[0].style.zIndex = 1;
+
+        changeVideo(0); // Ustawiamy wideo na pierwszej sekcji
+    }
+
+    function scrollToSection(event) {
+        event.preventDefault();
+        const targetId = event.target.getAttribute('href');
+        const targetIndex = Array.from(sections).findIndex(section => `#${section.id}` === targetId);
+
+        if (targetIndex !== -1 && targetIndex !== currentIndex) {
+            gotoSection(targetIndex, targetIndex > currentIndex ? 'down' : 'up');
+        }
+    }
+
+    navButtons.forEach(button => {
+        button.addEventListener('click', scrollToSection);
+    });
+
+    pinSections();
+
+    window.addEventListener('wheel', handleScroll);
+    window.addEventListener('touchstart', handleScroll);
+});

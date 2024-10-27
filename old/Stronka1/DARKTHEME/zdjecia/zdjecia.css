@@ -1,0 +1,1288 @@
+*{
+    text-decoration: none;
+
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    background: rgb(229, 229, 229);
+    overflow-x: hidden;
+}
+
+h1{
+    color: #393939;
+    font-family: sans-serif;
+    font-size: 60px;
+    position: absolute;
+    z-index: 3;
+    margin-top: 30px;
+    left: 45%;
+}
+
+
+
+.back{
+    position: absolute;
+    top: 1%;
+    left: 2%;
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    line-height: 200%;
+    color: #393939;
+    font-size: 50px;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-family: sans-serif;
+    background-position: center;
+    z-index: 1;
+    transition: ease-in-out 0.5s;
+}
+.back:hover {
+    
+    transition: ease-in-out 0.5s;
+    color: #000000;
+    opacity: 1;
+    filter: blur(50%);
+    cursor: auto;
+    
+
+}
+.back:before {
+    content:  '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    right: -10%;
+    bottom: -10%;
+    z-index: -1;
+    background: #000000;
+    opacity: 0;
+    transition: 0.5s;
+}
+.back:hover:before {   
+    filter: blur(70px);
+    opacity: 70%;
+
+}
+
+
+.tlo{
+    position: absolute;
+    top: 1%;
+    left: 94%;
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    line-height: 200%;
+    color: #393939;
+    font-size: 50px;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-family: sans-serif;
+    background-position: center;
+    z-index: 1;
+    transition: ease-in-out 0.5s;
+}
+.tlo:hover {
+    
+    transition: ease-in-out 0.5s;
+    color: #000000;
+    opacity: 1;
+    filter: blur(50%);
+    cursor: auto;
+    
+
+}
+.tlo:before {
+    content:  '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    right: -10%;
+    bottom: -10%;
+    z-index: -1;
+    background: #000000;
+    opacity: 0;
+    transition: 0.5s;
+}
+.tlo:hover:before {   
+    filter: blur(70px);
+    opacity: 70%;
+
+}
+
+
+
+.mojezdjecia{
+    position: absolute;
+    top: 33%;
+    left: 10%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 300px;
+    text-align: center;
+    line-height: 300px;
+    color: #ffb4b4;
+    font-size: 100px;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-family: sans-serif;
+    box-sizing: border-box;
+    background: #393939;
+    background-size: 300%;
+    border-radius: 100px;
+    border-color: #ff0000;
+    background-position: center;
+    z-index: 2;
+    transition: ease-in-out 0.5s;
+
+}
+.mojezdjecia p{
+    visibility: visible;
+    opacity: 1;
+    font-size: 70px;
+    z-index: -1;
+    line-height: 10px;
+    font-weight: bold;
+    color: #ffb4b4;
+    transition: ease-in-out 1.5s;
+    text-transform: none;
+    width: 500px;
+    height: 1px;
+    top: 25%;
+    left: 100%;
+    position: absolute;
+    margin-left: 1000px;
+    z-index: 1;
+    
+}
+.mojezdjecia:hover {
+    
+    transition: ease-in-out 0.5s;
+    color: rgba(255, 255, 255, 0);
+    background-position: center;
+    background-size: cover;
+    opacity: 1;
+    filter: blur(50%);
+    cursor: auto;
+    height: 300px;
+    width: 1600px;
+    top: 33%;
+    left: 49%;
+    z-index: 3;
+
+}
+.mojezdjecia:before {
+    content:  '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    right: -10%;
+    bottom: -10%;
+    z-index: -1;
+    background: #ffb4b4;
+    background-size: 400%;
+    border-radius: 50px;
+    opacity: 0;
+    transition: ease-in-out 0.5s;
+}
+.mojezdjecia:hover p{
+    opacity: 0;
+    visibility: hidden;
+    top: 25%;
+    left: 100%;
+    color: rgba(255, 255, 255, 0);
+    font-size: 70px;
+    line-height: 10px;
+    margin-top: 10%;
+    text-transform: none;
+    transition: ease-in-out 0.5s;
+    font-family: sans-serif;
+    font-weight: bold;
+    cursor: auto;
+
+}
+.mojezdjecia:hover:before {   
+    filter: blur(70px);
+    opacity: 70%;
+}
+
+
+
+.jazinnymi{
+    position: absolute;
+    top: 77%;
+    left: 10%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 300px;
+    text-align: center;
+    line-height: 300px;
+    color: #ffb4f6;
+    font-size: 100px;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-family: sans-serif;
+    box-sizing: border-box;
+    background: #393939;
+    background-size: 300%;
+    border-radius: 100px;
+    border-color: #ff0000;
+    background-position: center;
+    z-index: 2;
+    transition: ease-in-out 0.5s;
+
+}
+.jazinnymi p{
+    visibility: visible;
+    opacity: 1;
+    font-size: 70px;
+    z-index: -1;
+    line-height: 10px;
+    font-weight: bold;
+    color: #ffb4f6;
+    transition: ease-in-out 1.5s;
+    text-transform: none;
+    width: 500px;
+    height: 1px;
+    top: 25%;
+    left: 100%;
+    position: absolute;
+    margin-left: 1000px;
+    z-index: 1;
+}
+.jazinnymi:hover {
+    
+    transition: ease-in-out 0.5s;
+    color: #fff;
+    background-position: center;
+    background-size: cover;
+    opacity: 1;
+    filter: blur(50%);
+    cursor: auto;
+    height: 300px;
+    width: 1600px;
+    top: 77%;
+    left: 49%;
+    z-index: 3;
+
+}
+.jazinnymi:before {
+    content:  '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    right: -10%;
+    bottom: -10%;
+    z-index: 1;
+    background: #ffb4f6;
+    background-size: 400%;
+    border-radius: 50px;
+    opacity: 0;
+    transition: 0.5s;
+}
+.jazinnymi:hover p{
+    opacity: 0;
+    visibility: hidden;
+    top: 25%;
+    left: 100%;
+    color: rgba(255, 255, 255, 0);
+    font-size: 70px;
+    line-height: 10px;
+    margin-top: 10%;
+    text-transform: none;
+    transition: ease-in-out 0.5s;
+    font-family: sans-serif;
+    font-weight: bold;
+    cursor: auto;
+}
+.jazinnymi:hover:before {   
+    filter: blur(70px);
+    opacity: 70%;
+
+}
+
+
+.blender{
+    position: absolute;
+    top: 121%;
+    left: 10%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 300px;
+    text-align: center;
+    line-height: 300px;
+    color: #dcb4ff;
+    font-size: 100px;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-family: sans-serif;
+    box-sizing: border-box;
+    background: #393939;
+    background-size: 300%;
+    border-radius: 100px;
+    border-color: #ff0000;
+    background-position: center;
+    z-index: 2;
+    transition: ease-in-out 0.5s;
+
+}
+.blender p{
+    visibility: visible;
+    opacity: 1;
+    font-size: 70px;
+    z-index: -1;
+    line-height: 10px;
+    font-weight: bold;
+    color: #dcb4ff;
+    transition: ease-in-out 1.5s;
+    text-transform: none;
+    width: 500px;
+    height: 1px;
+    top: 25%;
+    left: 100%;
+    position: absolute;
+    margin-left: 1000px;
+    z-index: 1;
+}
+.blender:hover {
+    
+    transition: ease-in-out 0.5s;
+    color: #fff;
+    background-position: center;
+    background-size: cover;
+    opacity: 1;
+    filter: blur(50%);
+    cursor: auto;
+    height: 300px;
+    width: 1600px;
+    top: 121%;
+    left: 49%;
+    z-index: 3;
+
+}
+.blender:before {
+    content:  '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    right: -10%;
+    bottom: -10%;
+    z-index: 1;
+    background: #dcb4ff;
+    background-size: 400%;
+    border-radius: 50px;
+    opacity: 0;
+    transition: 0.5s;
+}
+.blender:hover p{
+    opacity: 0;
+    visibility: hidden;
+    top: 25%;
+    left: 100%;
+    color: rgba(255, 255, 255, 0);
+    font-size: 70px;
+    line-height: 10px;
+    margin-top: 10%;
+    text-transform: none;
+    transition: ease-in-out 0.5s;
+    font-family: sans-serif;
+    font-weight: bold;
+    cursor: auto;
+}
+.blender:hover:before {   
+    filter: blur(70px);
+    opacity: 70%;
+
+}
+
+
+.mojefilmy{
+    position: absolute;
+    top: 165%;
+    left: 10%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 300px;
+    text-align: center;
+    line-height: 300px;
+    color: #b4c2ff;
+    font-size: 100px;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-family: sans-serif;
+    box-sizing: border-box;
+    background: #393939;
+    background-size: 300%;
+    border-radius: 100px;
+    border-color: #ff0000;
+    background-position: center;
+    z-index: 2;
+    transition: ease-in-out 0.5s;
+
+}
+.mojefilmy p{
+    visibility: visible;
+    opacity: 1;
+    font-size: 70px;
+    z-index: 1;
+    line-height: 10px;
+    font-weight: bold;
+    color: #b4c2ff;
+    transition: ease-in-out 1.5s;
+    text-transform: none;
+    width: 500px;
+    height: 1px;
+    top: 25%;
+    left: 100%;
+    position: absolute;
+    margin-left: 1000px;
+    z-index: 1;
+    
+}
+.mojefilmy:hover {
+    
+    transition: ease-in-out 0.5s;
+    color: rgba(255, 255, 255, 0);
+    background-position: center;
+    background-size: cover;
+    opacity: 1;
+    filter: blur(50%);
+    cursor: auto;
+    height: 300px;
+    width: 1600px;
+    top: 165%;
+    left: 49%;
+    z-index: 3;
+
+}
+.mojefilmy:before {
+    content:  '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    right: -10%;
+    bottom: -10%;
+    z-index: 1;
+    background: #b4c2ff;
+    background-size: 400%;
+    border-radius: 50px;
+    opacity: 0;
+    transition: 0.5s;
+}
+.mojefilmy:hover p{
+    opacity: 0;
+    visibility: hidden;
+    top: 25%;
+    left: 100%;
+    color: rgba(255, 255, 255, 0);
+    font-size: 70px;
+    line-height: 10px;
+    margin-top: 10%;
+    text-transform: none;
+    transition: ease-in-out 0.5s;
+    font-family: sans-serif;
+    font-weight: bold;
+    cursor: auto;
+}
+.mojefilmy:hover:before {   
+    filter: blur(70px);
+    opacity: 70%;
+
+}
+
+
+#warstwa{
+    height: 1700px;
+    width: 700px;
+    background-color: rgba(255, 255, 255, 0);
+    position: absolute;
+    z-index: 2;
+    top: 20%;
+    left: 68%;
+}
+
+
+
+.mojezdjecia .zdj1{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.mojezdjecia:hover .zdj1{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(255, 255, 255, 0));
+    background-position: center;
+    background-size: cover;
+}
+.mojezdjecia:hover .zdj1:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 10%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(255, 255, 255, 0));
+}
+
+.mojezdjecia .zdj2{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 30%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.mojezdjecia:hover .zdj2{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 30%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(255, 255, 255, 0));
+    background-position: center;
+    background-size: cover;
+}
+.mojezdjecia:hover .zdj2:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 25%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(255, 255, 255, 0));
+}
+
+.mojezdjecia .zdj3{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 45%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.mojezdjecia:hover .zdj3{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 45%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(255, 255, 255, 0));
+    background-position: center;
+    background-size: cover;
+}
+.mojezdjecia:hover .zdj3:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 40%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(255, 255, 255, 0));
+}
+
+.mojezdjecia .zdj4{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 60%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.mojezdjecia:hover .zdj4{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 60%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/DSC_0237.JPG);
+    background-position: center;
+    background-size: cover;
+}
+.mojezdjecia:hover .zdj4:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 55%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/DSC_0237.JPG)
+}
+
+.mojezdjecia .zdj5{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 75%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.mojezdjecia:hover .zdj5{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 75%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/DSC_0278.JPG);
+    background-position: center;
+    background-size: cover;
+}
+.mojezdjecia:hover .zdj5:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 75%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/DSC_0278.JPG)
+}
+
+
+.jazinnymi .zdj1{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.jazinnymi:hover .zdj1{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/DSC_0123.JPG);
+    background-position: center;
+    background-size: cover;
+}
+.jazinnymi:hover .zdj1:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 10%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/DSC_0123.JPG)
+}
+
+.jazinnymi .zdj2{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 30%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.jazinnymi:hover .zdj2{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 30%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/IMG_20190706_161543.jpg);
+    background-position: center;
+    background-size: cover;
+}
+.jazinnymi:hover .zdj2:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 25%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/IMG_20190706_161543.jpg)
+}
+
+.jazinnymi .zdj3{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 45%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.jazinnymi:hover .zdj3{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 45%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/IMG_20190715_201608.jpg);
+    background-position: center;
+    background-size: cover;
+}
+.jazinnymi:hover .zdj3:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 40%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/IMG_20190715_201608.jpg)
+}
+
+.jazinnymi .zdj4{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 60%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.jazinnymi:hover .zdj4{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 60%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/DSC_0242.JPG);
+    background-position: center;
+    background-size: cover;
+}
+.jazinnymi:hover .zdj4:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 55%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/DSC_0242.JPG)
+}
+
+.jazinnymi .zdj5{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 75%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.jazinnymi:hover .zdj5{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 75%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/DSC_0138.JPG);
+    background-position: center;
+    background-size: cover;
+}
+.jazinnymi:hover .zdj5:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 75%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/DSC_0138.JPG)
+}
+
+
+.blender .zdj1{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.blender:hover .zdj1{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/szklanki_z_maka2.png);
+    background-position: center;
+    background-size: cover;
+}
+.blender:hover .zdj1:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 10%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/szklanki_z_maka2.png)
+}
+
+.blender .zdj2{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 30%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.blender:hover .zdj2{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 30%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/Zrzut%20ekranu%201.png);
+    background-position: center;
+    background-size: cover;
+}
+.blender:hover .zdj2:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 25%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/Zrzut%20ekranu%201.png)
+}
+
+.blender .zdj3{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 45%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.blender:hover .zdj3{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 45%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/Zrzut%20ekranu%202.png);
+    background-position: center;
+    background-size: cover;
+}
+.blender:hover .zdj3:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 40%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/Zrzut%20ekranu%202.png)
+}
+
+.blender .zdj4{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 60%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.blender:hover .zdj4{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 60%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/Zrzut%20ekranu%203.png);
+    background-position: center;
+    background-size: cover;
+}
+.blender:hover .zdj4:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 55%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/Zrzut%20ekranu%203.png)
+}
+
+.blender .zdj5{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 75%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.blender:hover .zdj5{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 75%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/blue%20gaming%20set%202.png);
+    background-position: center;
+    background-size: cover;
+}
+.blender:hover .zdj5:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 75%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: url(../../zdj/blue%20gaming%20set%202.png)
+}
+
+
+.mojefilmy .zdj1{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.mojefilmy:hover .zdj1{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(255, 255, 255, 0));
+    background-position: center;
+    background-size: cover;
+}
+.mojefilmy:hover .zdj1:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 10%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(255, 255, 255, 0))
+}
+
+.mojefilmy .zdj2{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 30%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.mojefilmy:hover .zdj2{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 30%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(255, 255, 255, 0));
+    background-position: center;
+    background-size: cover;
+}
+.mojefilmy:hover .zdj2:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 25%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(255, 255, 255, 0));
+}
+
+.mojefilmy .zdj3{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 45%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.mojefilmy:hover .zdj3{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 45%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(255, 255, 255, 0));
+    background-position: center;
+    background-size: cover;
+}
+.mojefilmy:hover .zdj3:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 40%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(255, 255, 255, 0));
+}
+
+.mojefilmy .zdj4{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 60%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.mojefilmy:hover .zdj4{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 60%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(255, 255, 255, 0));
+    background-position: center;
+    background-size: cover;
+}
+.mojefilmy:hover .zdj4:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 55%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(255, 255, 255, 0));
+}
+
+.mojefilmy .zdj5{
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 75%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+}
+.mojefilmy:hover .zdj5{
+    opacity: 1;
+    height: 200px;
+    width: 200px;
+    border-radius: 60px;
+    position: absolute;
+    top: 15%;
+    left: 75%;
+    z-index: 5;
+    transition: ease-in-out 0.5s;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(255, 255, 255, 0));
+    background-position: center;
+    background-size: cover;
+}
+.mojefilmy:hover .zdj5:hover{
+    opacity: 1;
+    height: 400px;
+    width: 400px;
+    border-radius: 60px;
+    position: absolute;
+    top: -15%;
+    left: 75%;
+    z-index: 6;
+    transition: ease-in-out 0.5s;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(255, 255, 255, 0));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

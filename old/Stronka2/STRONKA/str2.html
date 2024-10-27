@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>str2</title>
+    <style>
+        body {
+            background-color: rgb(41, 41, 41);
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <pre>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: rgb(36, 36, 36);
+    font-family: 'Poppins', sans-serif;
+}
+
+.header {
+    height: 10%;
+    width: 100%;
+    background-color: rgba(245, 222, 179, 0.427);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+}
+.left {
+    width: 10%;
+    height: 200%;
+    background-color: rgba(238, 130, 238, 0.425);
+    position: absolute;
+    float: left;
+    top: 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+}
+ul li, ol li a {
+    color: white;
+    text-decoration: none;
+    width: 100%;
+}
+
+ul li:hover, ol li:hover a {
+    color: red;
+}
+.mid {
+    left: 10%;
+    background-color: rgba(65, 105, 225, 0.425);
+    height: 200%;
+    width: 80%;
+    position: absolute;
+    top: 10%;
+}
+.mid img {
+    width: 600px;
+}
+table, th, tr, td {
+    border: 2px black solid;
+    border-collapse: collapse;
+}
+td {
+    text-align: center;
+}
+table {
+    background-color: seashell;
+    filter: blur(5px);
+    transition: ease-in-out .3s;
+}
+th, td {
+    padding: 5px;
+}
+th:hover, td:hover {
+    background-color: rgb(186, 186, 186);
+}
+table:hover {
+    filter: blur(0px);
+}
+
+.right {
+    width: 10%;
+    height: 200%;
+    background-color: rgba(224, 197, 64, 0.466);
+    position: absolute;
+    top: 10%;
+    left: 90%;
+    color: white;
+}
+.animacja {
+    width: 100px;
+    height: 100px;
+    background-color: rgb(255, 38, 0);
+    border-radius: 40rem;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: calc(0% + 50px);
+    animation: kulko 2s infinite alternate linear;
+}
+
+@keyframes kulko {
+    from {
+        top: calc(0% + 50px);
+        background-color: chartreuse;
+    }
+    to {
+        top: calc(100% - 50px);
+        background-color: rgb(255, 0, 183);
+    }
+    
+}
+.audio {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.podstrony li a{
+    color: red;
+}
+.podstrony {
+    text-align: center;
+}
+    </pre>
+</body>
+</html>

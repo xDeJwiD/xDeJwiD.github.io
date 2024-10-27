@@ -1,0 +1,29 @@
+Witam, jest to stronka w 101% robiona przezemnie.
+
+	Możliwe błędy/niedoskonałości:
+
+-w miejscu gdzie są zdjęcia, mogą być lekkie lagi,
+	najprawdopodobniej spowodowane sporą ilością kodu
+	ponieważ nie wiedziałem i nie umiałem go skrócić
+	do prostszej postaci.
+
+-ponownie w miejscu gdzie są zdjęcia, nie ma na dole
+	ani jednego filmu, choć jest tak nazwana kategoria.
+	Jest tak dlatego, że filmy moje zajmują łącznie 
+	ponad 1gb i nie wstawailem ich żeby mieć pewność, 
+	że moja strona się wogóle wyśle.
+
+-nie wszędzie dałem stopkę z copyrightami, jest
+	ona tylko na głównej stronie.
+
+		-NAJWAŻNIEJSZE-
+strona robiona na moim (dobrym komputerze na rozdzielczości
+1920x1080). U pana może to się całkowicie inaczej pokazywać.
+Za wszelkie błedy, braki rzeczy które trzeba było wykonać
+z góry przepraszam, ale myślę, że stronka którą przygotowałem
+nie jest aż taka zła :)
+
+
+Można też odwiedzić stronę: dawidszynka.xlx.pl   :D
+
+Pozdrawiam, Dawid Szymanowski kl. 1TI

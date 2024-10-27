@@ -1,0 +1,585 @@
+:root {
+    --bgc: rgb(46, 46, 46);
+
+    --hackc: rgb(27, 132, 27);
+    --hackb: black;
+    --hackbg: rgb(0, 121, 8);
+
+
+    --col1: rgb(0, 255, 255);
+    --col2: rgb(0, 255, 106);
+    --col3: rgb(128, 0, 255);
+    --col4: rgb(255, 0, 128);
+    --col5: rgb(251, 255, 0);
+    --col6: rgb(255, 0, 0);
+    --col7: rgb(0, 255, 123);
+    --col8: rgb(85, 0, 255);
+    --col9: rgb(255, 225, 0);
+    --col10: rgb(255, 0, 132);
+    --col11: rgb(0, 200, 255);
+    --col12: rgb(85, 0, 255);
+    --col13: rgb(221, 255, 0);
+    --col14: rgb(255, 0, 111);
+    --col15: rgb(255, 0, 0);
+    --col16: rgb(255, 0, 132);
+    --col17: rgb(0, 200, 255);
+    --col18: rgb(85, 0, 255);
+    --col19: rgb(221, 255, 0);
+    --col20: rgb(255, 0, 111);
+    --col21: rgb(0, 255, 255);
+    --col22: rgb(0, 255, 13);
+    --col23: rgb(255, 0, 102);
+    --col24: rgb(255, 255, 0);
+    --col25: rgb(85, 0, 255);
+}
+
+
+
+
+
+
+
+
+
+
+#section1::before {
+    background-color: var(--col1);
+}
+#section2::before {
+    background-color: var(--col2);
+}
+#section3::before {
+    background-color: var(--col3);
+}
+#section4::before {
+    background-color: var(--col4);
+}
+#section5::before {
+    background-color: var(--col5);
+}
+#section6::before {
+    background-color: var(--col6);
+}
+#section7::before {
+    background-color: var(--col7);
+}
+#section8::before {
+    background-color: var(--col8);
+}
+#section9::before {
+    background-color: var(--col9);
+}
+#section10::before {
+    background-color: var(--col10);
+}
+#section11::before {
+    background-color: var(--col11);
+}
+#section12::before {
+    background-color: var(--col12);
+}
+#section13::before {
+    background-color: var(--col13);
+}
+#section14::before {
+    background-color: var(--col14);
+}
+#section15::before {
+    background-color: var(--col15);
+}
+#section16::before {
+    background-color: var(--col16);
+}
+#section17::before {
+    background-color: var(--col17);
+}
+#section18::before {
+    background-color: var(--col18);
+}
+#section19::before {
+    background-color: var(--col19);
+}
+#section20::before {
+    background-color: var(--col20);
+}
+#section21::before {
+    background-color: var(--col21);
+}
+#section22::before {
+    background-color: var(--col22);
+}
+#section23::before {
+    background-color: var(--col23);
+}
+#section24::before {
+    background-color: var(--col24);
+}
+#section25::before {
+    background-color: var(--col25);
+}
+
+
+
+
+
+
+
+
+#section1 .jsinfo h2::after {
+    background-color: var(--col1);
+}
+#section2 .jsinfo h2::after {
+    background-color: var(--col2);
+}
+#section3 .jsinfo h2::after {
+    background-color: var(--col3);
+}
+#section4 .jsinfo h2::after {
+    background-color: var(--col4);
+}
+#section5 .jsinfo h2::after {
+    background-color: var(--col5);
+}
+#section6 .jsinfo h2::after {
+    background-color: var(--col6);
+}
+#section7 .jsinfo h2::after {
+    background-color: var(--col7);
+}
+#section8 .jsinfo h2::after {
+    background-color: var(--col8);
+}
+#section9 .jsinfo h2::after {
+    background-color: var(--col9);
+}
+#section10 .jsinfo h2::after {
+    background-color: var(--col10);
+}
+#section11 .jsinfo h2::after {
+    background-color: var(--col11);
+}
+#section12 .jsinfo h2::after {
+    background-color: var(--col12);
+}
+#section13 .jsinfo h2::after {
+    background-color: var(--col13);
+}
+#section14 .jsinfo h2::after {
+    background-color: var(--col14);
+}
+#section15 .jsinfo h2::after {
+    background-color: var(--col15);
+}
+#section16 .jsinfo h2::after {
+    background-color: var(--col16);
+}
+#section17 .jsinfo h2::after {
+    background-color: var(--col17);
+}
+#section18 .jsinfo h2::after {
+    background-color: var(--col18);
+}
+#section19 .jsinfo h2::after {
+    background-color: var(--col19);
+}
+#section20 .jsinfo h2::after {
+    background-color: var(--col20);
+}
+#section21 .jsinfo h2::after {
+    background-color: var(--col21);
+}
+#section22 .jsinfo h2::after {
+    background-color: var(--col22);
+}
+#section23 .jsinfo h2::after {
+    background-color: var(--col23);
+}
+#section24 .jsinfo h2::after {
+    background-color: var(--col24);
+}
+#section25 .jsinfo h2::after {
+    background-color: var(--col25);
+}
+
+
+
+
+
+
+#section1 .js {
+    background: linear-gradient(var(--col1), transparent);
+}
+#section2 .js {
+    background: linear-gradient(var(--col2), transparent);
+}
+#section3 .js {
+    background: linear-gradient(var(--col3), transparent);
+}
+#section4 .js {
+    background: linear-gradient(var(--col4), transparent);
+}
+#section5 .js {
+    background: linear-gradient(var(--col5), transparent);
+}
+#section6 .js {
+    background: linear-gradient(var(--col6), transparent);
+}
+#section7 .js {
+    background: linear-gradient(var(--col7), transparent);
+}
+#section8 .js {
+    background: linear-gradient(var(--col8), transparent);
+}
+#section9 .js {
+    background: linear-gradient(var(--col9), transparent);
+}
+#section10 .js {
+    background: linear-gradient(var(--col10), transparent);
+}
+#section11 .js {
+    background: linear-gradient(var(--col11), transparent);
+}
+#section12 .js {
+    background: linear-gradient(var(--col12), transparent);
+}
+#section13 .js {
+    background: linear-gradient(var(--col13), transparent);
+}
+#section14 .js {
+    background: linear-gradient(var(--col14), transparent);
+}
+#section15 .js {
+    background: linear-gradient(var(--col15), transparent);
+}
+#section16 .js {
+    background: linear-gradient(var(--col16), transparent);
+}
+#section17 .js {
+    background: linear-gradient(var(--col17), transparent);
+}
+#section18 .js {
+    background: linear-gradient(var(--col18), transparent);
+}
+#section19 .js {
+    background: linear-gradient(var(--col19), transparent);
+}
+#section20 .js {
+    background: linear-gradient(var(--col20), transparent);
+}
+#section21 .js {
+    background: linear-gradient(var(--col21), transparent);
+}
+#section22 .js {
+    background: linear-gradient(var(--col22), transparent);
+}
+#section23 .js {
+    background: linear-gradient(var(--col23), transparent);
+}
+#section24 .js {
+    background: linear-gradient(var(--col24), transparent);
+}
+#section25 .js {
+    background: linear-gradient(var(--col25), transparent);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.dark-mode #section1::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section2::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section3::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section4::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section5::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section6::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section7::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section8::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section9::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section10::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section11::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section12::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section13::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section14::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section15::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section16::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section17::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section18::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section19::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section20::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section21::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section22::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section23::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section24::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+.dark-mode #section25::before {
+    background-color: var(--hackbg);
+    box-shadow: 0px 0px 10px 5px rgb(0, 179, 27);
+}
+
+
+
+
+
+
+
+.dark-mode #section1 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section2 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section3 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section4 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section5 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section6 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section7 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section8 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section9 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section10 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section11 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section12 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section13 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section14 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section15 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section16 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section17 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section18 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section19 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section20 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section21 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section22 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section23 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section24 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+.dark-mode #section25 .jsinfo h2::after {
+    background-color: var(--hackbg);
+}
+
+
+
+
+
+.dark-mode #section1 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section2 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section3 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section4 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section5 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section6 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section7 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section8 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section9 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section10 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section11 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section12 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section13 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section14 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section15 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section16 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section17 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section18 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section19 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section20 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section21 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section22 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section23 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section24 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}
+.dark-mode #section25 .js {
+    background: var(--hackbg);
+    box-shadow: inset 0px -15px 10px -10px black;
+}

@@ -1,0 +1,413 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('http://fonts.cdnfonts.com/css/matrix');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', Courier, monospace;
+    list-style: none;
+}
+button {
+    cursor: pointer;
+}
+::-webkit-scrollbar {
+    background-color: var(--bgc);
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    background-color: var(--bgc);
+}
+::-webkit-scrollbar-button {
+    background-color: var(--bgc);
+}
+::-webkit-scrollbar-corner {
+    background-color: var(--bgc);
+}
+::-webkit-scrollbar-thumb {
+    background-color: rgb(92, 92, 92);
+    border-radius: 20px;
+}
+::-webkit-scrollbar-track-piece {
+    background-color: var(--bgc);
+}
+
+:root {
+    --ebgc: rgb(33, 33, 33);
+
+    --bgc: rgb(46, 46, 46);
+
+    --hackc: rgb(27, 132, 27);
+    
+    --hh: 10vh;
+}
+
+body {
+    background-color: var(--bgc);
+}
+#header {
+    position: sticky;
+    width: 100%;
+    background-color: rgba(46, 46, 46, 0.53);
+    backdrop-filter: blur(1rem);
+    height: var(--hh);
+    z-index: 1000000;
+    top: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    color: white;
+    margin-bottom: 20px;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
+}
+#header .btn {
+    width: auto;
+    height: auto;
+    outline: none;
+    border: 2px solid rgb(255, 255, 255);
+    color: white;
+    border-radius: .5rem;
+    background-color: transparent;
+    font-size: 1.6rem;
+    font-weight: 700;
+    padding: 10px 30px;
+    transition: .2s ease-in-out;
+}
+#header .btn:hover {
+    background-color: white;
+    color: var(--bgc);
+}
+#reload {
+    position: fixed;
+    width: 100%;
+    height: 50px;
+    background-color: rgba(46, 46, 46, 0.53);
+    backdrop-filter: blur(1rem);
+    top: calc(100% - 50px);
+    z-index: 100;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    z-index: 1000000;
+}
+#reload button {
+    width: auto;
+    height: auto;
+    outline: none;
+    border: 2px solid rgb(255, 255, 255);
+    color: white;
+    background-color: rgb(33, 33, 33);
+    border-radius: .5rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+    padding: 15px;
+    transition: .2s ease-in-out;
+    position: absolute;
+    bottom: 50%;
+    z-index: 120;
+}
+#reload button:hover {
+    background-color: white;
+    color: var(--bgc);
+}
+.section {
+    width: 100%;
+    height: 300px;
+    position: relative;
+    background-color: var(--ebgc);
+    margin-bottom: 20px;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
+}
+.section::before {
+    content: '';
+    width: 100%;
+    height: 20px;
+    position: absolute;
+    top: -20px;
+    left: 0;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out, box-shadow 1s ease-out;
+}
+.jsinfo {
+    width: 25%;
+    height: 100%;
+    background-color: transparent;
+    float: left;
+    box-shadow: inset 20px 20px 20px 5px black;
+    text-align: center;
+    padding: 20px;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
+}
+.jsinfo::before {
+    content: '';
+    width: 10%; 
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
+}
+.jsinfo h2 {
+    color: rgb(255, 255, 255);
+    text-shadow: 0px 0px 10px black;
+    position: absolute;
+    padding: 10px 30px;
+    top: 0%;
+    left: 0%;
+    z-index: 20;
+    line-height: 3rem;
+}
+.jsinfo h4 {
+    color: rgb(255, 255, 255);
+    position: relative;
+    padding: 10px 30px;
+    top: 50%;
+    left: 50%;
+    font-size: 2rem;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    line-height: 3rem;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
+}
+.jsinfo h2::after {
+    border-radius: 0 0 20px 0;
+    content: '';
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    box-shadow: 15px 15px 10px 1px black;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out, box-shadow 1s ease-out;
+}
+.js {
+    width: 40%;
+    height: 100%;
+    background-color: rgb(80, 80, 80);
+    float: left;
+    padding: 10px;
+    box-shadow: inset 0px 15px 10px -10px black;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow-y: visible;
+    overflow-x: hidden;
+}
+.js {
+    font-weight: 600;
+    color: white;
+    text-shadow: 0px 0px 10px black;
+}
+.js button {
+    background-color: rgba(0, 0, 0, 0.461);
+    color: black;
+    padding: 20px;
+    margin: 10px;
+    border: rgb(255, 255, 255) 3px solid;
+    border-radius: .5rem;
+    font-weight: 500;
+    color: white;
+    cursor: pointer;
+}
+.jspreview {
+    width: 35%;
+    height: 100%;
+    background-color: rgb(30, 30, 30);
+    float: left;
+    box-shadow: inset 20px 10px 20px 5px black;
+    color: rgb(255, 255, 255);
+    text-shadow: 7px 7px 2px rgb(0, 0, 0);
+    font-weight: 300;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    padding: 20px;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
+}
+
+.dark-mode {
+    background-color: black;
+}
+.dark-mode #header {
+    background-color: rgba(0, 137, 0, 0.53);
+    color: black;
+}
+.dark-mode #header button {
+    border-color: black;
+    color: black;
+}
+.dark-mode #header .btn:hover {
+    background-color: black;
+    color: var(--hackc);
+}
+.dark-mode .section h2 {
+    color: black;
+}
+.dark-mode {
+    background-color: rgb(35, 35, 35);
+}
+.dark-mode .section .jsinfo, .dark-mode .section .jspreview{
+    background-color: black;
+    color: rgb(48, 199, 48);
+}
+.dark-mode .section .jsinfo h4 {
+    color: rgb(48, 199, 48);
+}
+.dark-mode .section .js {
+    color: black;
+}
+.dark-mode .section .js button {
+    border: rgb(48, 199, 48) 3px solid;
+    color: rgb(48, 199, 48);
+}
+.hack {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    left: 0%;
+    bottom: 0%;
+    margin: 0px 10px;
+}
+.hack input {
+    font-weight: 900;
+    width: 15px;
+    height: 15px;
+    margin: 10px;
+    border-radius: 3rem;
+    background: blue;
+}
+
+.hack #Hackermode:checked {
+    color: rgb(149, 255, 0);
+    font-weight: 700;
+}
+
+.dark-mode * {
+    font-family: 'Matrix', sans-serif;
+}
+.section input {
+    line-height: 3rem;
+    text-align: center;
+    font-size: 1.5rem;
+    background-color: rgba(0, 0, 0, 0.131);
+    outline: none;
+    border: 1px white dashed;
+    border-bottom: 4px rgb(255, 255, 255) solid;
+    box-shadow: none;
+    color: white;
+}
+.dark-mode .section .jsinfo p {
+    color: var(--hackc);
+}
+.dark-mode input {
+    border-color: black;
+    color: white;
+}
+.dark-mode .by {
+    color: rgba(0, 0, 0, 0.742);
+}
+p.by {
+    color: rgba(255, 255, 255, 0.912);
+    font-size: .8rem;
+    position: relative;
+    right: 38%;
+    bottom: 0;
+    font-weight: 200;
+}
+::placeholder {
+    color: white;
+    opacity: 1;
+}
+.dark-mode ::placeholder {
+    color: rgb(48, 199, 48);
+    opacity: 1;
+}
+
+
+
+#section3 {
+    height: 400px;
+}
+#section4 {
+    height: 600px;
+}
+#section4 .js, #section12 .js{
+    width: 5%;
+}
+#section4 .jspreview, #section12 .jspreview {
+    width: 70%;
+}
+
+.section .js ul li {
+    margin: 10px 0px;
+    display: block;
+}
+
+.section .jsinfo p {
+    position: absolute;
+    bottom: 0;
+    width: 20%;
+    left: 12%;
+    transform: translate(-50%, 0%);
+    margin: 10px;
+    color: white;
+}
+.section .js p {
+    font-weight: 400;
+}
+
+.sbody {
+    background-color: transparent;
+    width: 40%;
+    height: 100%;
+    position: absolute;
+    padding: 10px;
+    z-index: 10;
+}
+#section4 .jspreview {
+    padding: 0;
+}
+#mydiv {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    top: 50%;
+    left: 85%;
+    z-index: 100;
+    padding: 10px;
+    transform: translate(-50%, -50%);
+    background-color: rgb(21, 21, 21);
+    overflow-y: auto;
+    font-size: .7rem;
+}
+#mydivheader {
+    position: fixed;
+    width: 100%;
+    height: 30px;
+    background-color: rgb(135, 135, 135);
+    top: 0px;
+    left: 0;
+}
+#mydiv #mydivheader ul li button{
+    width: 15px;
+    height: 15px;
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    margin: 5px;
+    border-radius: 40rem;
+    border: none;
+    outline: none;
+}
+#mydiv #mydivheader ul {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    margin-left: 10px;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    
+}

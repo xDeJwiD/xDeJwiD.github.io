@@ -1,0 +1,224 @@
+
+/* ==================================================================== */
+
+/* | */
+
+/* | */
+
+/* ============================  SHOP  =============================== */
+
+/* | */
+
+/* | */
+
+/* ==================================================================== */
+
+/* | */
+
+.shop {
+    background-color: var(--bg);
+    width: 100%;
+    height: auto;
+    min-height: 100%;
+    border-radius: 1.3rem;
+  }
+  
+  
+  .look, .items {
+    /* background-color: #e01a4f; */
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow-wrap: break-word;
+    overflow: visible;
+  }
+  
+  .look .nagl {
+    font-size: 3rem;
+    color: var(--main-text);
+    font-weight: 700;
+  }
+  
+  .look-flex {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: auto;
+    gap: 1rem;
+    padding: 4rem;
+    background-color: var(--main-darker);
+    overflow: hidden;
+    border-radius: 1rem;
+    position: relative;
+  }
+  
+  .look-flex::before {
+    content: '';
+    position: absolute;
+    width: 120%;
+    height: 5px;
+    background-color: #ffffff;
+    box-shadow: var(--main) 0px 0px 40px 20px;
+    transform: rotate(10deg);
+  }
+  
+  .look-flex::after {
+    content: '';
+    position: absolute;
+    width: 120%;
+    height: 5px;
+    background-color: #ffffff;
+    box-shadow: var(--main) 0px 0px 40px 20px;
+    transform: rotate(-20deg);
+  }
+  
+  @keyframes laser1 {
+    0% {
+      transform: rotateZ(20deg);
+    }
+    100% {
+      transform: rotateZ(190deg);
+    }
+  }
+  @keyframes laser2 {
+    0% {
+      transform: rotateZ(-20deg);
+    }
+    100% {
+      transform: rotateZ(120deg);
+    }
+  }
+  
+  .karta {
+    width: 20rem;
+    /* background-color: #f15946; */
+    height: 500px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    overflow: visible;
+    z-index: 10;
+  }
+  
+  .karta-hover {
+    width: 100%;
+    height: 500px;
+    background-color: #201723;
+    z-index: 100;
+    position: absolute;
+    transition: ease-in-out .2s;
+    border-radius: 1rem;
+    overflow: visible;
+  }
+  
+  .karta-hover::after {
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    /* background-color: #e01a4f77; */
+    border-radius: 1rem;
+    transition: ease-in-out .4s;
+  }
+  
+  .karta:hover .karta-hover {
+    transform: translate(0%, -10%);
+    border-radius: 1rem 1rem 0 0;
+  }
+  
+  .karta:hover .sinfo {
+    color: var(--main);
+    transition: ease-in-out .2s;
+    border-radius: 0 0 0 0;
+  }
+  
+  .karta-hover:hover::after {
+    background-color: transparent;
+    transition: ease-in-out .2s;
+  }
+  
+  .kup {
+    position: absolute;
+    z-index: 2;
+    height: 10%;
+    width: 100%;
+    background-color: var(--main);
+    border-radius: 0 0 1rem 1rem;
+    bottom: 0;
+    display: flex;
+  
+    font-size: 1.1rem;
+  }
+  
+  .kup-btn {
+    border-radius: 0 0 1rem 1rem;
+    background-color: var(--main);
+    /* width: 200%; */
+  }
+  
+  /* .kup-koszyk {
+    border-radius: 0 0 1rem 0;
+    background-color: #ffffff;
+  } */
+  
+  .kup a {
+    width: 50%;
+    position: relative;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    color: #0c090d;
+    font-weight: 700;
+    transition: ease-in-out .3s;
+    width: 100%;
+  }
+  
+  .kup a:hover {
+    background-color: rgba(0, 0, 0, 0.228);
+    color: #ffffff;
+    cursor: pointer;
+    transition: ease-in-out .2s;
+  }
+  
+  .sinfo {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    background-color: var(--main-dark);
+    padding: 20px;
+    border-radius: 0 0 1rem 1rem;
+    color: #ffffff;
+    transition: ease-in-out .4s;
+    z-index: 30;
+  }
+  .sinfo p:nth-child(1) {
+    font-weight: 700;
+  }
+  
+  .ciuch1 {
+    background-image: url(../sklep/koszulka.jpg);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  .ciuch2 {
+    background-image: url(../sklep/spodnie.jpg);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  .ciuch3 {
+    background-image: url(../sklep/buty.jpg);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  

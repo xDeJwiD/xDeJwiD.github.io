@@ -1,0 +1,621 @@
+@import url("https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@100;300;400;500;700;800;900&family=Varela+Round&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  list-style: none;
+  text-decoration: none;
+  font-family: "M PLUS Rounded 1c", sans-serif;
+  border: none;
+  outline: none;
+
+  transition: background ease-in-out 0.2s;
+}
+
+body {
+  background-color: var(--bg);
+}
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background-color: var(--bg);
+}
+::-webkit-scrollbar-track-piece {
+  background-color: var(--bg);
+}
+::-webkit-scrollbar-button {
+  background-color: aqua;
+  height: 0px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--main);
+  border-radius: 1rem;
+  margin: 10px;
+}
+
+/* ==================================================================== */
+
+/* | */
+
+/* | */
+
+/* ========================  RIGHT PANEL  ============================= */
+
+/* | */
+
+/* | */
+
+/* ==================================================================== */
+
+/* | */
+
+#right-panel {
+  position: absolute;
+  right: 0;
+  /* background: var(--left-panel); */
+  background-color: transparent;
+  backdrop-filter: opacity(50%);
+  height: calc(100% - 2 * 20px);
+  width: calc(100% - 7rem - 4 * 20px);
+  margin: 20px;
+  padding: 10px 10px 0px 10px;
+  /* padding: 20px 50px; */
+  transform: translate(0%, 0%);
+  transition: width ease-in-out 0.5s, ease-in-out 0.5s;
+  border-radius: 1.3rem;
+}
+#left-panel.max ~ #right-panel {
+  position: absolute;
+  right: 0;
+  background-color: transparent;
+  height: calc(100% - 2 * 20px);
+  width: calc(100% - 20rem - 4 * 20px);
+  margin: 20px;
+  transform: translate(0%, 0%);
+}
+
+#right-panel .top {
+  position: relative;
+  top: 0%;
+  left: 50%;
+  transform: translate(-50%, 0%);
+  width: 100%;
+  /* height: 100%; */
+  padding: 0 0px;
+  background: var(--main-accent);
+  border-radius: 1.3rem;
+  display: flex;
+  overflow: auto;
+  scroll-behavior: smooth;
+  margin: 0 0 20px 0;
+}
+
+.top-scroll-gradient::after {
+  content: "";
+  background: linear-gradient(90deg, transparent, var(--bg));
+  width: 30px;
+  right: 0;
+  top: 2rem;
+  height: calc(200px - 30px);
+  position: absolute;
+  z-index: 20;
+}
+.top-scroll-gradient::before {
+  content: "";
+  background: linear-gradient(270deg, transparent, var(--bg));
+  width: 30px;
+  left: 0;
+  top: 2rem;
+  height: calc(200px - 30px);
+  position: absolute;
+  z-index: 20;
+}
+
+.bottom-scroll-gradient::after {
+  content: "";
+  /* background: linear-gradient(transparent, var(--main)); */
+  background-color: red;
+  width: 100px;
+  right: 10px;
+  bottom: 0px;
+  height: calc(200px - 30px);
+  position: absolute;
+  z-index: 20;
+}
+
+h3 {
+  color: white;
+  margin: 0px 30px;
+  position: absolute;
+  z-index: 10;
+
+  animation: appear 2s;
+  animation-delay: 0s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+
+.h-top {
+  color: var(--main);
+}
+.h-bottom {
+  color: var(--main-dark);
+}
+
+/* #right-panel .bottom {
+  position: relative;
+  top: 0%;
+  left: 50%;
+  transform: translate(-50%, 0%);
+  width: 100%;
+  padding: 0 0px;
+  background: var(--main-accent);
+  border-radius: 1.3rem;
+  display: flex;
+  overflow: auto;
+  scroll-behavior: smooth;
+} */
+
+/* #right-panel .net::after {
+    content: '';
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--main), transparent 7rem, transparent 50%, transparent calc(100% - 7rem),var(--main-accent));
+    z-index: 10;
+    position: absolute;
+    overflow: hidden;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+} */
+
+#right-panel .top::-webkit-scrollbar {
+  height: 10px;
+}
+#right-panel .top::-webkit-scrollbar-track {
+  background-color: var(--bg);
+}
+#right-panel .top::-webkit-scrollbar-track-piece {
+  background-color: var(--bg);
+}
+#right-panel .top::-webkit-scrollbar-button {
+  background-color: transparent;
+  height: 0px;
+  width: 15px;
+}
+
+#right-panel .top::-webkit-scrollbar-thumb {
+  background-color: var(--main);
+  border-radius: 1rem;
+  margin: 10px;
+}
+
+#right-panel .bottom::-webkit-scrollbar {
+  background: transparent;
+  height: 0px;
+}
+
+.top .scroll > div {
+  width: 200px;
+  height: 150px;
+  background-color: var(--main);
+  border-radius: 1.3rem;
+  position: relative;
+  margin: 10px;
+}
+
+/* .bottom .scroll div {
+  width: 300px;
+  height: 400px;
+  background-color: var(--main);
+  border-radius: 1.3rem;
+  position: relative;
+  margin: 10px;
+} */
+.bottom {
+  background: var(--main-accent);
+  width: 100%;
+  height: calc(100% - 40px - 20px - 150px - 10px - 2rem);
+  border-radius: 1.3rem;
+  position: relative;
+  padding: 0px 20px 0px 20px;
+  top: 2rem;
+  left: 50%;
+  transform: translate(-50%, 0%);
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  align-content: stretch;
+
+  overflow: auto;
+  scroll-behavior: smooth;
+}
+
+.bottom > .bottomDiv {
+  flex-grow: 1;
+  flex-basis: 20rem;
+  /* width: 300px; */
+  min-height: 290px;
+  height: calc(50% - 40px);
+  position: relative;
+  background-color: var(--main-dark);
+  margin: 10px;
+  border-radius: 1.3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+  cursor: pointer;
+
+  transition: all 0.5s ease;
+
+  overflow: hidden;
+}
+.bottomDiv.bottomMax {
+  cursor: auto;
+}
+
+.bottom .bottomDiv div, .bottomDiv.bottomMax > section.mini{
+  display: none;
+}
+.bottomDiv.bottomMax div {
+  display: block;
+}
+
+section.mini h1 {
+  font-size: 2rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--main-text);
+}
+section.mini {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+section.mini svg {
+
+  color: var(--main-text);
+}
+.minisvg {
+  fill: white;
+}
+
+
+.scroll {
+  padding: 30px 20px 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  height: fit-content;
+}
+
+.home {
+  height: 100%;
+}
+
+.bottomDiv.hidden {
+  display: none;
+  background-color: red;
+}
+
+.back {
+  width: fit-content;
+  height: fit-content;
+  position: absolute;
+  background-color: var(--bg);
+  top: 0;
+  left: 0;
+  font-size: 3rem;
+  color: var(--main);
+  padding: 0 10px 10px 0;
+  transition: all .3s ease;
+  border-radius: 0 0 1.3rem 0;
+  border-top: solid 10px var(--bg);
+  border-left: solid 10px var(--bg);
+  border-right: solid 10px var(--main-dark);
+  border-bottom: solid 10px var(--main-dark);
+  cursor: pointer;
+}
+.back:hover {
+  color: var(--main-text);
+}
+.back::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  background: var(--main-dark);
+  border-radius: 1.3rem;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  transform: translate(-50%, 100%);
+}
+.back::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  background: var(--main-dark);
+  border-radius: 1.3rem;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translate(100%, -50%);
+}
+
+.back i {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+/* ==================================================================== */
+
+/* | */
+
+/* | */
+
+/* ========================  SMALL DEVICE  ============================ */
+
+/* | */
+
+/* | */
+
+/* ==================================================================== */
+
+/* | */
+
+@media (max-width: 500px) {
+  body {
+    background-color: black;
+  }
+  body > * {
+    display: none;
+  }
+  body::after {
+    content: "Jeśli to widzisz, to pewnie jesteś na telefonie. Nie chciało nam się robić responsywności. Wejdź na kompie.";
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+@media (max-height: 700px) {
+  body {
+    background-color: black;
+  }
+  body > * {
+    display: none;
+  }
+  body::after {
+    content: "Jeśli to widzisz, to sory. Nie chciało nam się robić responsywności. Wejdź na kompie.";
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* ==================================================================== */
+
+/* | */
+
+/* | */
+
+/* ======================  SMOOTH ANIMATIONS  ========================= */
+
+/* | */
+
+/* | */
+
+/* ==================================================================== */
+
+/* | */
+
+.top .scroll div,
+.bottom div,
+h3,
+#left-panel,
+#left-panel ul li {
+  filter: opacity(0);
+}
+
+#categories ul li:nth-child(2) {
+  animation: appear 1s;
+  animation-delay: 0.2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+#categories ul li:nth-child(4) {
+  animation: appear 1s;
+  animation-delay: 0.4s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+#categories ul li:nth-child(6) {
+  animation: appear 1s;
+  animation-delay: 0.6s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+#categories ul li:nth-child(8) {
+  animation: appear 1s;
+  animation-delay: 0.8s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+
+.top .scroll div:nth-child(1) {
+  animation: appear 1s;
+  animation-delay: 0.2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.top .scroll div:nth-child(2) {
+  animation: appear 1s;
+  animation-delay: 0.4s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.top .scroll div:nth-child(3) {
+  animation: appear 1s;
+  animation-delay: 0.6s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.top .scroll div:nth-child(4) {
+  animation: appear 1s;
+  animation-delay: 0.8s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.top .scroll div:nth-child(5) {
+  animation: appear 1s;
+  animation-delay: 1s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+/* .top .scroll div:nth-child(6) {
+  animation: appear 1s;
+  animation-delay: 1.2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.top .scroll div:nth-child(7) {
+  animation: appear 1s;
+  animation-delay: 1.4s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.top .scroll div:nth-child(8) {
+  animation: appear 1s;
+  animation-delay: 1.6s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.top .scroll div:nth-child(9) {
+  animation: appear 1s;
+  animation-delay: 1.8s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.top .scroll div:nth-child(10) {
+  animation: appear 1s;
+  animation-delay: 2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+} */
+
+.bottom div:nth-child(1) {
+  animation: appear 1s;
+  animation-delay: 0.2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.bottom div:nth-child(2) {
+  animation: appear 1s;
+  animation-delay: 0.4s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.bottom div:nth-child(3) {
+  animation: appear 1s;
+  animation-delay: 0.6s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.bottom div:nth-child(4) {
+  animation: appear 1s;
+  animation-delay: 0.8s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.bottom div:nth-child(5) {
+  animation: appear 1s;
+  animation-delay: 1s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.bottom div:nth-child(6) {
+  animation: appear 1s;
+  animation-delay: 1.2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.bottom div:nth-child(7) {
+  animation: appear 1s;
+  animation-delay: 1.4s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+
+.look {
+  filter: opacity(0);
+  animation: appear 1s;
+  animation-delay: 0.2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.look .nagl {
+  filter: opacity(0);
+  animation: appear 1s;
+  animation-delay: 0.2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.look .look-flex {
+  filter: opacity(0);
+  animation: appear 1s;
+  animation-delay: 1s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.look .look-flex::before {
+  filter: opacity(0);
+  animation: appear 1s, laser1 100s linear alternate;
+  animation-delay: 2s, 0s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1, infinite;
+}
+.look .look-flex::after {
+  filter: opacity(0);
+  animation: appear 1s, laser2 100s linear alternate;
+  animation-delay: 2s, 0s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1, infinite;
+}
+
+.look .look-flex .karta:nth-child(1) {
+  filter: opacity(0);
+  animation: appear 1s;
+  animation-delay: 1.2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.look .look-flex .karta:nth-child(2) {
+  filter: opacity(0);
+  animation: appear 1s;
+  animation-delay: 1.4s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}
+.look .look-flex .karta:nth-child(3) {
+  filter: opacity(0);
+  animation: appear 1s;
+  animation-delay: 1.6s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+}

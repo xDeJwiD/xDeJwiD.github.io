@@ -1,5 +1,0 @@
-var drzewo = document.createDocumentFragment()
-div = document.createElement("div")
-div.appendChild(document.createTextNode("Ło kurwa działa"))
-drzewo.appendChild(div)
-document.getElementById('syf').appendChild(drzewo)
