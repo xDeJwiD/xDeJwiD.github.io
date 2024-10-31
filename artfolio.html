@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Artfolio - DeJwiD</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <!--------------------- MENU & NAV BAR --------------------->
+    <div id="wrapper-main">
+      <!-- MENU WRAPPER -->
+      <div id="wrapper-top">
+        <ul>
+          <li><a href="index.html">ABOUT</a></li>
+        </ul>
+        <ul>
+          <li><a href="" class="art active">ARTFOLIO</a></li>
+        </ul>
+        <ul>
+          <li><a href="contact.html">CONTACT</a></li>
+        </ul>
+      </div>
+      <!-- NAV WRAPPER -->
+      <div id="wrapper-nav" class="fadein">
+        <a href="#section1" class="btn active"></a>
+        <a href="#section2" class="btn"></a>
+        <a href="#section3" class="btn"></a>
+        <a href="#section4" class="btn"></a>
+        <a href="#section5" class="btn"></a>
+        <a href="#section6" class="btn"></a>
+        <a href="#section7" class="btn"></a>
+
+        <!-- <a href="#section20" class="btn"></a> -->
+      </div>
+    </div>
+
+    <!------------------------ SECTIONS ------------------------>
+
+    <!-- MODUE SECTION -->
+    <div class="section fadein" id="section1">
+      <div class="about">
+        <h1>MODUE</h1>
+        <div class="tags">
+          <p class="tag lopoly">Lo-poly</p>
+          <p class="tag cycles">Cycles</p>
+          <p class="tag date">2024</p>
+        </div>
+        <p class="info">Fan-made product visualization.</p>
+        <a onclick="morePanel(1, 1)" class="seemore">See more</a>
+      </div>
+    </div>
+    <!-- GOPRO SECTION -->
+    <div class="section fadein" id="section2">
+      <div class="about">
+        <h1>GoPro Hero 8</h1>
+        <div class="tags">
+          <p class="tag hipoly">Hi-poly</p>
+          <p class="tag cycles">Cycles</p>
+          <p class="tag date">2023</p>
+        </div>
+        <p class="info">Fan-made product visualization.</p>
+        <a onclick="morePanel(1, 2)" class="seemore">See more</a>
+      </div>
+    </div>
+    <!-- ARCH SECTION -->
+    <div class="section fadein" id="section3">
+      <div class="about">
+        <h1>ARCH VIZ</h1>
+        <div class="tags">
+          <p class="tag hipoly">Hi-poly</p>
+          <p class="tag cycles">Cycles</p>
+          <p class="tag date">2024</p>
+        </div>
+        <p class="info"></p>
+        <a onclick="morePanel(1, 3)" class="seemore">See more</a>
+      </div>
+    </div>
+    <!-- NISSAN SECTION -->
+    <div class="section fadein" id="section4">
+      <div class="about">
+        <h1>NISSAN 'THE NUKE'</h1>
+        <div class="tags">
+          <p class="tag fan">Fan-made</p>
+          <p class="tag cycles">Cycles</p>
+          <p class="tag date">2023</p>
+        </div>
+        <p class="info"></p>
+        <a onclick="morePanel(1, 4)" class="seemore">See more</a>
+        <a
+          href="https://www.youtube.com/watch?v=iVGs5SpBFaM"
+          target="_blank"
+          class="watchfull"
+          >Watch full</a
+        >
+      </div>
+    </div>
+    <!-- NOTHING SECTION -->
+    <div class="section fadein" id="section5">
+      <div class="about">
+        <h1>NOTHING EAR (1)</h1>
+        <div class="tags">
+          <p class="tag hipoly">Hi-poly</p>
+          <p class="tag cycles">Cycles</p>
+          <p class="tag date">2024</p>
+        </div>
+        <p class="info">Fan-made product visualization.</p>
+        <a onclick="morePanel(1, 5)" class="seemore">See more</a>
+      </div>
+    </div>
+    <!-- FERRARI F1 SECTION -->
+    <div class="section fadein" id="section6">
+      <div class="about">
+        <h1>F1 Ferrari 91'</h1>
+        <div class="tags">
+          <p class="tag hipoly">Hi-poly</p>
+          <p class="tag eevee">Eevee</p>
+          <p class="tag date">2021</p>
+        </div>
+        <p class="info"></p>
+        <a onclick="morePanel(1, 6)" class="seemore">See more</a>
+      </div>
+    </div>
+    <!-- FERRARI PIRELLI SECTION -->
+    <div class="section fadein" id="section7">
+      <div class="about">
+        <h1>Ferrari 488 Pista Spider</h1>
+        <p>with Pirelli TRofeo RS</p>
+        <div class="tags">
+          <p class="tag hipoly">Hi-poly</p>
+          <p class="tag eevee">Eevee</p>
+          <p class="tag date">2024</p>
+        </div>
+        <p class="info"></p>
+        <a onclick="morePanel(1, 7)" class="seemore">See more</a>
+      </div>
+    </div>
+
+    <!-- OTHER SECTION -->
+    <!-- <div class="section fadein" id="section20">
+      <div class="about">
+        <h1>Other Projects</h1>
+        <div class="tags">
+          <p class="tag lopoly">Lo-poly</p>
+          <p class="tag hipoly">Hi-poly</p>
+          <p class="tag fan">Fan-made</p>
+          <p class="tag cycles">Cycles</p>
+          <p class="tag eevee">Eevee</p>
+          <p class="tag date">2024</p>
+        </div>
+        <p class="info">Fan-made product visualization.</p>
+        <a onclick="morePanel(1, 20)" class="seemore">See more</a>
+      </div>
+    </div> -->
+
+    <!--------------------- MORE SECTIONS --------------------->
+
+    <!-- MODUE MORE SECTION -->
+    <div class="section-more hidden" id="section-more1">
+      <div class="more-left" onclick="morePanel(0, 1)">
+        <p>Click here to close</p>
+      </div>
+      <div class="more-center">
+        <!-- <img src="" alt="" /> -->
+         <video src="./img/vdo/Mod.webm" controls></video>
+      </div>
+      <div class="more-right">
+        <h1></h1>
+        <p></p>
+      </div>
+    </div>
+
+    <!-- GOPRO MORE SECTION -->
+    <div class="section-more hidden" id="section-more2">
+      <div class="more-left" onclick="morePanel(0, 2)">
+        <p>Click here to close</p>
+      </div>
+      <div class="more-center">
+        <img src="./img/content/gopro/2.png" alt="" />
+        <img src="./img/content/gopro/3.png" alt="" />
+        <img src="./img/content/gopro/4.png" alt="" />
+        <img src="./img/content/gopro/5.png" alt="" />
+        <img src="./img/content/gopro/6.png" alt="" />
+        <img src="./img/content/gopro/7.png" alt="" />
+        <img src="./img/content/gopro/8.png" alt="" />
+      </div>
+      <div class="more-right">
+        <h1></h1>
+        <p></p>
+      </div>
+    </div>
+
+    <!-- ARCH MORE SECTION -->
+    <div class="section-more hidden" id="section-more3">
+      <div class="more-left" onclick="morePanel(0, 3)">
+        <p>Click here to close</p>
+      </div>
+      <div class="more-center">
+        <img src="./img/content/arch/3.jpg" alt="" />
+        <img src="./img/content/arch/7.jpg" alt="" />
+        <img src="./img/content/arch/8.jpg" alt="" />
+        <img src="./img/content/arch/1.jpg" alt="" />
+      </div>
+      <div class="more-right">
+        <h1></h1>
+        <p></p>
+      </div>
+    </div>
+
+    <!-- NISSAN MORE SECTION -->
+    <div class="section-more hidden" id="section-more4">
+      <div class="more-left" onclick="morePanel(0, 4)">
+        <p>Click here to close</p>
+      </div>
+      <div class="more-center">
+        <img src="./img/content/thenuke/testAG.png" alt="" />
+        <img src="./img/content/thenuke/environment2.png" alt="" />
+        <img src="./img/content/thenuke/environment4.png" alt="" />
+        <img src="./img/content/thenuke/TheNukeHWBox3Low.png" alt="" />
+        <img src="./img/content/thenuke/TheNukeLow.png" alt="" />
+        <img src="./img/content/thenuke/TheNukeLowBack.png" alt="" />
+      </div>
+      <div class="more-right">
+        <h1></h1>
+        <p></p>
+      </div>
+    </div>
+
+    <!-- NOTHING1 MORE SECTION -->
+    <div class="section-more hidden" id="section-more5">
+      <div class="more-left" onclick="morePanel(0, 5)">
+        <p>Click here to close</p>
+      </div>
+      <div class="more-center">
+        <img src="./img/content/nothingear1/noting1.png" alt="" />
+        <img src="./img/content/nothingear1/noting2.png" alt="" />
+        <img src="./img/content/nothingear1/noting3.png" alt="" />
+        <img src="./img/content/nothingear1/noting4.png" alt="" />
+        <img src="./img/content/nothingear1/render1.jpg" alt="" />
+      </div>
+      <div class="more-right">
+        <h1></h1>
+        <p></p>
+      </div>
+    </div>
+    <!-- FERRARI F1 MORE SECTION -->
+    <div class="section-more hidden" id="section-more6">
+      <div class="more-left" onclick="morePanel(0, 6)">
+        <p>Click here to close</p>
+      </div>
+      <div class="more-center">
+        <img src="./img/content/ferrarif1/f1.png" alt="" />
+        <img src="./img/content/ferrarif1/f12.png" alt="" />
+        <img src="./img/content/ferrarif1/f123.png" alt="" />
+      </div>
+      <div class="more-right">
+        <h1></h1>
+        <p></p>
+      </div>
+    </div>
+    <!-- FERRARI WHEELS MORE SECTION -->
+    <div class="section-more hidden" id="section-more7">
+      <div class="more-left" onclick="morePanel(0, 7)">
+        <p>Click here to close</p>
+      </div>
+      <div class="more-center">
+
+        <img src="./img/content/ferraripirelli/1.png" alt="" />
+        <img src="./img/content/ferraripirelli/1w.png" alt="" />
+        <img src="./img/content/ferraripirelli/2.png" alt="" />
+        <img src="./img/content/ferraripirelli/2w.png" alt="" />
+        <img src="./img/content/ferraripirelli/3.png" alt="" />
+        <img src="./img/content/ferraripirelli/3w.png" alt="" />
+        <img src="./img/content/ferraripirelli/4.png" alt="" />
+        <img src="./img/content/ferraripirelli/4w.png" alt="" />
+        <img src="./img/content/ferraripirelli/6.png" alt="" />
+      </div>
+      <div class="more-right">
+        <h1></h1>
+        <p></p>
+      </div>
+    </div>
+
+    <!-- OTHER MORE SECTION -->
+    <!-- <div class="section-more hidden" id="section-more20">
+
+      <div class="more-left" onclick="morePanel(0, 20)">
+        <p>Click here to close</p>
+      </div>
+
+
+      <div class="more-center">
+
+        <div class="other" id="other1">
+          <h1>Ferrari F1</h1>
+          <div class="tags">
+            <p class="tag lopoly">Hi-poly</p>
+            <p class="tag cycles">Cycles</p>
+            <p class="tag date">2020</p>
+          </div>
+          <img src="./img/content/ferraripirelli/1.png" alt="" />
+          <img src="./img/content/ferraripirelli/1w.png" alt="" />
+        </div>
+
+
+        <div class="other" id="other2">
+          <h1>Test caption</h1>
+          <div class="tags">
+            <p class="tag hipoly">Hi-poly</p>
+            <p class="tag eevee">Eevee</p>
+            <p class="tag date">2024</p>
+          </div>
+          <img src="./img/content/ferraripirelli/1.png" alt="" />
+          <img src="./img/content/ferraripirelli/1w.png" alt="" />
+        </div>
+
+        <div class="other" id="other3">
+          <h1>Test caption</h1>
+          <div class="tags">
+            <p class="tag hipoly">Hi-poly</p>
+            <p class="tag eevee">Eevee</p>
+            <p class="tag date">2024</p>
+          </div>
+          <img src="./img/content/ferraripirelli/1.png" alt="" />
+          <img src="./img/content/ferraripirelli/1w.png" alt="" />
+        </div>
+
+        <div class="other" id="other4">
+          <h1>Test caption</h1>
+          <div class="tags">
+            <p class="tag hipoly">Hi-poly</p>
+            <p class="tag eevee">Eevee</p>
+            <p class="tag date">2024</p>
+          </div>
+          <img src="./img/content/ferraripirelli/1.png" alt="" />
+          <img src="./img/content/ferraripirelli/1w.png" alt="" />
+        </div>
+      </div>
+
+
+      <div class="more-right">
+        <ul>
+          <li><a href="#other1">Projekt 1</a></li>
+          <li><a href="#other2">Projekt 2</a></li>
+          <li><a href="#other3">Projekt 3</a></li>
+          <li><a href="#other4">Projekt 4</a></li>
+        </ul>
+      </div>
+    </div> -->
+
+    <div class="gradient"></div>
+    <div class="display">
+      <video src="" autoplay muted loop class=""></video>
+    </div>
+  </body>
+  <script src="s.js"></script>
+  <!-- <script src="test.js"></script> -->
+  <script src="m.js"></script>
+  <script src="o.js"></script>
+  <script src="videoLoad.js"></script>
+  <!-- <script src="p.js"></script> -->
+</html>

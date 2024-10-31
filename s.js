@@ -11,7 +11,18 @@ document.addEventListener("DOMContentLoaded", () => {
     "./img/vdo/Arch.webm", // Sekcja 3
     "./img/vdo/Nuke.webm", // Sekcja 4
     "./img/vdo/Nothing.webm", // Sekcja 5
+    "./img/vdo/F1.webm", // Sekcja 6
+    "./img/vdo/Wheel.webm", // Sekcja 7
   ];
+
+  const sectionsmoreshown = document.querySelectorAll(".section-more");
+
+  // Funkcja sprawdzająca, czy wszystkie elementy mają klasę "hidden"
+  function areAllSectionsHidden() {
+    return Array.from(sectionsmoreshown).every((section) =>
+      section.classList.contains("hidden")
+    );
+  }
 
   function gotoSection(index, direction) {
     if (isAnimating || index < 0 || index >= sections.length) return;
@@ -27,9 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
     changeVideo(index); // Wygaszamy obecne wideo przed zmianą sekcji
 
     // Przestawiamy nową sekcję na górze lub na dole, w zależności od kierunku
-    nextSection.style.transform = `translateY(${
-      direction === "down" ? 100 : -100
-    }%)`;
+    nextSection.style.transform = `translateY(${direction === "down" ? 100 : -100}%)`;
     nextSection.style.zIndex = 3; // Przestawiamy nową sekcję na wierzch
     nextSection.style.visibility = "visible"; // Upewniamy się, że nowa sekcja jest widoczna
     nextSection.style.transition = "none"; // Wyłączamy przejście, żeby ustawić pozycję
@@ -38,9 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
       nextSection.style.transition = "transform 0.75s ease-in-out";
       currentSection.style.transition = "transform 0.75s ease-in-out";
 
-      currentSection.style.transform = `translateY(${
-        direction === "down" ? -100 : 100
-      }%)`; // Aktualna sekcja schodzi w dół lub w górę
+      currentSection.style.transform = `translateY(${direction === "down" ? -100 : 100}%)`; // Aktualna sekcja schodzi w dół lub w górę
       nextSection.style.transform = `translateY(0)`; // Nowa sekcja pojawia się
 
       setTimeout(() => {
@@ -72,7 +79,12 @@ document.addEventListener("DOMContentLoaded", () => {
         // Zmieniamy źródło wideo tylko, jeśli zmieniamy sekcję
         if (videoElement.src !== backgroundVideos[index]) {
           videoElement.src = backgroundVideos[index];
-          videoElement.play(); // Odtwarzamy wideo po zmianie źródła
+
+          // Upewniamy się, że wideo jest odtwarzane po zmianie źródła
+          videoElement.muted = true; // Wyłączamy dźwięk dla autoplay
+          videoElement.play().catch((error) => {
+            console.error("Error playing video:", error);
+          });
         }
 
         // Przywracamy przezroczystość do 1 po załadowaniu nowego wideo
@@ -89,21 +101,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Funkcja sprawdzająca i ustawiająca styl w zależności od src
   function updateVideoStyle() {
+
     if (videoElement.src.includes("Mod.webm")) {
       videoElement.classList.add("modue");
+    }
+    else if (videoElement.src.includes("Wheel.webm")) {
+      videoElement.classList.add("wheel");
     } else {
       videoElement.classList.remove("modue");
+      videoElement.classList.remove("wheel");
     }
+
   }
 
   function handleScroll(event) {
     if (isAnimating) return;
 
-    const delta = event.deltaY || event.touches[0].clientY;
-    if (delta > 0) {
-      gotoSection(currentIndex + 1, "down");
-    } else if (delta < 0) {
-      gotoSection(currentIndex - 1, "up");
+    let delta;
+    if (event.deltaY !== undefined) {
+      // Dla urządzeń z kółkiem myszy
+      delta = event.deltaY;
+    } else if (event.touches) {
+      // Dla urządzeń dotykowych
+      const touch = event.touches[0];
+      const touchEnd = touch.clientY;
+      delta = lastTouchY - touchEnd; // Zmiana kierunku dla urządzeń mobilnych
+      lastTouchY = touchEnd;
+    }
+
+    if (areAllSectionsHidden()) {
+      // Używamy normalnego kierunku na komputerze
+      if (delta > 0) {
+        gotoSection(currentIndex + 1, "down"); // Dla komputera
+      } else if (delta < 0) {
+        gotoSection(currentIndex - 1, "up"); // Dla komputera
+      }
+    } else {
+      console.log("Not all sections are hidden, skipping scroll event");
+      // Jeśli przynajmniej jeden element nie jest ukryty, nie wykonuj akcji
     }
   }
 
@@ -124,7 +159,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Szybka animacja pojawiania wideo po załadowaniu strony
     if (videoElement) {
       videoElement.src = backgroundVideos[0]; // Ładujemy pierwsze wideo
-      videoElement.play(); // Odtwarzamy wideo od razu
+      videoElement.muted = true; // Wyłączamy dźwięk dla autoplay
+      videoElement.play().catch((error) => {
+        console.error("Error playing initial video:", error);
+      }); // Odtwarzamy wideo od razu
 
       updateVideoStyle(); // Zaktualizuj styl po zmianie src
       // Po załadowaniu wideo, płynnie je pokazujemy
@@ -155,5 +193,8 @@ document.addEventListener("DOMContentLoaded", () => {
   pinSections();
 
   window.addEventListener("wheel", handleScroll);
-  window.addEventListener("touchstart", handleScroll);
+  window.addEventListener("touchstart", (event) => {
+    lastTouchY = event.touches[0].clientY; // Zapisujemy pozycję dotyku
+  });
+  window.addEventListener("touchmove", handleScroll);
 });

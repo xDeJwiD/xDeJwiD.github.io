@@ -7,3 +7,8 @@ document.addEventListener('mousedown', function(event) {
         event.preventDefault(); // Blokuje kliknięcie środkowym przyciskiem myszy
     }
 });
+
+
+
+
+

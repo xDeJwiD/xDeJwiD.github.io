@@ -1,0 +1,36 @@
+<!------------------------ SECTIONS ------------------------>
+
+<!-- x SECTION -->
+<div class="section fadein" id="section">    
+  <div class="about">
+    <h1></h1>                                 
+    <div class="tags">
+      <p class="tag lopoly">Lo-poly</p>
+      <p class="tag hipoly">Hi-poly</p>
+      <p class="tag fan">Fan-made</p>
+      <p class="tag cycles">Cycles</p>
+      <p class="tag eevee">Eevee</p>
+      <p class="tag date">2024</p>
+    </div>
+    <p class="info">Fan-made product visualization.</p>
+    <a onclick="morePanel(1, x)" class="seemore">See more</a>   
+  </div>
+</div>
+
+
+
+<!--------------------- MORE SECTIONS --------------------->
+
+<!-- x MORE SECTION -->
+<div class="section-more hidden" id="section-more">      
+  <div class="more-left" onclick="morePanel(0, x)">       
+    <p>Click here to close</p>
+  </div>
+  <div class="more-center">
+    <img src="" alt="" />
+  </div>
+  <div class="more-right">
+    <h1></h1>
+    <p></p>
+  </div>
+</div>
