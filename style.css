@@ -124,6 +124,7 @@ body {
   height: 100vh;
   position: relative;
   z-index: 2;
+  opacity: 0;
 }
 
 .section .about {
@@ -136,6 +137,7 @@ body {
   justify-content: left;
   text-align: right;
   z-index: 2;
+  /* opacity: 0; */
 }
 
 .section .about h1 {

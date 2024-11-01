@@ -104,9 +104,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (videoElement.src.includes("Mod.webm")) {
       videoElement.classList.add("modue");
+      videoElement.classList.remove("wheel");
     }
     else if (videoElement.src.includes("Wheel.webm")) {
       videoElement.classList.add("wheel");
+      videoElement.classList.remove("modue");
+
     } else {
       videoElement.classList.remove("modue");
       videoElement.classList.remove("wheel");
