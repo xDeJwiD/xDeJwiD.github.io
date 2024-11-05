@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const sections = document.querySelectorAll(".section");
-  const navButtons = document.querySelectorAll("#wrapper-nav .btn");
+  const navButtons = document.querySelectorAll("#wrapper-nav a.btn");
   const videoElement = document.querySelector(".display video");
   let currentIndex = 0;
   let isAnimating = false;
