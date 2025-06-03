@@ -460,6 +460,7 @@ a.art:not(.active) {
   }
 }
 
+
 /*********************** ABOUT ME SECTION **********************/
 
 .wrapper-aboutme {
@@ -473,7 +474,7 @@ a.art:not(.active) {
   height: 100lvh;
   width: 80vw;
   text-align: left;
-  gap: 2rem;
+  gap: 3rem;
   font-weight: 100;
 }
 
@@ -482,10 +483,11 @@ a.art:not(.active) {
   width: 100%;
   opacity: 0;
   font-weight: 200;
+  /* line-height: 1.6rem; */
 }
 
-.bold {
-  font-weight: 900;
+h2.bold {
+  font-weight: 800;
 }
 
 .affinity {
@@ -573,6 +575,12 @@ a.art:not(.active) {
   background-size: cover;
   background-repeat: no-repeat;
   border-radius: 2rem;
+}
+
+.sec {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
 }
 
 /************************** MORE SECTION **************************/
@@ -726,6 +734,10 @@ a.art:not(.active) {
     width: 90vw;
     justify-content: center;
     flex-direction: column;
+    gap: 1rem;
+  }
+  .sec {
+    gap: 0.5rem;
   }
   .wrapper-aboutme .imgme {
     height: 25%;
@@ -763,6 +775,10 @@ a.art:not(.active) {
   }
   .wrapper-aboutme {
     width: 90vw;
+    gap: 2rem;
+  }
+  .sec {
+    gap: 1rem;
   }
   .wrapper-aboutme .sec .imgme {
     width: 50%;
