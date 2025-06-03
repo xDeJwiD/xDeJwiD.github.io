@@ -101,7 +101,7 @@ body {
   flex-direction: column;
   align-items: center;
   border-radius: 3rem;
-  gap: .2rem;
+  gap: 0.2rem;
 }
 
 #wrapper-nav a {
@@ -137,13 +137,6 @@ body {
   clip: auto;
   pointer-events: none;
 }
-
-
-
-
-
-
-
 
 /**************** SECTIONS ****************/
 .section {
@@ -189,7 +182,6 @@ body {
   font-size: 5rem;
   line-height: 4rem;
 }
-
 
 .tags {
   display: inline-flex;
@@ -371,29 +363,6 @@ a.art:not(.active) {
   transition: ease-in-out 0.3s;
 }
 
-@media (max-width: 600px) {
-  #wrapper-top ul li {
-    height: 1.5rem;
-    margin: 0 1rem;
-  }
-
-  #wrapper-top ul li a {
-    font-size: 1.5rem;
-  }
-}
-
-@media (min-width: 601px) and (max-width: 1200px) {
-  body {
-    font-size: 18px;
-  }
-}
-
-@media (min-width: 1201px) {
-  body {
-    font-size: 20px;
-  }
-}
-
 /******************* CONTACT ME PAGE *******************/
 
 .wrapper-contact {
@@ -432,10 +401,6 @@ a.art:not(.active) {
   font-size: 2rem;
   line-height: 0;
 }
-
-
-
-
 
 /********************** ANIMATIONS **********************/
 
@@ -499,21 +464,28 @@ a.art:not(.active) {
 
 .wrapper-aboutme {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
+  justify-self: center;
   color: white;
   height: 100vh;
   height: 100lvh;
-  width: 100%;
-  text-align: center;
-  gap: 1rem;
+  width: 80vw;
+  text-align: left;
+  gap: 2rem;
   font-weight: 100;
 }
 
-.wrapper-aboutme h3, .wrapper-aboutme h2 {
-  width: 50%;
+.wrapper-aboutme h3,
+.wrapper-aboutme h2 {
+  width: 100%;
   opacity: 0;
+  font-weight: 200;
+}
+
+.bold {
+  font-weight: 900;
 }
 
 .affinity {
@@ -554,6 +526,7 @@ a.art:not(.active) {
   background-position: 100% 50%;
   animation: colorslide 1s linear forwards;
   animation-delay: 2s;
+  font-weight: 600;
 }
 
 @keyframes colorslide {
@@ -574,7 +547,6 @@ a.art:not(.active) {
   --fade-in-delay: 0.5s;
 }
 
-
 .wrapper-aboutme .fadein:nth-child(2) {
   animation-delay: calc(var(--fade-in-delay) * 2);
 }
@@ -588,13 +560,20 @@ a.art:not(.active) {
   animation-delay: calc(var(--fade-in-delay) * 5);
 }
 
+/* .wrapper-aboutme img {
+  height: 70vh;
+} */
 
-
-
-
-
-
-
+.imgme {
+  width: 100%;
+  min-width: 25vw;
+  height: 60%;
+  background-image: url(./img/other/me/JaJaponia1.png);
+  background-position: 50% 30%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border-radius: 2rem;
+}
 
 /************************** MORE SECTION **************************/
 
@@ -653,13 +632,9 @@ a.art:not(.active) {
   align-self: center;
 }
 
-
-
-
 /* .more-center img:nth-of-type(2n+1) {
   align-self: flex-end;
 } */
-
 
 /* .section .about {
   position: fixed;
@@ -694,7 +669,7 @@ a.art:not(.active) {
 }
 .more-right a {
   color: rgba(255, 255, 255, 0.363);
-  transition: ease-in-out .2s;
+  transition: ease-in-out 0.2s;
   /* font-size: 5rem;
   font-size: clamp(3rem, 4vw + 1rem, 5rem);
   line-height: clamp(3rem, 4vw + 1rem, 5rem); */
@@ -703,13 +678,10 @@ a.art:not(.active) {
   color: white;
 }
 
-
-
 .more-right p:not([class]) {
   color: white;
   font-size: 2rem;
 }
-
 
 .section-more .more-left p {
   color: rgb(110, 110, 110);
@@ -726,9 +698,87 @@ a.art:not(.active) {
   position: relative;
 }
 
+@media (max-width: 600px) {
+  #wrapper-top ul {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    width: 33%;
+    padding: 0;
+  }
+  #wrapper-top ul li {
+    height: 1.5rem;
+    padding: 0;
+    /* margin: 0 1rem; */
+  }
+
+  #wrapper-top ul li a {
+    font-size: 1.5rem;
+    padding: 0;
+  }
+
+  #wrapper-nav {
+    left: 2%;
+    padding: 0.2rem;
+    gap: 0.1rem;
+  }
+  .wrapper-aboutme {
+    width: 90vw;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .wrapper-aboutme .imgme {
+    height: 25%;
+    background-position: 50% 20%;
+
+  }
+  #wrapper-nav a {
+    width: 15px;
+    height: 15px;
+    padding: 6px;
+  }
+
+  .wrapper-aboutme h3,
+  .wrapper-aboutme h2 {
+    font-size: 1rem;
+  }
+}
 
 
 
 
+@media (min-width: 601px) and (max-width: 1200px) {
+  body {
+    font-size: 20px;
+  }
+
+  #wrapper-top ul {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    width: 33%;
+  }
+  #wrapper-top ul li a {
+    padding: 0;
+  }
+  .wrapper-aboutme {
+    width: 90vw;
+  }
+  .wrapper-aboutme .sec .imgme {
+    width: 50%;
+  }
+
+  .wrapper-aboutme h3,
+  .wrapper-aboutme h2 {
+    font-size: 1.2rem;
+  }
+}
 
 
+
+
+@media (min-width: 1201px) {
+  body {
+    font-size: 20px;
+  }
+}
