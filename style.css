@@ -944,8 +944,8 @@ h2.bold {
 
   .seemore,
   .watchfull {
-    font-size: 0.9rem;
-    line-height: 1.3rem;
+    font-size: 1.3rem;
+    line-height: 2rem;
   }
 
   /* ---------- MORE SEKCJA (obrazy/wideo) ---------- */
@@ -967,27 +967,12 @@ h2.bold {
     gap: 2rem;
   }
 
-  .more-center img,
-  .more-center video {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-  }
 
   .section-more .more-center .other h1 {
     font-size: 2rem;
     line-height: 2.2rem;
   }
 
-  .gradient {
-    background-image: none;
-  }
-
-  .display video {
-    object-fit: cover;
-    height: 100%;
-    width: 100%;
-  }
 
   /* ---------- CONTACT SECTION ---------- */
 .wrapper-contact {
@@ -1032,9 +1017,9 @@ h2.bold {
   word-break: normal;
 }
 
-
-
-
+.seemore {
+  display: none;
+}
 }
 
 
