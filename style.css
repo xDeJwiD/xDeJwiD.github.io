@@ -385,10 +385,12 @@ a.art:not(.active) {
   flex-direction: column;
   text-align: center;
   margin: 4rem 0;
+  font-weight: 400;
 }
 
 .wrapper-contact h3 {
   font-size: 2rem;
+  font-weight: 200;
 }
 
 .wrapper-contact a {
@@ -401,6 +403,21 @@ a.art:not(.active) {
   font-size: 2rem;
   line-height: 0;
 }
+
+.ig {
+  background: linear-gradient(90deg,rgba(168, 28, 237, 1) 0%, rgba(199, 87, 87, 1) 50%, rgba(237, 170, 83, 1) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.out {
+  background: linear-gradient(270deg,rgba(28, 52, 237, 1) 0%, rgba(83, 206, 237, 1) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+
 
 /********************** ANIMATIONS **********************/
 
