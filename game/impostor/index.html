@@ -16,21 +16,21 @@
   /* ========= KOLORY – zmieniasz TYLKO tutaj ========= */
   :root{
     /* baza */
-    --bg:#120c0f;           /* tło strony */
-    --bg-glow:#1c1216;      /* poświata w tle (radial gradient) */
-    --card:#1e1520;         /* karty/modale */
+    --bg:#0c0e12;           /* tło strony */
+    --bg-glow:#12171c;      /* poświata w tle (radial gradient) */
+    --card:#151b20;         /* karty/modale */
     --text:#fff5f5;         /* główny tekst */
-    --muted:#b09aaa;        /* słabszy tekst */
+    --muted:#9aadb0;        /* słabszy tekst */
 
     /* akcent (gradient głównych przycisków) */
-    --accent:#ff9a8b;
-    --accent2:#ffd08a;
+    --accent:#ffac8b;
+    --accent2:#8affd8;
 
     /* to, co wcześniej było „niebieskie” */
-    --secondary:#2a1b27;                 /* tła btn.secondary, HOLD, aktywne bąble losowania */
+    --secondary:#1b212a;                 /* tła btn.secondary, HOLD, aktywne bąble losowania */
     --secondary-border:rgba(255,255,255,.16);
 
-    --chip:#241720;                      /* tła chipów/wierszy list */
+    --chip:#171e24;                      /* tła chipów/wierszy list */
     --chip-border:rgba(255,255,255,.08);
 
     --input:#1a1218;                     /* tło inputów */
@@ -39,7 +39,7 @@
     --hairline:rgba(255,255,255,.08);    /* cienkie linie */
     --panel-border:rgba(255,255,255,.06);
 
-    --btn-glow:rgba(255,160,140,.35);    /* poświata pod gł. przyciskiem */
+    --btn-glow:rgba(140, 255, 240, 0.35);    /* poświata pod gł. przyciskiem */
   }
 
   html{height:100%;background:var(--bg)}
@@ -122,7 +122,7 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>Impostor Party</h1><span class="badge">mobile</span>
+    <h1>Impostor Party</h1><span class="badge">mobilnie</span>
   </header>
 
   <!-- MENU -->
@@ -230,49 +230,40 @@
 </div>
 
 <script>
-/* ======= MOTYWY – możesz wybrać z gotowych albo zmienić zmienne w :root ======= */
-// const THEMES = {
-//   ocean:  {bg:"#0f1220",card:"#161a2e",muted:"#9097ad",text:"#f5f7ff",accent:"#6ee7ff",accent2:"#a78bfa"},
-//   sunset: {bg:"#120c0f",card:"#1e1520",muted:"#b09aaa",text:"#fff5f5",accent:"#ff9a8b",accent2:"#ffd08a"},
-//   forest: {bg:"#0e1411",card:"#15201a",muted:"#9ab0a3",text:"#f2fff7",accent:"#7bd88f",accent2:"#4fd1c5"},
-//   grape:  {bg:"#140c1f",card:"#1f1530",muted:"#a395b6",text:"#f7f1ff",accent:"#c084fc",accent2:"#60a5fa"},
-//   light:  {bg:"#f5f7fb",card:"#ffffff",muted:"#6b7280",text:"#0f172a",accent:"#60a5fa",accent2:"#22d3ee"}
-// };
-// function applyTheme(name){
-//   const t = THEMES[name] || THEMES.ocean;
-//   const r = document.documentElement;
-//   r.style.setProperty('--bg', t.bg);
-//   r.style.setProperty('--card', t.card);
-//   r.style.setProperty('--muted', t.muted);
-//   r.style.setProperty('--text', t.text);
-//   r.style.setProperty('--accent', t.accent);
-//   r.style.setProperty('--accent2', t.accent2);
-//   try{
-//     document.querySelectorAll('meta[name="theme-color"]').forEach(m=>m.setAttribute('content', t.bg));
-//   }catch(e){}
-//   localStorage.setItem('impostor_theme', name);
-// }
-// (function initTheme(){
-//   const q = new URLSearchParams(location.search).get('theme');
-//   // jeśli podasz ?theme=..., to to wygrywa (i się zapisze)
-//   if (q) { applyTheme(q.toLowerCase()); return; }
-//   // w przeciwnym razie – zawsze sunset jako domyślny i zapisz go
-//   applyTheme('sunset');
-// })();
-
-
-
 /* ======= DANE ======= */
-const WORDS={ "Jedzenie":["PIZZA","PĄCZEK","ROSÓŁ","SUSHI","KANAPKA","CZEKOLADA","SAŁATKA","BURGER","SER","JABŁKO"],
-"Zwierzęta":["SŁOŃ","KOT","PIES","ŻYRAFA","PINGWIN","REKIN","KOALA","KROWA","KUNA","SOWA"],
-"Miejsca":["WARSZAWA","PLAŻA","LAS","GÓRY","MUZEUM","STADION","DWORZEC","SZKOŁA","KINO","LOTNISKO"],
-"Przedmioty":["LAPTOP","OKULARY","ZEGAREK","MIKROFON","KRZESŁO","ROWER","LATARKA","KSIĄŻKA","DŁUGOPIS","PARASOL"],
-"Sport":["PIŁKA NOŻNA","KOSZYKÓWKA","TENIS","SIATKÓWKA","BIEGI","PŁYWANIE","SZACHY","HOKEJ","BADMINTON","RUGBY"] };
-const ALL_WORDS=Object.values(WORDS).flat();
-const STORAGE_KEY="impostorParty_v9";
+const WORDS = [
+  "ZIMNY","CIEPŁY","GORĄCY","LEKKI","CIĘŻKI","SZYBKI","WOLNY","CICHY","GŁOŚNY","MIĘKKI","TWARDY","KOLOROWY","CZARNY","BIAŁY","SZARY","ZIELONY","NIEBIESKI","ŻÓŁTY","CZERWONY","FIOLETOWY","POMARAŃCZOWY","RÓŻOWY","DŁUGI","KRÓTKI","WĄSKI","SZEROKI","WYSOKI","NISKI","GŁĘBOKI","PŁYTKI",
+  "RADOŚĆ","SMUTEK","STRACH","ZASKOCZENIE","ZŁOŚĆ","ODWAGA","CIERPLIWOŚĆ","LENISTWO","PRACOWITOŚĆ","NADZIEJA","TĘSKNOTA","ZMĘCZENIE","ENERGIA","CHAOS","PORZĄDEK","PRZYSZŁOŚĆ","PRZESZŁOŚĆ","CHWILA","WIECZNOŚĆ","SZCZĘŚCIE","KREATYWNOŚĆ","NOSTALGIA","CIEKAWOŚĆ","NUDA","WSTYD",
+  "PARK","LAS","PLAŻA","GÓRY","PUSTYNIA","DŻUNGLA","WULKAN","WYSPA","PÓŁWYSEP","MIASTO","WIEŚ","ULICA","SKWER","MOST","TUNEL","PORT","LOTNISKO","STACJA","DWORZEC","MUZEUM","TEATR","KINO","STADION","BASEN","BIBLIOTEKA","SZKOŁA","SZPITAL","PRZYCHODNIA",
+  "LAMPA","ŻARÓWKA","KRZESŁO","STÓŁ","BIURKO","SOFA","ŁÓŻKO","SZAFA","SZUFLADA","PODUSZKA","KOC","ZASŁONA","DYWAN","TELEWIZOR","PILOT","KLAWIATURA","MYSZKA","MONITOR","KAMERA","APARAT","DRON","MIKROFON","GŁOŚNIK","SŁUCHAWKI","LAPTOP","KOMPUTER","TABLET","TELEFON","ŁADOWARKA","BATERIA","KABEL","ROUTER","DRUKARKA","SKANER","GARNEK","PATELNIA","CZAJNIK","PIEKARNIK","ZMYWARKA","LODÓWKA","TOSTER","BLENDER","MIKSER","TALERZ","MISA",
+  "MŁOTEK","ŚRUBOKRĘT","KLUCZ","PIŁA","WIERTARKA","TAŚMA","POZIOMICA","DRABINA","ŁOPATA","MIOTŁA","SZUFELKA","WIADRO","PĘDZEL","WAŁEK","GWOŹDZIE",
+  "PIŁKA","BRAMKA","SIATKA","KIJ","RAKIETA","NARTY","ŁYŻWY","KASK","HANTEL","BOKS","TENIS","KOSZYKÓWKA","SIATKÓWKA","SZERMIERKA","ŁUCZNICTWO","WSPINACZKA","ŻEGLARSTWO","NURKOWANIE","GOLF","RUGBY",
+  "PIES","KOT","KROWA","KOZA","OWCA","ŚWINIA","KOŃ","OSIOŁ","KURA","KOGUT","INDYK","GĘŚ","KACZKA","ŁABĘDŹ","GOŁĄB","WRÓBEL","SOWA","JASKÓŁKA","ORZEŁ","JASTRZĄB","RYŚ","LIS","WILK","NIEDŹWIEDŹ","ŁOŚ","JELEŃ","SARNA","BÓBR","ZAJĄC","KRÓLIK","WIEWIÓRKA","JEŻ","MYSZ","SZCZUR","REKIN","DELFIN","WIELORYB","OŚMIORNICA",
+  "PIZZA","BURGER","SAŁATKA","ZUPA","ROSÓŁ","BIGOS","NALEŚNIK","PIEROGI","CIASTO","TORT","CZEKOLADA","LIZAK","GUMA","JOGURT","SER","MASŁO","CHLEB","BUŁKA","BAGIETKA","KIEŁBASA","PARÓWKA","BEKON","JAJKO","OMLET","SZYNKA","OGÓREK","POMIDOR","PAPRYKA","CEBULA","CZOSNEK","MARCHEWKA","ZIEMNIAK","KALAFIOR","BROKUŁ","BAKŁAŻAN","AWOKADO","BANAN","JABŁKO",
+  "DESZCZ","ŚNIEG","GRAD","MGŁA","WIATR","CHMURA","NIEBO","SŁOŃCE","KSIĘŻYC","GWIAZDA","TĘCZA","BURZA","HURAGAN","TORNADO","WULKAN","ZORZA","TRZĘSIENIE","TSUNAMI","BAŁTYK","GÓRA","DOLINA","RZEKA",
+  "GŁOWA","TWARZ","OKO","NOS","USTA","JĘZYK","UCHO","ZĄB","SZYJA","BARK","RĘKA","DŁOŃ","PALEC","KCIUK","BRZUCH","PLECY","NOGA","KOLANO","STOPA","PIĘTA",
+  "KOSZULA","SPODNIE","SPÓDNICA","SUKIENKA","SWETER","BLUZA","KURTKA","PŁASZCZ","MARYNARKA","PASEK","BUTY","KAPCIE","SKARPETA","CZAPKA","KAPELUSZ",
+  "SAMOCHÓD","ROWER","MOTOCYKL","AUTOBUS","TRAMWAJ","POCIĄG","METRO","STATEK","PROM","ŁÓDŹ","KAJAK","HULAJNOGA","SKUTER","HELIKOPTER","SAMOLOT",
+  "LEKARZ","PIELĘGNIARKA","NAUCZYCIEL","KELNER","KUCHARZ","PRAWNIK","POLICJANT","STRAŻAK","MUZYK","AKTOR","REŻYSER","MALARZ","PISARZ","POETA","DZIENNIKARZ","FOTOGRAF","ARCHITEKT","INŻYNIER","OGRODNIK","STOLARZ",
+  "APLIKACJA","HASŁO","KOD","PLIK","FOLDER","SYSTEM","SERWER","SIEĆ","WIFI","PORTAL","STRONA","PRZEGLĄDARKA","GRA","KONSOLA","JOYSTICK",
+  "BIEGAĆ","SKAKAĆ","PŁYWAĆ","LATAĆ","TAŃCZYĆ","ŚPIEWAĆ","GOTOWAĆ","CZYTAĆ","PISAĆ","LICZYĆ","RYSOWAĆ","MALOWAĆ","GRAĆ","SŁUCHAĆ"
+];
+const ALL_WORDS = WORDS;
+
+/* ======= STORAGE KEY (nowa wersja, żeby nie mieszać zapisu) ======= */
+const STORAGE_KEY="impostorParty_v10";
 
 /* ======= STAN ======= */
-const state={ players:[], targetCount:5, entryIndex:0, word:"", impostorIndex:-1, lastImpostorIndex:null, startIndex:0, partyMode:false };
+const state={
+  players:[],
+  targetCount:5,
+  entryIndex:0,
+  word:"",
+  impostorIndices:[],       // wielu impostorów
+  lastImpostorIndices:[],   // zapamiętanie z poprzedniej gry do punktacji
+  startIndex:0,
+  partyMode:false
+};
 
 /* ======= HELPERS ======= */
 const el=id=>document.getElementById(id);
@@ -284,19 +275,54 @@ function uuid(){ if(crypto?.randomUUID) return crypto.randomUUID();
   if(crypto?.getRandomValues){ return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c/4).toString(16)); }
   return 'xxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&0x3|0x8);return v.toString(16);});}
 
-/* storage */
-const save=()=>localStorage.setItem(STORAGE_KEY,JSON.stringify({
-  players:state.players,startIndex:state.startIndex,lastImpostorIndex:state.lastImpostorIndex,partyMode:state.partyMode
-}));
-const load=()=>{ try{const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return false;
-  const d=JSON.parse(raw); if(!Array.isArray(d.players)||d.players.length<1) return false;
-  state.players=d.players; state.startIndex=(Number.isInteger(d.startIndex)? d.startIndex % state.players.length:0);
-  state.lastImpostorIndex=(typeof d.lastImpostorIndex==="number")? d.lastImpostorIndex:null;
-  state.partyMode=!!d.partyMode; return true;}catch(e){return false;}};
+/* ======= IMPOSTOR UTILS ======= */
+const isImpostor = (i) => state.impostorIndices.includes(i);
 
-function show(id){ for(const s of ["view-menu","view-setup","view-entry","view-start","view-lobby","view-manage"]){ const v=el(s); if(v) v.style.display=(s===id)?"":"none"; } }
-function showOverlay(id,on=true){ const ov=el(id); if(on){ document.body.classList.add('lock-scroll'); ov.classList.add('show'); requestAnimationFrame(()=>window.scrollTo(0,0)); }
-  else{ ov.classList.remove('show'); document.body.classList.remove('lock-scroll'); }}
+// 1%: wszyscy; 5%: dokładnie dwóch; reszta: jeden
+function chooseImpostors(total){
+  const r = Math.random();
+  if (r < 0.01) { // 1%
+    return Array.from({length: total}, (_,i)=>i);
+  }
+  if (r < 0.06) { // kolejne 5%
+    if (total < 2) return [0];
+    let a = rand(total), b;
+    do { b = rand(total); } while (b === a);
+    return a < b ? [a,b] : [b,a];
+  }
+  return [rand(total)]; // singiel
+}
+
+/* ======= storage ======= */
+const save=()=>localStorage.setItem(STORAGE_KEY,JSON.stringify({
+  players:state.players,
+  startIndex:state.startIndex,
+  lastImpostorIndices:state.lastImpostorIndices,
+  partyMode:state.partyMode
+}));
+const load=()=>{ try{
+  const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return false;
+  const d=JSON.parse(raw); if(!Array.isArray(d.players)||d.players.length<1) return false;
+  state.players=d.players;
+  state.startIndex=(Number.isInteger(d.startIndex)? d.startIndex % state.players.length:0);
+  // kompatybilność wstecz: stary zapis mógł mieć lastImpostorIndex
+  if(Array.isArray(d.lastImpostorIndices)) state.lastImpostorIndices=d.lastImpostorIndices;
+  else if(typeof d.lastImpostorIndex==="number") state.lastImpostorIndices=[d.lastImpostorIndex];
+  else state.lastImpostorIndices=[];
+  state.partyMode=!!d.partyMode;
+  return true;
+}catch(e){return false;}};
+
+function show(id){
+  for(const s of ["view-menu","view-setup","view-entry","view-start","view-lobby","view-manage"]){
+    const v=el(s); if(v) v.style.display=(s===id)?"":"none";
+  }
+}
+function showOverlay(id,on=true){
+  const ov=el(id);
+  if(on){ document.body.classList.add('lock-scroll'); ov.classList.add('show'); requestAnimationFrame(()=>window.scrollTo(0,0)); }
+  else  { ov.classList.remove('show'); document.body.classList.remove('lock-scroll'); }
+}
 
 /* ======= MENU ======= */
 function initMenu(){
@@ -309,13 +335,17 @@ window.addEventListener("load", initMenu);
 el("partyMode").addEventListener("change", (e)=>{ state.partyMode = e.target.checked; save(); renderStats(); });
 
 /* ======= NOWA GRA ======= */
-el("btn-new").addEventListener("click",()=>{ state.targetCount=Math.min(12,Math.max(3,parseInt(el("playerCount").value)||5)); el("playerCount").value=state.targetCount; show("view-setup"); });
+el("btn-new").addEventListener("click",()=>{
+  state.targetCount=Math.min(12,Math.max(3,parseInt(el("playerCount").value)||5));
+  el("playerCount").value=state.targetCount; show("view-setup");
+});
 el("back-to-menu").addEventListener("click", initMenu);
 
 el("btn-begin-entry").addEventListener("click", ()=>{
   state.targetCount=Math.min(12,Math.max(3,parseInt(el("playerCount").value)||5));
-  state.players=[]; state.entryIndex=0; state.word=pickWord(); state.impostorIndex=rand(state.targetCount);
-  state.lastImpostorIndex=state.impostorIndex; // impostor bieżącej gry
+  state.players=[]; state.entryIndex=0; state.word=pickWord();
+  state.impostorIndices = chooseImpostors(state.targetCount); // ⬅️ wielu impostorów
+  state.lastImpostorIndices = [...state.impostorIndices];     // ⬅️ zapamiętaj rundę
   el("entry-index").textContent="1"; el("entry-total").textContent=String(state.targetCount);
   el("entry-name").value=""; renderEntryList(); show("view-entry"); setTimeout(()=>el("entry-name").focus(),120);
 });
@@ -330,7 +360,7 @@ el("entry-confirm").addEventListener("click",()=>{
   const name=el("entry-name").value.trim(); if(!name) return alert("Podaj imię.");
   if(state.players.some(p=>p.name.toLowerCase()===name.toLowerCase())) return alert("To imię już jest na liście.");
   state.players.push({id:uuid(),name,points:0,shots:0});
-  const idx=state.entryIndex; const isImp=(idx===state.impostorIndex);
+  const idx=state.entryIndex; const isImp=isImpostor(idx); // ⬅️
   el("entry-name").blur();
   openSecret({playerName:name, text:isImp?null:state.word, isImp, pos:idx, total:state.targetCount, nextName:(idx+1<state.targetCount? ("Gracz "+(idx+2)):null)});
   const once=()=>{ el("secret-hide").removeEventListener("click",once);
@@ -405,7 +435,6 @@ function animateWheelTo(targetIndex,done){
 
 /* ======= LOBBY / STATYSTYKI ======= */
 function renderStats(){
-  // nagłówek dynamicznie (shots tylko w partyMode)
   const head = el("stats-head");
   head.innerHTML = state.partyMode
     ? '<tr><th>Gracz</th><th>Punkty</th><th class="shots-col">Shoty</th></tr>'
@@ -427,27 +456,26 @@ el("btn-new-round").addEventListener("click", ()=> showOverlay("overlay-result",
 el("res-yes").addEventListener("click", ()=>{ applyPreviousResult(true); showOverlay("overlay-result", false); dealNewRound(); });
 el("res-no").addEventListener("click",  ()=>{ applyPreviousResult(false); showOverlay("overlay-result", false); dealNewRound(); });
 
-/* PUNKTACJA:
-   - impostor wygrał -> impostor.points++
-   - impostor przegrał -> każdy niewinny .points++
+/* PUNKTACJA (wielu impostorów):
+   - impostor wygrał -> KAŻDY impostor: +1 punkt
+   - impostor przegrał -> KAŻDY niewinny: +1 punkt
    SHOTY (tylko jeśli partyMode true):
-   - impostor wygrał -> wszyscy niewinni +1 shot
-   - impostor przegrał -> impostor +2 shoty
+   - impostor wygrał -> KAŻDY niewinny +1 shot
+   - impostor przegrał -> KAŻDY impostor +2 shoty
 */
 function applyPreviousResult(impostorWon){
-  if(typeof state.lastImpostorIndex!=="number") return;
-  const impIdx = state.lastImpostorIndex;
+  const imps = new Set(state.lastImpostorIndices || []);
+  if (imps.size === 0) return;
 
   if(impostorWon){
-    state.players[impIdx].points = (state.players[impIdx].points||0) + 1;
+    state.players.forEach((p,i)=>{ if(imps.has(i)) p.points = (p.points||0) + 1; });
     if(state.partyMode){
-      state.players.forEach((p,i)=>{ if(i!==impIdx) p.shots = (p.shots||0) + 1; });
+      state.players.forEach((p,i)=>{ if(!imps.has(i)) p.shots = (p.shots||0) + 1; });
     }
   }else{
-    // punkty dla wszystkich poza impostorem
-    state.players.forEach((p,i)=>{ if(i!==impIdx) p.points = (p.points||0) + 1; });
+    state.players.forEach((p,i)=>{ if(!imps.has(i)) p.points = (p.points||0) + 1; });
     if(state.partyMode){
-      state.players[impIdx].shots = (state.players[impIdx].shots||0) + 2;
+      state.players.forEach((p,i)=>{ if(imps.has(i)) p.shots = (p.shots||0) + 2; });
     }
   }
   renderStats();
@@ -456,11 +484,14 @@ function applyPreviousResult(impostorWon){
 /* Rozdanie nowej rundy + sekwencyjne ujawnianie */
 function dealNewRound(){
   state.startIndex=(state.startIndex+1)%state.players.length;
-  state.word=pickWord(); state.impostorIndex=rand(state.players.length);
-  state.lastImpostorIndex=state.impostorIndex; save(); revealSequence(0);
+  state.word=pickWord();
+  state.impostorIndices = chooseImpostors(state.players.length);  // ⬅️ losuj co rundę
+  state.lastImpostorIndices = [...state.impostorIndices];
+  save();
+  revealSequence(0);
 }
 function revealSequence(i){
-  const total=state.players.length, p=state.players[i], isImp=(i===state.impostorIndex);
+  const total=state.players.length, p=state.players[i], isImp=isImpostor(i);
   const nextName=(i+1<total)?state.players[i+1].name:null;
   openSecret({playerName:p.name, text:isImp?null:state.word, isImp, pos:i, total, nextName});
   const once=()=>{ el("secret-hide").removeEventListener("click", once);
@@ -474,7 +505,7 @@ const manageHTML=(p,i)=>`
   <div class="rowcard" style="display:flex;align-items:center;gap:8px;padding:10px">
     <div class="chip">${i+1}</div>
     <input type="text" data-name="${i}" value="${escapeHtml(p.name)}"
-      style="flex:1;min-width:100px;background:#0b0f1e;border:1px solid rgba(255,255,255,.08);
+      style="flex:1;min-width:100px;background:var(--input);border:1px solid var(--hairline);
       border-radius:10px;padding:10px;color:var(--text);font-size:16px"/>
     <button class="icon" data-up="${i}" title="Wyżej">↑</button>
     <button class="icon" data-down="${i}" title="Niżej">↓</button>
@@ -512,8 +543,6 @@ document.addEventListener("click",(e)=>{
 
 /* ======= KONTYNUUJ ======= */
 el("btn-continue").addEventListener("click", ()=>{ el("starter-name").textContent=state.players[state.startIndex]?.name ?? "–"; renderStats(); show("view-lobby"); });
-// localStorage.removeItem('impostor_theme');
-
 </script>
 </body>
 </html>
