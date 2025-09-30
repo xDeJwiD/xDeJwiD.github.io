@@ -1,548 +1,209 @@
 <!DOCTYPE html>
 <html lang="pl">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Impostor Party – 1 urządzenie</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <link rel="stylesheet" href="impostor.css" />
+    <title>Impostor Party</title>
 
-<!-- Kolor UI Safari / iOS -->
-<meta name="theme-color" content="#0f1220" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0f1220" media="(prefers-color-scheme: dark)">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Impostor Party">
+    <!-- Kolor UI Safari / iOS -->
+    <meta
+      name="theme-color"
+      content="#0f1220"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#0f1220"
+      media="(prefers-color-scheme: dark)"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Impostor Party" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Impostor Party</h1>
+        <span class="badge">mobilnie</span>
+      </header>
 
-<style>
-  /* ========= KOLORY – zmieniasz TYLKO tutaj ========= */
-  :root{
-    /* baza */
-    --bg:#0c0e12;           /* tło strony */
-    --bg-glow:#12171c;      /* poświata w tle (radial gradient) */
-    --card:#151b20;         /* karty/modale */
-    --text:#fff5f5;         /* główny tekst */
-    --muted:#9aadb0;        /* słabszy tekst */
+      <!-- MENU -->
+      <section id="view-menu" class="card screen">
+        <div>
+          <h2 class="title">Witaj 👋</h2>
+          <p class="muted">Gracie na jednym telefonie.</p>
+        </div>
+        <div class="row">
+          <button class="btn full" id="btn-continue" disabled>
+            Kontynuuj poprzednią grę
+          </button>
+          <button class="btn secondary full" id="btn-new">Nowa gra</button>
+          <button class="btn secondary full" id="btn-test">Test</button>
+        </div>
 
-    /* akcent (gradient głównych przycisków) */
-    --accent:#ffac8b;
-    --accent2:#8affd8;
+        <div class="divider"></div>
+        <label class="row" style="align-items: center">
+          <input
+            type="checkbox"
+            id="partyMode"
+            style="width: 20px; height: 20px; accent-color: #7dd3fc"
+          />
+          <span>Tryb imprezowy <strong>18+</strong> (shoty)</span>
+        </label>
+      </section>
 
-    /* to, co wcześniej było „niebieskie” */
-    --secondary:#1b212a;                 /* tła btn.secondary, HOLD, aktywne bąble losowania */
-    --secondary-border:rgba(255,255,255,.16);
+      <!-- SETUP -->
+      <section id="view-setup" class="card screen" style="display: none">
+        <div>
+          <h2 class="title">Nowa gra</h2>
+          <label>Ilość graczy</label>
+          <input
+            id="playerCount"
+            inputmode="numeric"
+            type="number"
+            min="3"
+            max="12"
+            value="5"
+          />
+        </div>
+        <div class="row" style="margin-top: 8px">
+          <button class="btn full" id="btn-begin-entry">Wpisz gracza 1</button>
+          <button class="btn ghost full" id="back-to-menu">◀ Wróć</button>
+        </div>
+      </section>
 
-    --chip:#171e24;                      /* tła chipów/wierszy list */
-    --chip-border:rgba(255,255,255,.08);
+      <!-- ENTRY -->
+      <section id="view-entry" class="card screen" style="display: none">
+        <div>
+          <h2 class="title">
+            Gracz <span id="entry-index">1</span> /
+            <span id="entry-total">1</span>
+          </h2>
+          <label>Imię gracza</label>
+          <input
+            id="entry-name"
+            type="text"
+            placeholder="np. Ola"
+            autocomplete="off"
+            autocapitalize="sentences"
+          />
+          <div class="row" style="margin-top: 8px">
+            <button class="btn full" id="entry-confirm">
+              Zatwierdź imię i pokaż rolę
+            </button>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div>
+          <label>Dodani</label>
+          <div id="entry-list" class="list"></div>
+        </div>
+      </section>
 
-    --input:#1a1218;                     /* tło inputów */
+      <!-- START -->
+      <section id="view-start" class="card screen" style="display: none">
+        <h2 class="title">Losowanie kto zaczyna…</h2>
+        <div class="wheel" id="start-wheel"></div>
+        <p class="muted" id="start-hint" style="margin-top: 8px">
+          Trwa losowanie…
+        </p>
+      </section>
 
-    --highlight:var(--accent2);          /* obrysy/aktywy */
-    --hairline:rgba(255,255,255,.08);    /* cienkie linie */
-    --panel-border:rgba(255,255,255,.06);
-
-    --btn-glow:rgba(140, 255, 240, 0.35);    /* poświata pod gł. przyciskiem */
-  }
-
-  html{height:100%;background:var(--bg)}
-  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;}
-  input,textarea{user-select:text; -webkit-user-select:text;}
-
-  body{
-    height:100%; margin:0; font-family:system-ui,-apple-system,Inter,Segoe UI,Roboto,Ubuntu,Arial;
-    background: radial-gradient(1200px 800px at 80% -10%, var(--bg-glow) 0%, var(--bg) 60%) fixed;
-    color:var(--text); padding-bottom:var(--safe-bottom); overscroll-behavior-y:none;
-  }
-  .wrap{max-width:540px;margin:0 auto;padding:clamp(10px,3.2vw,18px);display:flex;flex-direction:column;gap:12px}
-  header{display:flex;justify-content:center;align-items:center;padding-top:var(--safe-top)}
-  h1{margin:0;font-size:clamp(20px,5vw,28px);text-align:center}
-  .badge{font-size:12px;color:#0b1020;background:linear-gradient(135deg,var(--accent),var(--accent2));padding:6px 10px;border-radius:999px;margin-left:8px}
-
-  .card{
-    background:linear-gradient(180deg,rgba(255,255,255,.04),transparent 30%),var(--card);
-    border:1px solid var(--panel-border);
-    border-radius:18px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);
-  }
-
-  .screen{min-height:82dvh;display:flex;flex-direction:column;justify-content:center;gap:12px}
-  .title{font-size:20px;margin:0 0 6px;text-align:center}
-  .muted{color:var(--muted);text-align:center}
-  .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-  .list{display:flex;flex-direction:column;gap:8px;align-items:stretch}
-  label{font-size:14px;color:var(--muted);display:block;text-align:center}
-
-  input[type="text"],input[type="number"]{
-    width:100%;padding:16px;border-radius:16px;border:1px solid var(--hairline);
-    background:var(--input);color:var(--text);font-size:16px
-  }
-
-  .btn{
-    appearance:none;border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:16px;font-weight:700;
-    color:#0b1020;background:linear-gradient(135deg,var(--accent),var(--accent2));
-    cursor:pointer;transition:transform .04s ease;box-shadow:0 6px 20px var(--btn-glow);
-    min-height:52px;min-width:220px
-  }
-  .btn:active{transform:translateY(1px)} .btn.full{width:100%}
-
-  .btn.secondary{background:var(--secondary);color:var(--text);border:1px solid var(--secondary-border)}
-  .btn.ghost{background:transparent;border:1px dashed rgba(255,255,255,.2);color:var(--muted)}
-
-  .chip{padding:8px 10px;border-radius:999px;border:1px solid var(--chip-border);color:var(--muted);background:var(--chip)}
-  .divider{height:1px;background:var(--hairline);margin:12px 0}
-
-  .table{width:100%;border-collapse:separate;border-spacing:0 8px}
-  .table td,.table th{padding:10px 12px}
-  .table thead th{font-size:12px;color:var(--muted);text-align:left}
-  .rowcard{background:var(--chip);border:1px solid var(--chip-border);border-radius:12px}
-
-  /* overlay */
-  .overlay{position:fixed;inset:0;background:rgba(8,10,18,.82);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
-  .overlay.show{display:flex}
-  .modal{width:min(520px,94vw);background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-  .huge{font-size:clamp(28px,7vw,40px);font-weight:800;text-align:center}
-  .for{font-size:16px;font-weight:800;letter-spacing:.4px}
-
-  /* losowanie */
-  .wheel{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px}
-  .wheel .p{padding:14px;border-radius:999px;border:1px solid var(--chip-border);background:var(--chip);min-width:120px;text-align:center}
-  .wheel .p.active{outline:3px solid var(--highlight);background:var(--secondary)}
-
-  /* hold with memory */
-  .hold{position:relative;overflow:hidden;touch-action:manipulation;background:var(--secondary);color:#fff;border:1px solid var(--secondary-border)}
-  .hold>.label{position:relative;z-index:2}
-  .hold::before{content:"";position:absolute;inset:0;width:calc(var(--holdp,0)*1%);background:linear-gradient(135deg,var(--accent),var(--accent2));z-index:1;transition:width .02s linear}
-
-  .handoff-inline{
-    display:none;margin-top:10px;text-align:center;font-weight:700;letter-spacing:.3px;
-    background:var(--chip);border:1px solid var(--chip-border);color:var(--text);padding:10px;border-radius:12px
-  }
-
-  .lock-scroll{height:100dvh;overflow:hidden}
-</style>
-
-</head>
-<body>
-<div class="wrap">
-  <header>
-    <h1>Impostor Party</h1><span class="badge">mobilnie</span>
-  </header>
-
-  <!-- MENU -->
-  <section id="view-menu" class="card screen">
-    <div>
-      <h2 class="title">Witaj 👋</h2>
-      <p class="muted">Gracie na jednym telefonie.</p>
+      <!-- LOBBY -->
+      <section id="view-lobby" class="card screen" style="display: none">
+        <h2 class="title">Lobby</h2>
+        <div class="row" style="margin-bottom: 6px">
+          <span class="chip"
+            >Zaczyna: <strong id="starter-name">–</strong></span
+          >
+        </div>
+        <div class="row">
+          <button class="btn full" id="btn-new-round">Nowa gra</button>
+          <button class="btn secondary full" id="btn-manage">
+            Zmień kolejność/ilość
+          </button>
+        </div>
+        <div class="divider"></div>
+        <h3 class="title">Statystyki</h3>
+        <table class="table">
+          <thead id="stats-head">
+            <tr>
+              <th>Gracz</th>
+              <th>Punkty</th>
+              <th class="shots-col">Shoty</th>
+            </tr>
+          </thead>
+          <tbody id="stats-body"></tbody>
+        </table>
+      </section>
     </div>
-    <div class="row">
-      <button class="btn full" id="btn-continue" disabled>Kontynuuj poprzednią grę</button>
-      <button class="btn secondary full" id="btn-new">Nowa gra</button>
-    </div>
-    <div class="divider"></div>
-    <label class="row" style="align-items:center">
-      <input type="checkbox" id="partyMode" style="width:20px;height:20px;accent-color:#7dd3fc"/>
-      <span>Tryb imprezowy <strong>18+</strong> (shoty)</span>
-    </label>
-  </section>
 
-  <!-- SETUP -->
-  <section id="view-setup" class="card screen" style="display:none">
-    <div>
-      <h2 class="title">Nowa gra</h2>
-      <label>Ilość graczy</label>
-      <input id="playerCount" inputmode="numeric" type="number" min="3" max="12" value="5"/>
-    </div>
-    <div class="row" style="margin-top:8px">
-      <button class="btn full" id="btn-begin-entry">Wpisz gracza 1</button>
-      <button class="btn ghost full" id="back-to-menu">◀ Wróć</button>
-    </div>
-  </section>
+    <!-- OVERLAYS -->
+    <div id="overlay-secret" class="overlay" role="dialog" aria-modal="true">
+      <div class="modal">
+        <!-- HERO z avatarami (tło u góry modala) -->
+        <div class="secret-hero">
+          <img id="hero-current" class="hero-img" alt="" />
+          <img id="hero-next" class="hero-img" alt="" aria-hidden="true" />
+          <div id="hero-banner" class="hero-banner" aria-hidden="true">
+            <span>Przekaż telefon do:</span>
+            <strong id="hero-next-name">—</strong>
+          </div>
+        </div>
 
-  <!-- ENTRY -->
-  <section id="view-entry" class="card screen" style="display:none">
-    <div>
-      <h2 class="title">Gracz <span id="entry-index">1</span> / <span id="entry-total">1</span></h2>
-      <label>Imię gracza</label>
-      <input id="entry-name" type="text" placeholder="np. Ola" autocomplete="off" autocapitalize="sentences" />
-      <div class="row" style="margin-top:8px">
-        <button class="btn full" id="entry-confirm">Zatwierdź imię i pokaż rolę</button>
+        <div class="row" style="justify-content: space-between">
+          <div class="chip for">DLA: <strong id="secret-player">–</strong></div>
+          <div class="chip" id="secret-pos">1 / 1</div>
+        </div>
+        <div class="card center" style="margin-top: 10px">
+          <div class="muted">Twoje hasło:</div>
+          <div id="secret-value" class="huge" style="display: none"></div>
+          <div
+            id="secret-imp-hint"
+            class="muted"
+            style="display: none; margin-top: 6px"
+          >
+            Jesteś impostorem – kamuflaż!
+          </div>
+          <div id="secret-instruction" class="muted" style="margin-top: 6px">
+            PRZYTRZYMAJ, aby zobaczyć
+          </div>
+        </div>
+        <div class="row" style="margin-top: 10px">
+          <button class="btn hold full" id="secret-show">
+            <span class="label">Przytrzymaj, by odsłonić</span>
+          </button>
+          <button
+            class="btn secondary full"
+            id="secret-hide"
+            style="display: none"
+          >
+            Ukryj i podaj dalej
+          </button>
+        </div>
+        <div id="handoff-inline" class="handoff-inline">
+          Przekaż telefon do: <strong id="handoff-next">—</strong>
+        </div>
       </div>
     </div>
-    <div class="divider"></div>
-    <div>
-      <label>Dodani</label>
-      <div id="entry-list" class="list"></div>
+
+    <div id="overlay-result" class="overlay" role="dialog" aria-modal="true">
+      <div class="modal">
+        <h3 class="title">Czy impostor wygrał właśnie zakończoną grę?</h3>
+        <div class="row">
+          <button class="btn" id="res-yes">Tak</button>
+          <button class="btn secondary" id="res-no">Nie</button>
+        </div>
+      </div>
     </div>
-  </section>
 
-  <!-- START -->
-  <section id="view-start" class="card screen" style="display:none">
-    <h2 class="title">Losowanie kto zaczyna…</h2>
-    <div class="wheel" id="start-wheel"></div>
-    <p class="muted" id="start-hint" style="margin-top:8px">Trwa losowanie…</p>
-  </section>
-
-  <!-- LOBBY -->
-  <section id="view-lobby" class="card screen" style="display:none">
-    <h2 class="title">Lobby</h2>
-    <div class="row" style="margin-bottom:6px">
-      <span class="chip">Zaczyna: <strong id="starter-name">–</strong></span>
-    </div>
-    <div class="row">
-      <button class="btn full" id="btn-new-round">Nowa gra</button>
-      <button class="btn secondary full" id="btn-manage">Zmień kolejność/ilość</button>
-    </div>
-    <div class="divider"></div>
-    <h3 class="title">Statystyki</h3>
-    <table class="table">
-      <thead id="stats-head"><tr><th>Gracz</th><th>Punkty</th><th class="shots-col">Shoty</th></tr></thead>
-      <tbody id="stats-body"></tbody>
-    </table>
-  </section>
-</div>
-
-<!-- OVERLAYS -->
-<div id="overlay-secret" class="overlay" role="dialog" aria-modal="true">
-  <div class="modal">
-    <div class="row" style="justify-content:space-between">
-      <div class="chip for">DLA: <strong id="secret-player">–</strong></div>
-      <div class="chip" id="secret-pos">1 / 1</div>
-    </div>
-    <div class="card center" style="margin-top:10px">
-      <div class="muted">Twoje hasło:</div>
-      <div id="secret-value" class="huge" style="display:none"></div>
-      <div id="secret-imp-hint" class="muted" style="display:none;margin-top:6px">Jesteś impostorem – kamuflaż!</div>
-      <div id="secret-instruction" class="muted" style="margin-top:6px">PRZYTRZYMAJ, aby zobaczyć</div>
-    </div>
-    <div class="row" style="margin-top:10px">
-      <button class="btn hold full" id="secret-show"><span class="label">Przytrzymaj, by odsłonić</span></button>
-      <button class="btn secondary full" id="secret-hide" style="display:none">Ukryj i podaj dalej</button>
-    </div>
-    <div id="handoff-inline" class="handoff-inline">Przekaż telefon do: <strong id="handoff-next">—</strong></div>
-  </div>
-</div>
-
-<div id="overlay-result" class="overlay" role="dialog" aria-modal="true">
-  <div class="modal">
-    <h3 class="title">Czy impostor wygrał właśnie zakończoną grę?</h3>
-    <div class="row">
-      <button class="btn" id="res-yes">Tak</button>
-      <button class="btn secondary" id="res-no">Nie</button>
-    </div>
-  </div>
-</div>
-
-<script>
-/* ======= DANE ======= */
-const WORDS = [
-  "ZIMNY","CIEPŁY","GORĄCY","LEKKI","CIĘŻKI","SZYBKI","WOLNY","CICHY","GŁOŚNY","MIĘKKI","TWARDY","KOLOROWY","CZARNY","BIAŁY","SZARY","ZIELONY","NIEBIESKI","ŻÓŁTY","CZERWONY","FIOLETOWY","POMARAŃCZOWY","RÓŻOWY","DŁUGI","KRÓTKI","WĄSKI","SZEROKI","WYSOKI","NISKI","GŁĘBOKI","PŁYTKI",
-  "RADOŚĆ","SMUTEK","STRACH","ZASKOCZENIE","ZŁOŚĆ","ODWAGA","CIERPLIWOŚĆ","LENISTWO","PRACOWITOŚĆ","NADZIEJA","TĘSKNOTA","ZMĘCZENIE","ENERGIA","CHAOS","PORZĄDEK","PRZYSZŁOŚĆ","PRZESZŁOŚĆ","CHWILA","WIECZNOŚĆ","SZCZĘŚCIE","KREATYWNOŚĆ","NOSTALGIA","CIEKAWOŚĆ","NUDA","WSTYD",
-  "PARK","LAS","PLAŻA","GÓRY","PUSTYNIA","DŻUNGLA","WULKAN","WYSPA","PÓŁWYSEP","MIASTO","WIEŚ","ULICA","SKWER","MOST","TUNEL","PORT","LOTNISKO","STACJA","DWORZEC","MUZEUM","TEATR","KINO","STADION","BASEN","BIBLIOTEKA","SZKOŁA","SZPITAL","PRZYCHODNIA",
-  "LAMPA","ŻARÓWKA","KRZESŁO","STÓŁ","BIURKO","SOFA","ŁÓŻKO","SZAFA","SZUFLADA","PODUSZKA","KOC","ZASŁONA","DYWAN","TELEWIZOR","PILOT","KLAWIATURA","MYSZKA","MONITOR","KAMERA","APARAT","DRON","MIKROFON","GŁOŚNIK","SŁUCHAWKI","LAPTOP","KOMPUTER","TABLET","TELEFON","ŁADOWARKA","BATERIA","KABEL","ROUTER","DRUKARKA","SKANER","GARNEK","PATELNIA","CZAJNIK","PIEKARNIK","ZMYWARKA","LODÓWKA","TOSTER","BLENDER","MIKSER","TALERZ","MISA",
-  "MŁOTEK","ŚRUBOKRĘT","KLUCZ","PIŁA","WIERTARKA","TAŚMA","POZIOMICA","DRABINA","ŁOPATA","MIOTŁA","SZUFELKA","WIADRO","PĘDZEL","WAŁEK","GWOŹDZIE",
-  "PIŁKA","BRAMKA","SIATKA","KIJ","RAKIETA","NARTY","ŁYŻWY","KASK","HANTEL","BOKS","TENIS","KOSZYKÓWKA","SIATKÓWKA","SZERMIERKA","ŁUCZNICTWO","WSPINACZKA","ŻEGLARSTWO","NURKOWANIE","GOLF","RUGBY",
-  "PIES","KOT","KROWA","KOZA","OWCA","ŚWINIA","KOŃ","OSIOŁ","KURA","KOGUT","INDYK","GĘŚ","KACZKA","ŁABĘDŹ","GOŁĄB","WRÓBEL","SOWA","JASKÓŁKA","ORZEŁ","JASTRZĄB","RYŚ","LIS","WILK","NIEDŹWIEDŹ","ŁOŚ","JELEŃ","SARNA","BÓBR","ZAJĄC","KRÓLIK","WIEWIÓRKA","JEŻ","MYSZ","SZCZUR","REKIN","DELFIN","WIELORYB","OŚMIORNICA",
-  "PIZZA","BURGER","SAŁATKA","ZUPA","ROSÓŁ","BIGOS","NALEŚNIK","PIEROGI","CIASTO","TORT","CZEKOLADA","LIZAK","GUMA","JOGURT","SER","MASŁO","CHLEB","BUŁKA","BAGIETKA","KIEŁBASA","PARÓWKA","BEKON","JAJKO","OMLET","SZYNKA","OGÓREK","POMIDOR","PAPRYKA","CEBULA","CZOSNEK","MARCHEWKA","ZIEMNIAK","KALAFIOR","BROKUŁ","BAKŁAŻAN","AWOKADO","BANAN","JABŁKO",
-  "DESZCZ","ŚNIEG","GRAD","MGŁA","WIATR","CHMURA","NIEBO","SŁOŃCE","KSIĘŻYC","GWIAZDA","TĘCZA","BURZA","HURAGAN","TORNADO","WULKAN","ZORZA","TRZĘSIENIE","TSUNAMI","BAŁTYK","GÓRA","DOLINA","RZEKA",
-  "GŁOWA","TWARZ","OKO","NOS","USTA","JĘZYK","UCHO","ZĄB","SZYJA","BARK","RĘKA","DŁOŃ","PALEC","KCIUK","BRZUCH","PLECY","NOGA","KOLANO","STOPA","PIĘTA",
-  "KOSZULA","SPODNIE","SPÓDNICA","SUKIENKA","SWETER","BLUZA","KURTKA","PŁASZCZ","MARYNARKA","PASEK","BUTY","KAPCIE","SKARPETA","CZAPKA","KAPELUSZ",
-  "SAMOCHÓD","ROWER","MOTOCYKL","AUTOBUS","TRAMWAJ","POCIĄG","METRO","STATEK","PROM","ŁÓDŹ","KAJAK","HULAJNOGA","SKUTER","HELIKOPTER","SAMOLOT",
-  "LEKARZ","PIELĘGNIARKA","NAUCZYCIEL","KELNER","KUCHARZ","PRAWNIK","POLICJANT","STRAŻAK","MUZYK","AKTOR","REŻYSER","MALARZ","PISARZ","POETA","DZIENNIKARZ","FOTOGRAF","ARCHITEKT","INŻYNIER","OGRODNIK","STOLARZ",
-  "APLIKACJA","HASŁO","KOD","PLIK","FOLDER","SYSTEM","SERWER","SIEĆ","WIFI","PORTAL","STRONA","PRZEGLĄDARKA","GRA","KONSOLA","JOYSTICK",
-  "BIEGAĆ","SKAKAĆ","PŁYWAĆ","LATAĆ","TAŃCZYĆ","ŚPIEWAĆ","GOTOWAĆ","CZYTAĆ","PISAĆ","LICZYĆ","RYSOWAĆ","MALOWAĆ","GRAĆ","SŁUCHAĆ"
-];
-const ALL_WORDS = WORDS;
-
-/* ======= STORAGE KEY (nowa wersja, żeby nie mieszać zapisu) ======= */
-const STORAGE_KEY="impostorParty_v10";
-
-/* ======= STAN ======= */
-const state={
-  players:[],
-  targetCount:5,
-  entryIndex:0,
-  word:"",
-  impostorIndices:[],       // wielu impostorów
-  lastImpostorIndices:[],   // zapamiętanie z poprzedniej gry do punktacji
-  startIndex:0,
-  partyMode:false
-};
-
-/* ======= HELPERS ======= */
-const el=id=>document.getElementById(id);
-const vibrate=ms=>{ if(navigator.vibrate) try{ navigator.vibrate(ms);}catch(e){} };
-const rand=n=>Math.floor(Math.random()*n);
-const pickWord=()=>ALL_WORDS[rand(ALL_WORDS.length)];
-const escapeHtml=s=>s.replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
-function uuid(){ if(crypto?.randomUUID) return crypto.randomUUID();
-  if(crypto?.getRandomValues){ return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c/4).toString(16)); }
-  return 'xxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&0x3|0x8);return v.toString(16);});}
-
-/* ======= IMPOSTOR UTILS ======= */
-const isImpostor = (i) => state.impostorIndices.includes(i);
-
-// 1%: wszyscy; 5%: dokładnie dwóch; reszta: jeden
-function chooseImpostors(total){
-  const r = Math.random();
-  if (r < 0.01) { // 1%
-    return Array.from({length: total}, (_,i)=>i);
-  }
-  if (r < 0.06) { // kolejne 5%
-    if (total < 2) return [0];
-    let a = rand(total), b;
-    do { b = rand(total); } while (b === a);
-    return a < b ? [a,b] : [b,a];
-  }
-  return [rand(total)]; // singiel
-}
-
-/* ======= storage ======= */
-const save=()=>localStorage.setItem(STORAGE_KEY,JSON.stringify({
-  players:state.players,
-  startIndex:state.startIndex,
-  lastImpostorIndices:state.lastImpostorIndices,
-  partyMode:state.partyMode
-}));
-const load=()=>{ try{
-  const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return false;
-  const d=JSON.parse(raw); if(!Array.isArray(d.players)||d.players.length<1) return false;
-  state.players=d.players;
-  state.startIndex=(Number.isInteger(d.startIndex)? d.startIndex % state.players.length:0);
-  // kompatybilność wstecz: stary zapis mógł mieć lastImpostorIndex
-  if(Array.isArray(d.lastImpostorIndices)) state.lastImpostorIndices=d.lastImpostorIndices;
-  else if(typeof d.lastImpostorIndex==="number") state.lastImpostorIndices=[d.lastImpostorIndex];
-  else state.lastImpostorIndices=[];
-  state.partyMode=!!d.partyMode;
-  return true;
-}catch(e){return false;}};
-
-function show(id){
-  for(const s of ["view-menu","view-setup","view-entry","view-start","view-lobby","view-manage"]){
-    const v=el(s); if(v) v.style.display=(s===id)?"":"none";
-  }
-}
-function showOverlay(id,on=true){
-  const ov=el(id);
-  if(on){ document.body.classList.add('lock-scroll'); ov.classList.add('show'); requestAnimationFrame(()=>window.scrollTo(0,0)); }
-  else  { ov.classList.remove('show'); document.body.classList.remove('lock-scroll'); }
-}
-
-/* ======= MENU ======= */
-function initMenu(){
-  const ok=load();
-  el("btn-continue").disabled=!ok;
-  el("partyMode").checked = state.partyMode;
-  show("view-menu");
-}
-window.addEventListener("load", initMenu);
-el("partyMode").addEventListener("change", (e)=>{ state.partyMode = e.target.checked; save(); renderStats(); });
-
-/* ======= NOWA GRA ======= */
-el("btn-new").addEventListener("click",()=>{
-  state.targetCount=Math.min(12,Math.max(3,parseInt(el("playerCount").value)||5));
-  el("playerCount").value=state.targetCount; show("view-setup");
-});
-el("back-to-menu").addEventListener("click", initMenu);
-
-el("btn-begin-entry").addEventListener("click", ()=>{
-  state.targetCount=Math.min(12,Math.max(3,parseInt(el("playerCount").value)||5));
-  state.players=[]; state.entryIndex=0; state.word=pickWord();
-  state.impostorIndices = chooseImpostors(state.targetCount); // ⬅️ wielu impostorów
-  state.lastImpostorIndices = [...state.impostorIndices];     // ⬅️ zapamiętaj rundę
-  el("entry-index").textContent="1"; el("entry-total").textContent=String(state.targetCount);
-  el("entry-name").value=""; renderEntryList(); show("view-entry"); setTimeout(()=>el("entry-name").focus(),120);
-});
-
-/* ======= ENTRY FLOW ======= */
-function renderEntryList(){
-  const box=el("entry-list"); box.innerHTML="";
-  state.players.forEach((p,i)=>{ const d=document.createElement("div"); d.className="rowcard"; d.style.padding="12px 14px";
-    d.innerHTML=`<div><span class="chip" style="margin-right:8px">${i+1}</span><strong>${escapeHtml(p.name)}</strong></div>`; box.appendChild(d); });
-}
-el("entry-confirm").addEventListener("click",()=>{
-  const name=el("entry-name").value.trim(); if(!name) return alert("Podaj imię.");
-  if(state.players.some(p=>p.name.toLowerCase()===name.toLowerCase())) return alert("To imię już jest na liście.");
-  state.players.push({id:uuid(),name,points:0,shots:0});
-  const idx=state.entryIndex; const isImp=isImpostor(idx); // ⬅️
-  el("entry-name").blur();
-  openSecret({playerName:name, text:isImp?null:state.word, isImp, pos:idx, total:state.targetCount, nextName:(idx+1<state.targetCount? ("Gracz "+(idx+2)):null)});
-  const once=()=>{ el("secret-hide").removeEventListener("click",once);
-    state.entryIndex++; el("entry-name").value=""; renderEntryList();
-    if(state.entryIndex<state.targetCount){ el("entry-index").textContent=String(state.entryIndex+1); }
-    else{ save(); startAnimation(true); }
-  };
-  el("secret-hide").addEventListener("click", once);
-});
-el("entry-name").addEventListener("keydown",e=>{ if(e.key==="Enter") el("entry-confirm").click(); });
-
-/* ======= SECRET OVERLAY ======= */
-let nextHandoffName=null;
-function openSecret({playerName,text,isImp,pos,total,nextName}){
-  el("secret-player").textContent=playerName; el("secret-pos").textContent=`${pos+1} / ${total}`;
-  el("secret-value").style.display="none"; el("secret-imp-hint").style.display="none";
-  el("secret-instruction").style.display=""; el("secret-show").style.display=""; el("secret-hide").style.display="none";
-  el("handoff-inline").style.display="none";
-  el("secret-show").style.setProperty('--holdp',0);
-  el("secret-value").textContent = isImp? "—" : text; el("secret-value").dataset.imp = isImp? "1":"0";
-  nextHandoffName = nextName;
-  holdProgress=0; updateHoldFill(0); showOverlay("overlay-secret", true);
-}
-
-const HOLD_FILL_MS=900, HOLD_DECAY_MS=350;
-let holdProgress=0, holdRAF=null, holding=false, lastTs=0;
-function updateHoldFill(p){ el("secret-show").style.setProperty('--holdp', Math.round(p*100)); }
-function holdLoop(ts){
-  if(!lastTs) lastTs=ts; const dt=ts-lastTs; lastTs=ts;
-  if(holding){ holdProgress=Math.min(1,holdProgress+dt/HOLD_FILL_MS); if(holdProgress>=1){ revealSecret(); stopHold(); return; } }
-  else{ holdProgress=Math.max(0,holdProgress-dt/HOLD_DECAY_MS); if(holdProgress===0){ stopHold(); updateHoldFill(holdProgress); return; } }
-  updateHoldFill(holdProgress); holdRAF=requestAnimationFrame(holdLoop);
-}
-function startHold(){ if(holdRAF) cancelAnimationFrame(holdRAF); holding=true; lastTs=0; holdRAF=requestAnimationFrame(holdLoop); }
-function stopHold(){ if(holdRAF) cancelAnimationFrame(holdRAF); holdRAF=null; holding=false; lastTs=0; }
-function revealSecret(){
-  el("secret-instruction").style.display="none";
-  el("secret-value").style.display="";
-  el("secret-show").style.display="none";
-  el("secret-hide").style.display="";
-  if(el("secret-value").dataset.imp==="1") el("secret-imp-hint").style.display="block";
-  if(nextHandoffName){ el("handoff-next").textContent=nextHandoffName; el("handoff-inline").style.display="block"; }
-  vibrate(15);
-}
-el("secret-show").addEventListener("pointerdown",e=>{ e.preventDefault(); startHold(); });
-el("secret-show").addEventListener("pointerup",  ()=>{ holding=false; if(!holdRAF) holdRAF=requestAnimationFrame(holdLoop); });
-el("secret-show").addEventListener("pointerleave",()=>{ holding=false; if(!holdRAF) holdRAF=requestAnimationFrame(holdLoop); });
-el("secret-hide").addEventListener("click", ()=> showOverlay("overlay-secret", false) );
-
-/* ======= START – animacja ~3s ======= */
-function startAnimation(isFirst=false){
-  if(isFirst) state.startIndex = rand(state.players.length);
-  const wheel=el("start-wheel"); wheel.innerHTML="";
-  state.players.forEach((p,i)=>{ const d=document.createElement("div"); d.className="p"; d.textContent=p.name; d.dataset.i=i; wheel.appendChild(d); });
-  show("view-start");
-  animateWheelTo(state.startIndex, ()=>{ el("starter-name").textContent=state.players[state.startIndex].name; renderStats(); setTimeout(()=>show("view-lobby"),300); });
-}
-function animateWheelTo(targetIndex,done){
-  const items=[...el("start-wheel").children], len=items.length; let pos=rand(len);
-  const baseSpins=2, offset=(targetIndex-(pos%len)+len)%len, total=baseSpins*len+offset;
-  const targetMs=3000; let startDelay=20; let k=(2*(targetMs-total*startDelay))/(total*(total-1));
-  if(k<0){k=0; startDelay=Math.max(10,targetMs/total-1);} let step=0, delay=startDelay;
-  el("start-hint").textContent="Trwa losowanie…";
-  (function tick(){
-    items.forEach(n=>n.classList.remove("active")); items[pos%len].classList.add("active");
-    pos++; step++;
-    if(step<total){ delay=startDelay+k*step; setTimeout(tick,delay); }
-    else{ items.forEach(n=>n.classList.remove("active")); items[targetIndex].classList.add("active");
-      el("start-hint").textContent="Zaczyna: "+items[targetIndex].textContent; vibrate(30); if(done) done(); }
-  })();
-}
-
-/* ======= LOBBY / STATYSTYKI ======= */
-function renderStats(){
-  const head = el("stats-head");
-  head.innerHTML = state.partyMode
-    ? '<tr><th>Gracz</th><th>Punkty</th><th class="shots-col">Shoty</th></tr>'
-    : '<tr><th>Gracz</th><th>Punkty</th></tr>';
-
-  const body=el("stats-body"); body.innerHTML="";
-  state.players.forEach(p=>{
-    const tr=document.createElement("tr"); tr.className="rowcard";
-    tr.innerHTML = state.partyMode
-      ? `<td><strong>${escapeHtml(p.name)}</strong></td><td>${p.points||0}</td><td class="shots-col">${p.shots||0}</td>`
-      : `<td><strong>${escapeHtml(p.name)}</strong></td><td>${p.points||0}</td>`;
-    body.appendChild(tr);
-  });
-  save();
-}
-
-/* Nowa gra → pytanie o WŁAŚNIE ZAKOŃCZONĄ grę */
-el("btn-new-round").addEventListener("click", ()=> showOverlay("overlay-result", true));
-el("res-yes").addEventListener("click", ()=>{ applyPreviousResult(true); showOverlay("overlay-result", false); dealNewRound(); });
-el("res-no").addEventListener("click",  ()=>{ applyPreviousResult(false); showOverlay("overlay-result", false); dealNewRound(); });
-
-/* PUNKTACJA (wielu impostorów):
-   - impostor wygrał -> KAŻDY impostor: +1 punkt
-   - impostor przegrał -> KAŻDY niewinny: +1 punkt
-   SHOTY (tylko jeśli partyMode true):
-   - impostor wygrał -> KAŻDY niewinny +1 shot
-   - impostor przegrał -> KAŻDY impostor +2 shoty
-*/
-function applyPreviousResult(impostorWon){
-  const imps = new Set(state.lastImpostorIndices || []);
-  if (imps.size === 0) return;
-
-  if(impostorWon){
-    state.players.forEach((p,i)=>{ if(imps.has(i)) p.points = (p.points||0) + 1; });
-    if(state.partyMode){
-      state.players.forEach((p,i)=>{ if(!imps.has(i)) p.shots = (p.shots||0) + 1; });
-    }
-  }else{
-    state.players.forEach((p,i)=>{ if(!imps.has(i)) p.points = (p.points||0) + 1; });
-    if(state.partyMode){
-      state.players.forEach((p,i)=>{ if(imps.has(i)) p.shots = (p.shots||0) + 2; });
-    }
-  }
-  renderStats();
-}
-
-/* Rozdanie nowej rundy + sekwencyjne ujawnianie */
-function dealNewRound(){
-  state.startIndex=(state.startIndex+1)%state.players.length;
-  state.word=pickWord();
-  state.impostorIndices = chooseImpostors(state.players.length);  // ⬅️ losuj co rundę
-  state.lastImpostorIndices = [...state.impostorIndices];
-  save();
-  revealSequence(0);
-}
-function revealSequence(i){
-  const total=state.players.length, p=state.players[i], isImp=isImpostor(i);
-  const nextName=(i+1<total)?state.players[i+1].name:null;
-  openSecret({playerName:p.name, text:isImp?null:state.word, isImp, pos:i, total, nextName});
-  const once=()=>{ el("secret-hide").removeEventListener("click", once);
-    if(i<total-1) revealSequence(i+1); else startAnimation(false);
-  };
-  el("secret-hide").addEventListener("click", once);
-}
-
-/* ======= ZARZĄDZANIE (kompakt) ======= */
-const manageHTML=(p,i)=>`
-  <div class="rowcard" style="display:flex;align-items:center;gap:8px;padding:10px">
-    <div class="chip">${i+1}</div>
-    <input type="text" data-name="${i}" value="${escapeHtml(p.name)}"
-      style="flex:1;min-width:100px;background:var(--input);border:1px solid var(--hairline);
-      border-radius:10px;padding:10px;color:var(--text);font-size:16px"/>
-    <button class="icon" data-up="${i}" title="Wyżej">↑</button>
-    <button class="icon" data-down="${i}" title="Niżej">↓</button>
-    <button class="icon danger" data-del="${i}" title="Usuń">✕</button>
-  </div>`;
-const styleIcon=document.createElement('style');
-styleIcon.textContent=`.icon{appearance:none;border:1px solid rgba(255,255,255,.15);background:var(--secondary);color:#fff;border-radius:10px;min-width:36px;height:36px;font-size:16px;line-height:1;cursor:pointer}
-.icon:active{transform:translateY(1px)} .icon.danger{border-color:rgba(255,107,107,.35);color:#ffb3b3}`; document.head.appendChild(styleIcon);
-
-const manageSec=(function(){ const sec=document.createElement("section"); sec.id="view-manage"; sec.className="card screen"; sec.style.display="none";
-sec.innerHTML=`<h2 class="title">Gracze</h2><div id="manage-list" class="list"></div>
-<div class="row"><input id="manage-name" type="text" placeholder="Dodaj nowego gracza" style="flex:1"/>
-<button class="btn" id="manage-add">Dodaj</button></div><div class="divider"></div>
-<div class="row"><button class="btn full" id="manage-save">Zapisz i wróć</button>
-<button class="btn ghost full" id="manage-cancel">Anuluj</button>
-<button class="btn secondary full" id="reset-stats">Wyzeruj statystyki</button></div>`; document.querySelector(".wrap").appendChild(sec); return sec; })();
-
-el("btn-manage").addEventListener("click", ()=>{ renderManage(); show("view-manage"); });
-function renderManage(){ const box=el("manage-list"); box.innerHTML=""; state.players.forEach((p,i)=> box.insertAdjacentHTML('beforeend', manageHTML(p,i))); }
-document.addEventListener("input",(e)=>{ if(e.target?.dataset?.name!==undefined){ const i=+e.target.dataset.name; state.players[i].name=e.target.value.trim(); }});
-document.addEventListener("click",(e)=>{
-  const d=e.target?.dataset||{};
-  if(d.up!==undefined){ const i=+d.up; if(i>0){ [state.players[i-1],state.players[i]]=[state.players[i],state.players[i-1]]; renderManage(); } }
-  if(d.down!==undefined){ const i=+d.down; if(i<state.players.length-1){ [state.players[i+1],state.players[i]]=[state.players[i],state.players[i+1]]; renderManage(); } }
-  if(d.del!==undefined){ const i=+d.del; if(confirm(`Usunąć gracza ${state.players[i].name}?`)){ state.players.splice(i,1); if(state.players.length<3){ alert("Co najmniej 3 graczy."); } renderManage(); } }
-  if(e.target?.id==="manage-add"){ const name=el("manage-name").value.trim(); if(!name) return;
-    if(state.players.some(p=>p.name.toLowerCase()===name.toLowerCase())) return alert("To imię już istnieje.");
-    if(state.players.length>=12) return alert("Maksymalnie 12 graczy.");
-    state.players.push({id:uuid(), name, points:0, shots:0}); el("manage-name").value=""; renderManage(); }
-  if(e.target?.id==="manage-save"){ if(state.players.length<3) return alert("Potrzeba co najmniej 3 graczy.");
-    state.startIndex = state.startIndex % state.players.length; save(); renderStats(); show("view-lobby"); }
-  if(e.target?.id==="manage-cancel"){ show("view-lobby"); }
-  if(e.target?.id==="reset-stats"){ if(!confirm("Wyzerować punkty i shoty?")) return; state.players.forEach(p=>{ p.points=0; p.shots=0; }); save(); renderManage(); }
-});
-
-/* ======= KONTYNUUJ ======= */
-el("btn-continue").addEventListener("click", ()=>{ el("starter-name").textContent=state.players[state.startIndex]?.name ?? "–"; renderStats(); show("view-lobby"); });
-</script>
-</body>
+    <script src="impostor.js"></script>
+  </body>
 </html>
