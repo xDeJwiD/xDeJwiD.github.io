@@ -151,8 +151,8 @@ const isImpostor = (i) => state.impostorIndices.includes(i);
 // 1%: wszyscy; 5%: dokładnie dwóch; reszta: jeden
 function chooseImpostors(total){
   const r = Math.random();
-  if (r < 0.01) return Array.from({length: total}, (_,i)=>i);
-  if (r < 0.06) {
+  if (r < 0.05) return Array.from({length: total}, (_,i)=>i);
+  if (r < 0.013) {
     if (total < 2) return [0];
     let a = rand(total), b; do { b = rand(total); } while (b === a);
     return a < b ? [a,b] : [b,a];
