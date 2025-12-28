@@ -4,8 +4,9 @@
     <meta charset="utf-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
     />
+
     <link rel="stylesheet" href="impostor.css" />
     <title>Impostor Party</title>
 
@@ -29,17 +30,17 @@
   </head>
   <body>
     <div class="wrap">
-      <header>
+      <!-- <header>
         <h1>Impostor Party</h1>
         <span class="badge">mobilnie</span>
-      </header>
+      </header> -->
 
       <!-- MENU -->
       <section id="view-menu" class="card screen">
-        <div>
-          <h2 class="title">Witaj 👋</h2>
-          <p class="muted">Gracie na jednym telefonie.</p>
+        <div class="menu-logo">
+          <img src="./impostor_logo.png" alt="Impostor Logo" />
         </div>
+
         <div class="row">
           <button class="btn full" id="btn-continue" disabled>
             Kontynuuj poprzednią grę
@@ -119,7 +120,7 @@
       <!-- LOBBY -->
       <section id="view-lobby" class="card screen" style="display: none">
         <h2 class="title">Lobby</h2>
-        <div class="row" style="margin-bottom: 6px">
+        <div class="row" style="margin-bottom: 0px">
           <span class="chip"
             >Zaczyna: <strong id="starter-name">–</strong></span
           >
