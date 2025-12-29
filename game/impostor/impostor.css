@@ -126,6 +126,7 @@ label {
   gap:10px;
   justify-content:center;
   flex-wrap:wrap;
+  margin-top: 8px;
 }
 
 .row .btn {
@@ -294,8 +295,9 @@ input:focus {
   background: var(--card);
   border: 2px solid var(--border);
   border-radius: 16px;
-  padding: 16px;
+  padding: 8px;
   box-shadow: none;
+  height: fit-content;
 }
 
 .modal {
@@ -307,7 +309,7 @@ input:focus {
   background: var(--card);
   border: 2px solid var(--border);
   border-radius: 16px;
-  padding: 16px;
+  padding: 8px;
   justify-content: space-between;
   
 
@@ -315,7 +317,7 @@ input:focus {
 }
 
 
-
+#secret-show, #secret-hide {margin-bottom: 8px;}
 
 /* ================== HOLD BUTTON ================== */
 .hold {
@@ -329,6 +331,7 @@ input:focus {
   border: none;
 
   font-weight: 800;
+  
 
   /* 3D */
   box-shadow: 0 10px 0 var(--red-pressed);
@@ -574,7 +577,7 @@ td > span {
   padding-top: calc(var(--hero-h) + var(--hero-gap));
   padding-left: 16px;
   padding-right: 16px;
-  padding-bottom: calc(2* var(--app-padding));
+  padding-bottom: calc(1* var(--app-padding));
 
   display: flex;
   flex-direction: column;
@@ -620,7 +623,7 @@ td > span {
   font-size: clamp(28px, 7vw, 40px);
   font-weight: 800;
   letter-spacing: 0.5px;
-  margin: 16px 0;
+  /* margin: 16px 0; */
 }
 
 #secret-imp-hint {
@@ -635,7 +638,7 @@ td > span {
   margin-bottom: 14px;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1200px) {
   :root {
     --app-padding:20px;
   }
