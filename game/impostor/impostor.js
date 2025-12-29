@@ -92,12 +92,52 @@ const AVATAR_FILES = {
 };
 
 /* ======= PRELOAD AVATARS ======= */
-function preloadImages(srcList) {
-  srcList.forEach((src) => {
+let avatarsPreloaded = false;
+
+function preloadAvatarsInBackground() {
+  if (avatarsPreloaded) return;
+
+  avatarsPreloaded = true;
+
+  Object.values(AVATAR_FILES).forEach((src) => {
     const img = new Image();
     img.src = src;
   });
 }
+
+function preloadAvatarsForPlayers(players) {
+  const unique = [...new Set(
+    players.map(p => p.avatar || AVATAR_FILES.nikt)
+  )];
+
+  return Promise.all(
+    unique.map(src =>
+      new Promise(resolve => {
+        const img = new Image();
+        img.src = src;
+        img.onload = async () => {
+          // kluczowe dla WebP
+          if (img.decode) {
+            try { await img.decode(); } catch {}
+          }
+          resolve();
+        };
+        img.onerror = resolve;
+      })
+    )
+  );
+}
+
+
+function showAvatarLoader() {
+  document.getElementById("avatar-loader")?.classList.remove("hidden");
+}
+
+function hideAvatarLoader() {
+  document.getElementById("avatar-loader")?.classList.add("hidden");
+}
+
+
 
 
 const NICKS_ADRIAN = [
@@ -358,10 +398,15 @@ function initMenu() {
   show("view-menu");
 }
 
+
 window.addEventListener("load", () => {
-  preloadAvatars(); 
-  initMenu();       
+  initMenu();
+
+  // preload w tle – bez czekania
+  // preloadAvatarsInBackground();
 });
+
+
 
 
 el("partyMode").addEventListener("change", (e) => {
@@ -416,11 +461,10 @@ function confirmOrder() {
 
   state.orderNames = names;
 
-  // ⬇️ TWORZYMY SLOTY GRACZY W TEJ KOLEJNOŚCI
   state.players = names.map((orderName, idx) => ({
     id: uuid(),
-    orderName: orderName, // ← IMIĘ TECHNICZNE
-    name: "", // ← NICK (uzupełni gracz)
+    orderName,
+    name: "",
     points: 0,
     shots: 0,
     avatar:
@@ -429,23 +473,43 @@ function confirmOrder() {
         : guessAvatarForName(orderName) || AVATAR_FILES.nikt,
   }));
 
-  // standardowa inicjalizacja rundy
-  state.entryIndex = 0;
-  state.word = pickUniqueWord();
-  state.impostorIndices = chooseImpostors(state.targetCount);
-  state.lastImpostorIndices = [...state.impostorIndices];
 
-  document.getElementById("view-order").remove();
 
-  el("entry-index").textContent = "1";
-  el("entry-total").textContent = String(state.targetCount);
-  el("entry-name").value = "";
+// ===== 🔥 LOADER START =====
+showAvatarLoader();
+
+document.getElementById("view-order").remove();
+
+state.entryIndex = 0;
+state.word = pickUniqueWord();
+state.impostorIndices = chooseImpostors(state.targetCount);
+state.lastImpostorIndices = [...state.impostorIndices];
+
+el("entry-index").textContent = "1";
+el("entry-total").textContent = String(state.targetCount);
+el("entry-name").value = "";
+
+
+preloadAvatarsForPlayers(state.players).then(async () => {
   renderEntryList();
+
+  // 🔥 CZEKAJ AŻ <img> W DOM SIĘ ZDEKODUJĄ
+  const imgs = document.querySelectorAll(".entry-avatar");
+  await Promise.all(
+    [...imgs].map(img => img.decode?.().catch(() => {}))
+  );
+
   show("view-entry");
+  hideAvatarLoader();
+
   updateNickButtonsVisibility();
-  setTimeout(() => el("entry-name").focus(), 120);
-  if (state.testMode) ensureNickButtons();
+  setTimeout(() => el("entry-name").focus(), 80);
+});
+
+
 }
+
+
 
 /* ======= DYNAMICZNE PRZYCISKI: Losuj nick Adrian/Kuba ======= */
 // function ensureNickButtons() {
@@ -868,6 +932,8 @@ function renderStats() {
   });
   save();
 }
+
+
 
 /* Nowa gra → pytanie o WŁAŚNIE ZAKOŃCZONĄ grę */
 el("btn-new-round").addEventListener("click", () =>
