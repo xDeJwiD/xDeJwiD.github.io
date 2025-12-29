@@ -39,7 +39,7 @@
 #view-manage img {
   width: 32px !important;
   height: 32px !important;
-  border-radius: 50%;
+  border-radius: 12px;
   object-fit: cover;
 }
 
@@ -100,7 +100,7 @@ header {
 
 /* ================== TYPO ================== */
 h1 { margin:0;text-align:center; }
-.title { text-align:center;margin:0 0 6px; }
+.title { text-align:center;margin:0 0 16px 0; }
 .muted { color:var(--muted);text-align:center; }
 
 label {
@@ -117,6 +117,10 @@ label {
   gap:10px;
   justify-content:center;
   flex-wrap:wrap;
+}
+
+.row .btn {
+  width: 40%;
 }
 
 .list {
@@ -265,6 +269,15 @@ input:focus {
   display: flex;
 }
 
+#overlay-result .modal {
+    width: calc(100% - 2 * var(--app-padding));
+    padding: var(--app-padding);
+    margin: 0 0 var(--app-padding) 0;
+  max-width: var(--app-max-width);
+
+  position: absolute;
+  bottom: 0;
+}
 
 
 .card {
@@ -427,6 +440,19 @@ filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#111827", endC
   opacity: 0;
 }
 
+th {
+  background-color: var(--border);
+  border-radius: 6px;
+  padding: 4px;
+}
+
+td {
+  background-color: var(--card);
+  text-align: center;
+}
+td > span {
+  text-align: center;
+}
 
 
 .hero-banner {
@@ -457,14 +483,15 @@ filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#111827", endC
 .stat-ava {
   width:clamp(44px,8vh,72px);
   height:clamp(44px,8vh,72px);
-  border-radius:50%;
+  border-radius:12px;
   object-fit:cover;
-  border:1px solid rgba(255,255,255,.18);
+  border:2px solid rgba(255,255,255,.18);
 }
 
 /* ================== WHEEL ================== */
 .wheel {
   display:flex;
+  flex-direction: column;
   flex-wrap:wrap;
   gap:8px;
   justify-content:center;
@@ -475,10 +502,34 @@ filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#111827", endC
   align-items:center;
   gap:12px;
   padding:10px 14px;
-  border-radius:999px;
+  border-radius:16px;
   background:var(--chip);
   border:1px solid var(--chip-border);
 }
+
+.start-player {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.start-avatar {
+  width: 40px;        /* przykładowy rozmiar */
+  height: 40px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.n {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
 
 .wheel .p.active {
   outline:3px solid var(--accent2);
@@ -488,7 +539,7 @@ filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#111827", endC
 .wheel img {
   width:72px;
   height:72px;
-  border-radius:50%;
+  border-radius:12px;
   object-fit:cover;
 }
 
