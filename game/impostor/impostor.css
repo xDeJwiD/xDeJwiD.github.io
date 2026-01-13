@@ -291,6 +291,8 @@ input:focus {
 }
 
 
+
+
 .card {
   background: var(--card);
   border: 2px solid var(--border);
@@ -345,7 +347,12 @@ input:focus {
 .hold > .label {
   position: relative;
   z-index: 2;
+  /* transition: all .3s; */
 }
+
+/* .hold:active .label {
+  color: var(--red-pressed);
+} */
 
 /* PROGRESS BAR */
 .hold::before {
@@ -432,6 +439,16 @@ filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#111827", endC
     transform 0.45s ease,
     opacity 0.45s ease;
 }
+
+.hero-img {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.hero-img:empty {
+  background-image: none;
+}
+
 
 .hero-img.is-current {
   transform: translateX(0);

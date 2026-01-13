@@ -407,6 +407,7 @@ window.addEventListener("load", () => {
 });
 
 
+let heroHandoffTimeout = null;
 
 
 el("partyMode").addEventListener("change", (e) => {
@@ -664,6 +665,7 @@ el("entry-name").addEventListener("keydown", (e) => {
 
 function openSecret({ playerName, text, isImp, pos, total, nextName }) {
   const { heroCurrent, heroNext, heroBanner, heroNextName } = getHeroRefs();
+  if (heroAnimating) return;
 
   // meta do późniejszej animacji
   currentSecretMeta = { pos, total };
@@ -671,14 +673,27 @@ function openSecret({ playerName, text, isImp, pos, total, nextName }) {
   heroAnimating = false;
 
   // ustaw „bieżący” avatar
-  const currAvatar = state.players[pos]?.avatar || AVATAR_FILES.nikt;
-  heroCurrent.src = currAvatar;
-  heroCurrent.className = "hero-img is-current";
+const currAvatar = state.players[pos]?.avatar || AVATAR_FILES.nikt;
+
+// 🔒 HARD RESET HERO (bez animacji)
+heroCurrent.style.transition = "none";
+heroCurrent.className = "hero-img is-current";
+heroCurrent.style.backgroundImage = `url("${currAvatar}")`;
+
+// wymuś zapis stylu
+heroCurrent.offsetHeight;
+
+// przywróć transition dla przyszłej animacji reveal
+heroCurrent.style.transition = "";
+
 
   // przygotuj next jako ukryty placeholder (żeby nie było złamanego obrazka)
-  heroNext.src = AVATAR_FILES.nikt;
+  heroNext.removeAttribute("src");
   heroNext.className = "hero-img";
   heroNext.setAttribute("aria-hidden", "true");
+  heroNext.style.opacity = "0";
+  heroNext.style.backgroundImage = "none";
+
   heroBanner.setAttribute("aria-hidden", "true");
   heroNextName.textContent = "";
 
@@ -700,7 +715,7 @@ function openSecret({ playerName, text, isImp, pos, total, nextName }) {
 }
 
 const HOLD_FILL_MS = 900,
-  HOLD_DECAY_MS = 350;
+  HOLD_DECAY_MS = 550;
 let holdProgress = 0,
   holdRAF = null,
   holding = false,
@@ -762,7 +777,9 @@ function revealSecret() {
   heroAnimating = true;
 
   const nextIdx  = pos + 1;
-  const nextAva  = state.players[nextIdx]?.avatar || AVATAR_FILES.nikt;
+  if (nextIdx >= total) return;
+  const nextAva  = state.players[nextIdx]?.avatar;
+  if (!nextAva) return;
   const nextName =
     state.players[nextIdx]?.name ||
     nextHandoffName ||
@@ -772,7 +789,8 @@ function revealSecret() {
      1. Przygotuj NEXT (PO PRAWEJ)
   ============================ */
   heroNext.style.transition = "none";
-  heroNext.src = nextAva;
+  heroNext.style.backgroundImage = `url("${nextAva}")`;
+
   heroNextName.textContent = nextName;
   heroNext.className = "hero-img from-right";
   heroNext.style.opacity = "1";
@@ -786,36 +804,67 @@ function revealSecret() {
   /* ============================
      2. OPÓŹNIENIE HANDOFFU
   ============================ */
-  setTimeout(() => {
-    heroBanner.setAttribute("aria-hidden", "false");
+  // setTimeout(() => {
+  //   heroBanner.setAttribute("aria-hidden", "false");
 
-    heroCurrent.classList.add("to-left");
-    heroNext.classList.add("enter");
+  //   heroCurrent.classList.add("to-left");
+  //   heroNext.classList.add("enter");
 
-    const onDone = (e) => {
-      if (e.target !== heroNext || e.propertyName !== "transform") return;
+  //   const onDone = (e) => {
+  //     if (e.target !== heroNext || e.propertyName !== "transform") return;
 
-      /* ============================
-         3. FINALNY STAN (bez animacji)
-      ============================ */
-      heroCurrent.style.transition = "none";
-      heroCurrent.className = "hero-img";
-      heroCurrent.setAttribute("aria-hidden", "true");
+  //     /* ============================
+  //        3. FINALNY STAN (bez animacji)
+  //     ============================ */
+  //     heroCurrent.style.transition = "none";
+  //     heroCurrent.className = "hero-img";
+  //     heroCurrent.setAttribute("aria-hidden", "true");
 
-      heroNext.style.transition = "none";
-      heroNext.className = "hero-img is-current";
+  //     heroNext.style.transition = "none";
+  //     heroNext.className = "hero-img is-current";
 
-      // wymuś zapis
-      heroNext.offsetHeight;
+  //     // wymuś zapis
+  //     heroNext.offsetHeight;
 
-      heroCurrent.style.transition = "";
-      heroNext.style.transition = "";
+  //     heroCurrent.style.transition = "";
+  //     heroNext.style.transition = "";
 
-      heroAnimating = false;
-    };
+  //     heroAnimating = false;
+  //   };
 
-    heroNext.addEventListener("transitionend", onDone, { once: true });
-  }, HERO_HANDOFF_DELAY);
+  //   heroNext.addEventListener("transitionend", onDone, { once: true });
+  // }, HERO_HANDOFF_DELAY);
+
+  heroHandoffTimeout = setTimeout(() => {
+  heroHandoffTimeout = null;
+
+  heroBanner.setAttribute("aria-hidden", "false");
+
+  heroCurrent.classList.add("to-left");
+  heroNext.classList.add("enter");
+
+  const onDone = (e) => {
+    if (e.target !== heroNext || e.propertyName !== "transform") return;
+
+    heroCurrent.style.transition = "none";
+    heroCurrent.className = "hero-img";
+    heroCurrent.setAttribute("aria-hidden", "true");
+
+    heroNext.style.transition = "none";
+    heroNext.className = "hero-img is-current";
+
+    heroNext.offsetHeight;
+
+    heroCurrent.style.transition = "";
+    heroNext.style.transition = "";
+
+    heroAnimating = false;
+  };
+
+  heroNext.addEventListener("transitionend", onDone, { once: true });
+
+}, HERO_HANDOFF_DELAY);
+
 }
 
 
@@ -832,9 +881,18 @@ el("secret-show").addEventListener("pointerleave", () => {
   holding = false;
   if (!holdRAF) holdRAF = requestAnimationFrame(holdLoop);
 });
-el("secret-hide").addEventListener("click", () =>
-  showOverlay("overlay-secret", false)
-);
+el("secret-hide").addEventListener("click", () => {
+  // ANULUJ NIEDOKOŃCZONY HANDOFF
+  if (heroHandoffTimeout) {
+    clearTimeout(heroHandoffTimeout);
+    heroHandoffTimeout = null;
+  }
+
+  heroAnimating = false;
+
+  showOverlay("overlay-secret", false);
+});
+
 
 /* ======= START – animacja ~3s ======= */
 function startAnimation(isFirst = false) {
