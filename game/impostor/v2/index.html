@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <link rel="icon" type="image/png" href="impostor_icon.png">
+
+  <link rel="stylesheet" href="impostor.css" />
+  <title>Impostor Party</title>
+
+  <!-- Kolor UI Safari / iOS -->
+  <meta name="theme-color" content="#0f1220" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0f1220" media="(prefers-color-scheme: dark)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Impostor Party" />
+</head>
+
+<body>
+  <div class="wrap">
+    <!-- <header>
+        <h1>Impostor Party</h1>
+        <span class="badge">mobilnie</span>
+      </header> -->
+
+    <!-- MENU -->
+    <section id="view-menu" class="card screen">
+      <div class="menu-logo">
+        <img src="./impostor_logo.png" alt="Impostor Logo" />
+      </div>
+
+      <div class="row">
+        <button class="btn full" id="btn-continue" disabled>
+          Kontynuuj poprzednią grę
+        </button>
+        <button class="btn secondary full" id="btn-new">Nowa gra</button>
+        <br />
+        <button class="btn secondary full" id="btn-test">Lepszy Tryb</button>
+      </div>
+
+      <div class="divider"></div>
+      <label class="row" style="align-items: center">
+        <input type="checkbox" id="partyMode" style="width: 20px; height: 20px; accent-color: #7dd3fc" />
+        <span>Tryb imprezowy <strong>18+</strong> (shoty)</span>
+      </label>
+    </section>
+
+    <!-- SETUP -->
+    <section id="view-setup" class="card screen" style="display: none">
+      <div>
+        <h2 class="title">Nowa gra</h2>
+        <label>Ilość graczy</label>
+        <input id="playerCount" inputmode="numeric" type="number" min="3" max="12" value="5" />
+      </div>
+      <div class="row" style="margin-top: 8px">
+        <button class="btn full" id="btn-begin-entry">Wpisz gracza 1</button>
+        <button class="btn ghost full" id="back-to-menu">◀ Wróć</button>
+      </div>
+    </section>
+
+    <!-- ENTRY -->
+    <section id="view-entry" class="card screen" style="display: none">
+      <div>
+        <h2 class="title">
+          Gracz <span id="entry-index">1</span> /
+          <span id="entry-total">1</span>
+        </h2>
+        <label>Imię gracza</label>
+        <input id="entry-name" type="text" placeholder="np. Ola" autocomplete="off" autocapitalize="sentences" />
+        <div class="row" style="margin-top: 8px">
+          <button class="btn full" id="entry-confirm">
+            Zatwierdź imię i pokaż rolę
+          </button>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div>
+        <label>Dodani</label>
+        <div id="entry-list" class="list"></div>
+      </div>
+    </section>
+
+    <!-- START -->
+    <section id="view-start" class="card screen" style="display: none">
+      <h2 class="title">Losowanie kto zaczyna…</h2>
+      <div class="wheel" id="start-wheel"></div>
+      <p class="muted" id="start-hint" style="margin-top: 8px">
+        Trwa losowanie…
+      </p>
+    </section>
+
+    <!-- LOBBY -->
+    <section id="view-lobby" class="card screen" style="display: none">
+      <h2 class="title">Lobby</h2>
+      <div class="row" style="margin-bottom: 0px">
+        <span class="chip">Zaczyna: <strong id="starter-name">–</strong></span>
+      </div>
+      <div class="row">
+        <button class="btn full" id="btn-new-round">Nowa gra</button>
+        <button class="btn secondary full" id="btn-manage">
+          Zmień kolejność/ilość
+        </button>
+      </div>
+      <div class="divider"></div>
+      <h3 class="title">Statystyki</h3>
+      <table class="table">
+        <thead id="stats-head">
+          <tr>
+            <th>Gracz</th>
+            <th>Punkty</th>
+            <th class="shots-col">Shoty</th>
+          </tr>
+        </thead>
+        <tbody id="stats-body"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <!-- OVERLAYS -->
+  <div id="overlay-secret" class="overlay" role="dialog" aria-modal="true">
+    <div class="modal">
+      <!-- HERO z avatarami (tło u góry modala) -->
+      <div class="secret-hero">
+        <div id="hero-current" class="hero-img"></div>
+        <div id="hero-next" class="hero-img"></div>
+        <div id="hero-banner" class="hero-banner" aria-hidden="true">
+          <span>Przekaż telefon do:</span>
+          <strong id="hero-next-name">—</strong>
+        </div>
+      </div>
+
+      <div class="row" style="justify-content: space-between">
+        <div class="chip for">DLA: <strong id="secret-player">–</strong></div>
+        <div class="chip" id="secret-pos">1 / 1</div>
+      </div>
+      <div class="card center" style="margin-top: 10px">
+
+        <div id="secret-word-label" class="muted">
+          Twoje hasło:
+        </div>
+
+        <div id="secret-imp-hint" class="muted" style="display:none; margin-bottom:10px">
+          Jesteś impostorem!
+        </div>
+
+        <div id="secret-category-label" class="muted" style="display:none">
+          Kategoria hasła:
+        </div>
+
+        <div id="secret-category" style="display:none"></div>
+
+        <div id="secret-value" class="huge" style="display:none"></div>
+
+        <div id="secret-instruction" class="muted" style="margin-top:6px">
+          PRZYTRZYMAJ, aby zobaczyć
+        </div>
+
+      </div>
+      <div class="row" style="margin-top: 10px">
+        <button class="btn hold full" id="secret-show">
+          <span class="label">Przytrzymaj, by odsłonić</span>
+        </button>
+        <button class="btn secondary full" id="secret-hide" style="display: none">
+          Ukryj i podaj dalej
+        </button>
+      </div>
+      <div id="handoff-inline" class="handoff-inline">
+        Przekaż telefon do: <strong id="handoff-next">—</strong>
+      </div>
+    </div>
+  </div>
+
+  <div id="overlay-result" class="overlay" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h3 class="title">Czy impostor wygrał właśnie zakończoną grę?</h3>
+      <div class="row">
+        <button class="btn" id="res-yes">Tak</button>
+        <button class="btn secondary" id="res-no">Nie</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="avatar-loader" class="avatar-loader hidden">
+    <div class="loader-buttons">
+      <div class="loader-btn"></div>
+      <div class="loader-btn"></div>
+      <div class="loader-btn"></div>
+    </div>
+    <div class="loader-text">Ładowanie</div>
+
+  </div>
+
+  <script src="impostor.js"></script>
+</body>
+
+</html>
