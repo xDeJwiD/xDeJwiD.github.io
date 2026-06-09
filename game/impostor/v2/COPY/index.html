@@ -26,117 +26,42 @@
       </header> -->
 
     <!-- MENU -->
-    <section id="view-menu" class="menu screen">
+    <section id="view-menu" class="card screen">
       <div class="menu-logo">
         <img src="./impostor_logo.png" alt="Impostor Logo" />
       </div>
 
       <div class="row">
-        <button class="btn secondary full" id="btn-test">Nowa gra</button>
+        <button class="btn full" id="btn-continue" disabled>
+          Kontynuuj poprzednią grę
+        </button>
+        <button class="btn secondary full" id="btn-new">Nowa gra</button>
         <br />
-        <!-- <button class="btn secondary full" id="btn-new">Nowa gra</button> -->
-        <br />
-        <button class="btn ghost full" id="btn-continue" disabled>Kontynuuj poprzednią grę</button>
-        
-        <br />
-        
+        <button class="btn secondary full" id="btn-test">Lepszy Tryb</button>
       </div>
 
-      <!-- <div class="divider"></div> -->
-
-    </section>
-
-    <!-- SETUP -->
-    <section id="view-setup" class="menu screen" style="display: none">
-      <div>
-        <div class="menu-logo">
-          <img src="./impostor_logo.png" alt="Impostor Logo" />
-        </div>
-        <div class="divider"></div>
-
-
-        <div class="settings-section">
-          <div class="settings-title">
-            Ilość impostorów
-          </div>
-
-          <div class="radio-group">
-
-            <input type="radio" id="count-default" name="impostorCount" value="default" checked>
-            <label for="count-default" class="radio-btn">
-              Normalnie
-            </label>
-
-            <input type="radio" id="count-1" name="impostorCount" value="1">
-            <label for="count-1" class="radio-btn">
-              Zawsze 1
-            </label>
-
-            <input type="radio" id="count-2" name="impostorCount" value="2">
-            <label for="count-2" class="radio-btn">
-              Zawsze 2
-            </label>
-
-            <input type="radio" id="count-many" name="impostorCount" value="many">
-            <label for="count-many" class="radio-btn">
-              Więcej niż 1
-            </label>
-
-          </div>
-        </div>
-
-
-
-        <div class="settings-section">
-          <div class="settings-title">
-            Wiedza impostora
-          </div>
-
-          <div class="radio-group">
-
-            <input type="radio" id="info-category" name="impostorInfo" value="category" checked>
-            <label for="info-category" class="radio-btn">
-              Zna kategorię
-            </label>
-
-            <input type="radio" id="info-none" name="impostorInfo" value="none">
-            <label for="info-none" class="radio-btn">
-              Nie wie nic
-            </label>
-
-            <input type="radio" id="info-hint" name="impostorInfo" value="hint">
-            <label for="info-hint" class="radio-btn">
-              Dostaje podpowiedź
-            </label>
-
-          </div>
-        </div>
-
-
-
-
-        <div class="settings-title">
-          Ilość graczy
-        </div>
-        <input id="playerCount" inputmode="numeric" type="number" min="3" max="12" value="5" />
-
-
-      </div>
-      <div class="row" style="margin-top: 8px">
-        <button class="btn full" id="btn-begin-entry">Wpisz gracza 1</button>
-        <button class="btn ghost full" id="back-to-menu">◀ Wróć</button>
-      </div>
-      
+      <div class="divider"></div>
       <label class="row" style="align-items: center">
         <input type="checkbox" id="partyMode" style="width: 20px; height: 20px; accent-color: #7dd3fc" />
         <span>Tryb imprezowy <strong>18+</strong> (shoty)</span>
       </label>
     </section>
 
-
+    <!-- SETUP -->
+    <section id="view-setup" class="card screen" style="display: none">
+      <div>
+        <h2 class="title">Nowa gra</h2>
+        <label>Ilość graczy</label>
+        <input id="playerCount" inputmode="numeric" type="number" min="3" max="12" value="5" />
+      </div>
+      <div class="row" style="margin-top: 8px">
+        <button class="btn full" id="btn-begin-entry">Wpisz gracza 1</button>
+        <button class="btn ghost full" id="back-to-menu">◀ Wróć</button>
+      </div>
+    </section>
 
     <!-- ENTRY -->
-    <section id="view-entry" class="menu screen" style="display: none">
+    <section id="view-entry" class="card screen" style="display: none">
       <div>
         <h2 class="title">
           Gracz <span id="entry-index">1</span> /
@@ -158,7 +83,7 @@
     </section>
 
     <!-- START -->
-    <section id="view-start" class="menu screen" style="display: none">
+    <section id="view-start" class="card screen" style="display: none">
       <h2 class="title">Losowanie kto zaczyna…</h2>
       <div class="wheel" id="start-wheel"></div>
       <p class="muted" id="start-hint" style="margin-top: 8px">
@@ -167,14 +92,14 @@
     </section>
 
     <!-- LOBBY -->
-    <section id="view-lobby" class="menu screen" style="display: none">
+    <section id="view-lobby" class="card screen" style="display: none">
       <h2 class="title">Lobby</h2>
       <div class="row" style="margin-bottom: 0px">
         <span class="chip">Zaczyna: <strong id="starter-name">–</strong></span>
       </div>
       <div class="row">
         <button class="btn full" id="btn-new-round">Nowa gra</button>
-        <button class="btn ghost full" id="btn-manage">
+        <button class="btn secondary-dark full" id="btn-manage">
           Zmień kolejność/ilość
         </button>
       </div>

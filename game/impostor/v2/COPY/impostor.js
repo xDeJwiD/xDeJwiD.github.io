@@ -150,8 +150,6 @@ const state = {
   entryIndex: 0,
   wordData: null,
   impostorIndices: [],
-  impostorInfo: "category",
-  impostorCount: "default",
   lastImpostorIndices: [],
   startIndex: 0,
   partyMode: false,
@@ -214,85 +212,18 @@ const isImpostor = (i) => state.impostorIndices.includes(i);
 
 // 1%: wszyscy; 5%: dokładnie dwóch; reszta: jeden
 function chooseImpostors(total) {
-
-  switch (state.impostorCount) {
-
-    case "1":
-      return [rand(total)];
-
-    case "2": {
-
-      if (total < 2)
-        return [rand(total)];
-
-      let a = rand(total);
-      let b;
-
-      do {
-        b = rand(total);
-      } while (b === a);
-
-      return [a, b];
-    }
-
-    case "many": {
-
-      const count =
-        Math.max(
-          2,
-          Math.min(
-            total - 1,
-            2 + rand(
-              Math.max(1, total - 2)
-            )
-          )
-        );
-
-      const result = [];
-
-      while (result.length < count) {
-
-        const i = rand(total);
-
-        if (!result.includes(i))
-          result.push(i);
-      }
-
-      return result;
-    }
-
-    default: {
-
-      // TWOJA STARA LOGIKA
-
-      const r = Math.random();
-
-      if (r < 0.05)
-        return Array.from(
-          { length: total },
-          (_, i) => i
-        );
-
-      if (r < 0.13) {
-
-        if (total < 2)
-          return [0];
-
-        let a = rand(total);
-        let b;
-
-        do {
-          b = rand(total);
-        } while (b === a);
-
-        return a < b
-          ? [a, b]
-          : [b, a];
-      }
-
-      return [rand(total)];
-    }
+  const r = Math.random();
+  if (r < 0.05) return Array.from({ length: total }, (_, i) => i);
+  if (r < 0.013) {
+    if (total < 2) return [0];
+    let a = rand(total),
+      b;
+    do {
+      b = rand(total);
+    } while (b === a);
+    return a < b ? [a, b] : [b, a];
   }
+  return [rand(total)];
 }
 
 /* ======= AVATARY – przypisanie po nazwie ======= */
@@ -415,16 +346,16 @@ el("partyMode").addEventListener("change", (e) => {
   renderStats();
 });
 
-// /* NOWA GRA – normalny tryb */
-// el("btn-new").addEventListener("click", () => {
-//   state.testMode = false;
-//   state.targetCount = Math.min(
-//     12,
-//     Math.max(3, parseInt(el("playerCount").value) || 5)
-//   );
-//   el("playerCount").value = state.targetCount;
-//   show("view-setup");
-// });
+/* NOWA GRA – normalny tryb */
+el("btn-new").addEventListener("click", () => {
+  state.testMode = false;
+  state.targetCount = Math.min(
+    12,
+    Math.max(3, parseInt(el("playerCount").value) || 5)
+  );
+  el("playerCount").value = state.targetCount;
+  show("view-setup");
+});
 
 /* TEST – tryb z avatarami (specjalne UI) */
 const btnTest = document.getElementById("btn-test");
@@ -443,22 +374,6 @@ if (btnTest) {
 el("back-to-menu").addEventListener("click", initMenu);
 
 el("btn-begin-entry").addEventListener("click", () => {
-  const selectedInfo =
-  document.querySelector(
-    'input[name="impostorInfo"]:checked'
-  );
-
-state.impostorInfo =
-  selectedInfo?.value || "category";
-
-  const selectedCount =
-  document.querySelector(
-    'input[name="impostorCount"]:checked'
-  );
-
-state.impostorCount =
-  selectedCount?.value || "default";
-
   state.targetCount = Math.min(
     12,
     Math.max(3, parseInt(el("playerCount").value) || 5)
@@ -571,7 +486,7 @@ function updateNickButtonsVisibility() {
 function openOrderView() {
   const sec = document.createElement("section");
   sec.id = "view-order";
-  sec.className = "menu screen";
+  sec.className = "card screen";
 
   let html = `
     <h2 class="title">Kolejność osób</h2>
@@ -652,19 +567,8 @@ el("entry-confirm").addEventListener("click", () => {
   openSecret({
   playerName: name,
   text: isImp
-  ? (
-      state.impostorInfo === "category"
-        ? state.wordData.category
-
-      : state.impostorInfo === "hint"
-        ? (
-            state.wordData.hint ||
-            "BRAK PODPOWIEDZI"
-          )
-
-      : ""
-    )
-  : state.wordData.word,
+    ? state.wordData.category
+    : state.wordData.word,
   isImp,
   pos: idx,
   total: state.targetCount,
@@ -747,33 +651,12 @@ heroCurrent.style.transition = "";
   el("secret-hide").style.display = "none";
   el("handoff-inline").style.display = "none";
   el("secret-show").style.setProperty("--holdp", 0);
-if (isImp) {
-
-  if (state.impostorInfo === "category") {
-
-    el("secret-category").textContent =
-      state.wordData.category
-
-  }
-  else if (
-    state.impostorInfo === "hint"
-  ) {
-
-    el("secret-category").textContent =
-      state.wordData.hint ||
-      "BRAK PODPOWIEDZI";
-
-  }
-  else {
-
-    el("secret-category").textContent = "";
-
-  }
+  if (isImp) {
+  el("secret-category").textContent =
+    state.wordData.category;
 
   el("secret-value").textContent = "";
-
 }
-
 else {
   el("secret-category").textContent = "";
   el("secret-value").textContent = text;
@@ -844,35 +727,9 @@ if (isImp) {
 
   el("secret-imp-hint").style.display = "block";
 
-if (
-  state.impostorInfo === "category" ||
-  state.impostorInfo === "hint"
-) {
-
   el("secret-category-label").style.display = "block";
 
   el("secret-category").style.display = "block";
-
-}
-else {
-
-  el("secret-category-label").style.display = "none";
-
-  el("secret-category").style.display = "none";
-
-}
-  if (state.impostorInfo === "hint") {
-
-  el("secret-category-label").textContent =
-    "Podpowiedź:";
-
-}
-else {
-
-  el("secret-category-label").textContent =
-    "Kategoria hasła:";
-
-}
 
 }
 else {
@@ -1184,19 +1041,8 @@ function revealSequence(i) {
   openSecret({
   playerName: p.name,
   text: isImp
-  ? (
-      state.impostorInfo === "category"
-        ? state.wordData.category
-
-      : state.impostorInfo === "hint"
-        ? (
-            state.wordData.hint ||
-            "BRAK PODPOWIEDZI"
-          )
-
-      : ""
-    )
-  : state.wordData.word,
+    ? state.wordData.category
+    : state.wordData.word,
   isImp,
   pos: i,
   total,
@@ -1232,7 +1078,7 @@ document.head.appendChild(styleIcon);
 const manageSec = (function () {
   const sec = document.createElement("section");
   sec.id = "view-manage";
-  sec.className = "menu screen";
+  sec.className = "card screen";
   sec.style.display = "none";
   sec.innerHTML = `<h2 class="title">Gracze</h2><div id="manage-list" class="list"></div>
 <div class="row"><input id="manage-name" type="text" placeholder="Dodaj nowego gracza" style="flex:1"/>

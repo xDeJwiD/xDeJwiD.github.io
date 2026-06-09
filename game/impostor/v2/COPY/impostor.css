@@ -28,10 +28,6 @@
   --purple-pressed: rgb(112, 0, 177);
   --purple-pressed-harder: rgb(78, 0, 122);
 
-  --gray:#374151;
-  --gray-pressed:#1f2937;
-
-
   /* LINIE */
   --border: #1f2937;
   --hairline: #1f2937;
@@ -256,16 +252,6 @@ input:focus {
 }
 
 
-.menu {
-  background: var(--card);
-  border: 2px solid var(--border);
-  border-radius: 48px;
-  padding: 8px;
-  box-shadow: none;
-  height: fit-content;
-}
-
-
 /* ================== ENTRY ================== */
 .entry-player {
   display:flex;
@@ -287,82 +273,6 @@ input:focus {
   display:none;
   gap:8px;
   margin-top:6px;
-}
-
-
-/* ===== RADIO BUTTONS AS BUTTONS ===== */
-
-.radio-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.radio-group input[type="radio"] {
-  display: none;
-}
-
-.radio-btn {
-  flex: 1;
-  min-width: 140px;
-
-  margin: 0;
-  padding: 14px;
-
-  border-radius: 14px;
-
-  background: var(--gray);
-  color: var(--muted);
-
-  font-weight: 800;
-  font-size: 15px;
-  text-align: center;
-
-  cursor: pointer;
-
-  box-shadow: 0 6px 0 var(--gray-pressed);
-
-  transition: none;
-}
-.radio-btn {
-  min-width: 0;
-}
-
-.settings-title {
-  margin-top: 20px;
-  margin-bottom: 12px;
-
-  color: var(--muted);
-
-  font-size: 18px;
-  font-weight: 800;
-
-  text-align: center;
-
-  letter-spacing: 0.3px;
-}
-.settings-section {
-  margin-bottom: 28px;
-}
-
-/* klik */
-
-.radio-btn:active {
-  transform: translateY(6px);
-  box-shadow: 0 2px 0 var(--gray-pressed);
-}
-
-/* zaznaczony */
-
-.radio-group input[type="radio"]:checked + .radio-btn {
-
-  background: var(--accent);
-
-  color: #052e16;
-
-  transform: translateY(6px);
-
-  box-shadow: 0 2px 0 var(--accent-pressed); 
 }
 
 /* ================== OVERLAY ================== */
@@ -764,14 +674,6 @@ td > span {
   :root {
     --app-padding:20px;
   }
-}
-
-@media (max-width: 600px) {
-
-  .radio-btn {
-    min-width: calc(50% - 5px);
-  }
-
 }
 
 
