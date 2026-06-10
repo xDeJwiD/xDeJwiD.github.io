@@ -64,7 +64,7 @@
 
             <input type="radio" id="count-default" name="impostorCount" value="default" checked>
             <label for="count-default" class="radio-btn">
-              Normalnie
+              Default
             </label>
 
             <input type="radio" id="count-1" name="impostorCount" value="1">
@@ -94,14 +94,14 @@
 
           <div class="radio-group">
 
-            <input type="radio" id="info-category" name="impostorInfo" value="category" checked>
-            <label for="info-category" class="radio-btn">
-              Zna kategorię
-            </label>
-
             <input type="radio" id="info-none" name="impostorInfo" value="none">
             <label for="info-none" class="radio-btn">
-              Nie wie nic
+              Brak
+            </label>
+
+            <input type="radio" id="info-category" name="impostorInfo" value="category" checked>
+            <label for="info-category" class="radio-btn">
+              Dostaje kategorię
             </label>
 
             <input type="radio" id="info-hint" name="impostorInfo" value="hint">
@@ -127,10 +127,10 @@
         <button class="btn ghost full" id="back-to-menu">◀ Wróć</button>
       </div>
       
-      <label class="row" style="align-items: center">
+      <!-- <label class="row" style="align-items: center">
         <input type="checkbox" id="partyMode" style="width: 20px; height: 20px; accent-color: #7dd3fc" />
         <span>Tryb imprezowy <strong>18+</strong> (shoty)</span>
-      </label>
+      </label> -->
     </section>
 
 
@@ -240,6 +240,7 @@
         <button class="btn secondary full" id="secret-hide" style="display: none">
           Ukryj i podaj dalej
         </button>
+        <br />
       </div>
       <div id="handoff-inline" class="handoff-inline">
         Przekaż telefon do: <strong id="handoff-next">—</strong>

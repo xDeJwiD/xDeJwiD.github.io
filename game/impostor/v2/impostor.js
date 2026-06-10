@@ -336,7 +336,7 @@ const save = () =>
       players: state.players,
       startIndex: state.startIndex,
       lastImpostorIndices: state.lastImpostorIndices,
-      partyMode: state.partyMode,
+      // partyMode: state.partyMode,
       usedWords: state.usedWords,
     })
   );
@@ -355,7 +355,7 @@ const load = () => {
     else if (typeof d.lastImpostorIndex === "number")
       state.lastImpostorIndices = [d.lastImpostorIndex];
     else state.lastImpostorIndices = [];
-    state.partyMode = !!d.partyMode;
+    // state.partyMode = !!d.partyMode;
     state.usedWords = Array.isArray(d.usedWords) ? d.usedWords : [];
     return true;
   } catch (e) {
@@ -392,7 +392,7 @@ function showOverlay(id, on = true) {
 function initMenu() {
   const ok = load();
   el("btn-continue").disabled = !ok;
-  el("partyMode").checked = state.partyMode;
+  // el("partyMode").checked = state.partyMode;
   // NIE wyłączamy testMode tutaj; włączasz go przyciskiem „Test”
   show("view-menu");
 }
@@ -409,11 +409,11 @@ window.addEventListener("load", () => {
 let heroHandoffTimeout = null;
 
 
-el("partyMode").addEventListener("change", (e) => {
-  state.partyMode = e.target.checked;
-  save();
-  renderStats();
-});
+// el("partyMode").addEventListener("change", (e) => {
+//   state.partyMode = e.target.checked;
+//   save();
+//   renderStats();
+// });
 
 // /* NOWA GRA – normalny tryb */
 // el("btn-new").addEventListener("click", () => {
