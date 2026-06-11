@@ -1,4 +1,35 @@
-const ALL_WORDS = WORDS;
+let ALL_WORDS = [];
+const WORD_SETS = {
+  default: WORDS_DEFAULT,
+  custom: WORDS_CUSTOM,
+};
+
+function rebuildWordPool() {
+
+  ALL_WORDS = [];
+
+  state.selectedWordSets.forEach(setName => {
+
+    if (WORD_SETS[setName]) {
+      ALL_WORDS.push(...WORD_SETS[setName]);
+    }
+
+  });
+
+  if (ALL_WORDS.length === 0) {
+    ALL_WORDS.push(...WORDS_DEFAULT);
+  }
+
+  console.log(
+    "Wybrane zestawy:",
+    state.selectedWordSets
+  );
+
+  console.log(
+    "Łączna liczba słów:",
+    ALL_WORDS.length
+  );
+}
 
 /* ======= STORAGE KEY ======= */
 const STORAGE_KEY = "impostorParty_v10";
@@ -45,7 +76,7 @@ function preloadAvatarsForPlayers(players) {
         img.onload = async () => {
           // kluczowe dla WebP
           if (img.decode) {
-            try { await img.decode(); } catch {}
+            try { await img.decode(); } catch { }
           }
           resolve();
         };
@@ -152,6 +183,9 @@ const state = {
   impostorIndices: [],
   impostorInfo: "category",
   impostorCount: "default",
+
+  selectedWordSets: ["default"],
+
   lastImpostorIndices: [],
   startIndex: 0,
   partyMode: false,
@@ -166,16 +200,16 @@ const vibrate = (ms) => {
   if (navigator.vibrate)
     try {
       navigator.vibrate(ms);
-    } catch (e) {}
+    } catch (e) { }
 };
 const rand = (n) => Math.floor(Math.random() * n);
 const escapeHtml = (s) =>
   s.replace(
     /[&<>"']/g,
     (m) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[
-        m
-      ])
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[
+      m
+    ])
   );
 function uuid() {
   if (crypto?.randomUUID) return crypto.randomUUID();
@@ -310,8 +344,8 @@ function guessAvatarForName(name) {
 function pickUniqueWord() {
   const used = new Set(state.usedWords || []);
   const pool = ALL_WORDS.filter(
-  (w) => !used.has(w.word)
-);
+    (w) => !used.has(w.word)
+  );
   if (pool.length === 0) {
     state.usedWords = [];
     save();
@@ -322,7 +356,7 @@ function pickUniqueWord() {
   }
   const word = pool[rand(pool.length)];
 
-used.add(word.word);
+  used.add(word.word);
   state.usedWords = Array.from(used);
   save();
   return word;
@@ -444,20 +478,30 @@ el("back-to-menu").addEventListener("click", initMenu);
 
 el("btn-begin-entry").addEventListener("click", () => {
   const selectedInfo =
-  document.querySelector(
-    'input[name="impostorInfo"]:checked'
-  );
+    document.querySelector(
+      'input[name="impostorInfo"]:checked'
+    );
 
-state.impostorInfo =
-  selectedInfo?.value || "category";
+  state.impostorInfo =
+    selectedInfo?.value || "category";
 
   const selectedCount =
-  document.querySelector(
-    'input[name="impostorCount"]:checked'
-  );
+    document.querySelector(
+      'input[name="impostorCount"]:checked'
+    );
 
-state.impostorCount =
-  selectedCount?.value || "default";
+  state.impostorCount =
+    selectedCount?.value || "default";
+
+  const selectedSets = [
+    ...document.querySelectorAll(
+      'input[name="wordSet"]:checked'
+    )
+  ].map(cb => cb.value);
+
+  state.selectedWordSets = selectedSets;
+
+  rebuildWordPool();
 
   state.targetCount = Math.min(
     12,
@@ -491,36 +535,36 @@ function confirmOrder() {
 
 
 
-// ===== 🔥 LOADER START =====
-showAvatarLoader();
+  // ===== 🔥 LOADER START =====
+  showAvatarLoader();
 
-document.getElementById("view-order").remove();
+  document.getElementById("view-order").remove();
 
-state.entryIndex = 0;
-state.wordData = pickUniqueWord();
-state.impostorIndices = chooseImpostors(state.targetCount);
-state.lastImpostorIndices = [...state.impostorIndices];
+  state.entryIndex = 0;
+  state.wordData = pickUniqueWord();
+  state.impostorIndices = chooseImpostors(state.targetCount);
+  state.lastImpostorIndices = [...state.impostorIndices];
 
-el("entry-index").textContent = "1";
-el("entry-total").textContent = String(state.targetCount);
-el("entry-name").value = "";
+  el("entry-index").textContent = "1";
+  el("entry-total").textContent = String(state.targetCount);
+  el("entry-name").value = "";
 
 
-preloadAvatarsForPlayers(state.players).then(async () => {
-  renderEntryList();
+  preloadAvatarsForPlayers(state.players).then(async () => {
+    renderEntryList();
 
-  // 🔥 CZEKAJ AŻ <img> W DOM SIĘ ZDEKODUJĄ
-  const imgs = document.querySelectorAll(".entry-avatar");
-  await Promise.all(
-    [...imgs].map(img => img.decode?.().catch(() => {}))
-  );
+    // 🔥 CZEKAJ AŻ <img> W DOM SIĘ ZDEKODUJĄ
+    const imgs = document.querySelectorAll(".entry-avatar");
+    await Promise.all(
+      [...imgs].map(img => img.decode?.().catch(() => { }))
+    );
 
-  show("view-entry");
-  hideAvatarLoader();
+    show("view-entry");
+    hideAvatarLoader();
 
-  updateNickButtonsVisibility();
-  setTimeout(() => el("entry-name").focus(), 80);
-});
+    updateNickButtonsVisibility();
+    setTimeout(() => el("entry-name").focus(), 80);
+  });
 
 
 }
@@ -614,8 +658,8 @@ function renderEntryList() {
     d.innerHTML = `
       <div class="entry-player">
         <img class="entry-avatar" src="${escapeHtml(
-          p.avatar || AVATAR_FILES.nikt
-        )}" alt="">
+      p.avatar || AVATAR_FILES.nikt
+    )}" alt="">
         <span class="chip entry-chip">${i + 1}</span>
         <strong class="${p.name ? "" : "entry-empty"}">
           ${escapeHtml(p.name || "—")}
@@ -650,26 +694,26 @@ el("entry-confirm").addEventListener("click", () => {
       ? state.players[idx + 1]?.name ?? "Gracz " + (idx + 2)
       : null;
   openSecret({
-  playerName: name,
-  text: isImp
-  ? (
-      state.impostorInfo === "category"
-        ? state.wordData.category
+    playerName: name,
+    text: isImp
+      ? (
+        state.impostorInfo === "category"
+          ? state.wordData.category
 
-      : state.impostorInfo === "hint"
-        ? (
-            state.wordData.hint ||
-            "BRAK PODPOWIEDZI"
-          )
+          : state.impostorInfo === "hint"
+            ? (
+              state.wordData.hint ||
+              "BRAK PODPOWIEDZI"
+            )
 
-      : ""
-    )
-  : state.wordData.word,
-  isImp,
-  pos: idx,
-  total: state.targetCount,
-  nextName,
-});
+            : ""
+      )
+      : state.wordData.word,
+    isImp,
+    pos: idx,
+    total: state.targetCount,
+    nextName,
+  });
   const once = () => {
     el("secret-hide").removeEventListener("click", once);
     state.entryIndex++;
@@ -693,15 +737,15 @@ el("entry-name").addEventListener("keydown", (e) => {
 
 function openSecret({ playerName, text, isImp, pos, total, nextName }) {
   document
-  .querySelector("#overlay-secret .modal")
-  .classList.remove("secret-impostor");
+    .querySelector("#overlay-secret .modal")
+    .classList.remove("secret-impostor");
   el("secret-word-label").style.display = "";
 
-el("secret-category-label").style.display = "none";
+  el("secret-category-label").style.display = "none";
 
-el("secret-category").style.display = "none";
+  el("secret-category").style.display = "none";
 
-el("secret-imp-hint").style.display = "none";
+  el("secret-imp-hint").style.display = "none";
   const { heroCurrent, heroNext, heroBanner, heroNextName } = getHeroRefs();
   if (heroAnimating) return;
 
@@ -711,18 +755,18 @@ el("secret-imp-hint").style.display = "none";
   heroAnimating = false;
 
   // ustaw „bieżący” avatar
-const currAvatar = state.players[pos]?.avatar || AVATAR_FILES.nikt;
+  const currAvatar = state.players[pos]?.avatar || AVATAR_FILES.nikt;
 
-// 🔒 HARD RESET HERO (bez animacji)
-heroCurrent.style.transition = "none";
-heroCurrent.className = "hero-img is-current";
-heroCurrent.style.backgroundImage = `url("${currAvatar}")`;
+  // 🔒 HARD RESET HERO (bez animacji)
+  heroCurrent.style.transition = "none";
+  heroCurrent.className = "hero-img is-current";
+  heroCurrent.style.backgroundImage = `url("${currAvatar}")`;
 
-// wymuś zapis stylu
-heroCurrent.offsetHeight;
+  // wymuś zapis stylu
+  heroCurrent.offsetHeight;
 
-// przywróć transition dla przyszłej animacji reveal
-heroCurrent.style.transition = "";
+  // przywróć transition dla przyszłej animacji reveal
+  heroCurrent.style.transition = "";
 
 
   // przygotuj next jako ukryty placeholder (żeby nie było złamanego obrazka)
@@ -747,37 +791,37 @@ heroCurrent.style.transition = "";
   el("secret-hide").style.display = "none";
   el("handoff-inline").style.display = "none";
   el("secret-show").style.setProperty("--holdp", 0);
-if (isImp) {
+  if (isImp) {
 
-  if (state.impostorInfo === "category") {
+    if (state.impostorInfo === "category") {
 
-    el("secret-category").textContent =
-      state.wordData.category
+      el("secret-category").textContent =
+        state.wordData.category
+
+    }
+    else if (
+      state.impostorInfo === "hint"
+    ) {
+
+      el("secret-category").textContent =
+        state.wordData.hint ||
+        "BRAK PODPOWIEDZI";
+
+    }
+    else {
+
+      el("secret-category").textContent = "";
+
+    }
+
+    el("secret-value").textContent = "";
 
   }
-  else if (
-    state.impostorInfo === "hint"
-  ) {
 
-    el("secret-category").textContent =
-      state.wordData.hint ||
-      "BRAK PODPOWIEDZI";
-
-  }
   else {
-
     el("secret-category").textContent = "";
-
+    el("secret-value").textContent = text;
   }
-
-  el("secret-value").textContent = "";
-
-}
-
-else {
-  el("secret-category").textContent = "";
-  el("secret-value").textContent = text;
-}
   el("secret-value").dataset.imp = isImp ? "1" : "0";
   holdProgress = 0;
   updateHoldFill(0);
@@ -833,73 +877,73 @@ function revealSecret() {
   // UI hasła
   el("secret-instruction").style.display = "none";
 
-const isImp =
-  el("secret-value").dataset.imp === "1";
+  const isImp =
+    el("secret-value").dataset.imp === "1";
 
-if (isImp) {
+  if (isImp) {
 
-  el("secret-value").style.display = "none";
+    el("secret-value").style.display = "none";
 
-  el("secret-word-label").style.display = "none";
+    el("secret-word-label").style.display = "none";
 
-  el("secret-imp-hint").style.display = "block";
+    el("secret-imp-hint").style.display = "block";
 
-if (
-  state.impostorInfo === "category" ||
-  state.impostorInfo === "hint"
-) {
+    if (
+      state.impostorInfo === "category" ||
+      state.impostorInfo === "hint"
+    ) {
 
-  el("secret-category-label").style.display = "block";
+      el("secret-category-label").style.display = "block";
 
-  el("secret-category").style.display = "block";
+      el("secret-category").style.display = "block";
 
-}
-else {
+    }
+    else {
 
-  el("secret-category-label").style.display = "none";
+      el("secret-category-label").style.display = "none";
 
-  el("secret-category").style.display = "none";
+      el("secret-category").style.display = "none";
 
-}
-  if (state.impostorInfo === "hint") {
+    }
+    if (state.impostorInfo === "hint") {
 
-  el("secret-category-label").textContent =
-    "Podpowiedź:";
+      el("secret-category-label").textContent =
+        "Podpowiedź:";
 
-}
-else {
+    }
+    else {
 
-  el("secret-category-label").textContent =
-    "Kategoria hasła:";
+      el("secret-category-label").textContent =
+        "Kategoria hasła:";
 
-}
+    }
 
-}
-else {
+  }
+  else {
 
-  el("secret-word-label").style.display = "";
+    el("secret-word-label").style.display = "";
 
-  el("secret-value").style.display = "";
+    el("secret-value").style.display = "";
 
-  el("secret-imp-hint").style.display = "none";
+    el("secret-imp-hint").style.display = "none";
 
-  el("secret-category-label").style.display = "none";
+    el("secret-category-label").style.display = "none";
 
-  el("secret-category").style.display = "none";
+    el("secret-category").style.display = "none";
 
-}
+  }
 
-el("secret-show").style.display = "none";
-el("secret-hide").style.display = "";
+  el("secret-show").style.display = "none";
+  el("secret-hide").style.display = "";
   const modal = document.querySelector("#overlay-secret .modal");
 
-if (el("secret-value").dataset.imp === "1") {
-  modal.classList.add("secret-impostor");
-}
-else {
-  modal.classList.remove("secret-impostor");
-}
-  
+  if (el("secret-value").dataset.imp === "1") {
+    modal.classList.add("secret-impostor");
+  }
+  else {
+    modal.classList.remove("secret-impostor");
+  }
+
   vibrate(15);
 
   const { heroCurrent, heroNext, heroBanner, heroNextName } = getHeroRefs();
@@ -908,9 +952,9 @@ else {
 
   heroAnimating = true;
 
-  const nextIdx  = pos + 1;
+  const nextIdx = pos + 1;
   if (nextIdx >= total) return;
-  const nextAva  = state.players[nextIdx]?.avatar;
+  const nextAva = state.players[nextIdx]?.avatar;
   if (!nextAva) return;
   const nextName =
     state.players[nextIdx]?.name ||
@@ -968,34 +1012,34 @@ else {
   // }, HERO_HANDOFF_DELAY);
 
   heroHandoffTimeout = setTimeout(() => {
-  heroHandoffTimeout = null;
+    heroHandoffTimeout = null;
 
-  heroBanner.setAttribute("aria-hidden", "false");
+    heroBanner.setAttribute("aria-hidden", "false");
 
-  heroCurrent.classList.add("to-left");
-  heroNext.classList.add("enter");
+    heroCurrent.classList.add("to-left");
+    heroNext.classList.add("enter");
 
-  const onDone = (e) => {
-    if (e.target !== heroNext || e.propertyName !== "transform") return;
+    const onDone = (e) => {
+      if (e.target !== heroNext || e.propertyName !== "transform") return;
 
-    heroCurrent.style.transition = "none";
-    heroCurrent.className = "hero-img";
-    heroCurrent.setAttribute("aria-hidden", "true");
+      heroCurrent.style.transition = "none";
+      heroCurrent.className = "hero-img";
+      heroCurrent.setAttribute("aria-hidden", "true");
 
-    heroNext.style.transition = "none";
-    heroNext.className = "hero-img is-current";
+      heroNext.style.transition = "none";
+      heroNext.className = "hero-img is-current";
 
-    heroNext.offsetHeight;
+      heroNext.offsetHeight;
 
-    heroCurrent.style.transition = "";
-    heroNext.style.transition = "";
+      heroCurrent.style.transition = "";
+      heroNext.style.transition = "";
 
-    heroAnimating = false;
-  };
+      heroAnimating = false;
+    };
 
-  heroNext.addEventListener("transitionend", onDone, { once: true });
+    heroNext.addEventListener("transitionend", onDone, { once: true });
 
-}, HERO_HANDOFF_DELAY);
+  }, HERO_HANDOFF_DELAY);
 
 }
 
@@ -1114,9 +1158,8 @@ function renderStats() {
         <span class="name">${escapeHtml(p.name)}</span>
       </div>`;
     tr.innerHTML = state.partyMode
-      ? `<td>${nameCell}</td><td>${p.points || 0}</td><td class="shots-col">${
-          p.shots || 0
-        }</td>`
+      ? `<td>${nameCell}</td><td>${p.points || 0}</td><td class="shots-col">${p.shots || 0
+      }</td>`
       : `<td>${nameCell}</td><td>${p.points || 0}</td>`;
     body.appendChild(tr);
   });
@@ -1182,26 +1225,26 @@ function revealSequence(i) {
     isImp = isImpostor(i);
   const nextName = i + 1 < total ? state.players[i + 1].name : null;
   openSecret({
-  playerName: p.name,
-  text: isImp
-  ? (
-      state.impostorInfo === "category"
-        ? state.wordData.category
+    playerName: p.name,
+    text: isImp
+      ? (
+        state.impostorInfo === "category"
+          ? state.wordData.category
 
-      : state.impostorInfo === "hint"
-        ? (
-            state.wordData.hint ||
-            "BRAK PODPOWIEDZI"
-          )
+          : state.impostorInfo === "hint"
+            ? (
+              state.wordData.hint ||
+              "BRAK PODPOWIEDZI"
+            )
 
-      : ""
-    )
-  : state.wordData.word,
-  isImp,
-  pos: i,
-  total,
-  nextName,
-});
+            : ""
+      )
+      : state.wordData.word,
+    isImp,
+    pos: i,
+    total,
+    nextName,
+  });
   const once = () => {
     el("secret-hide").removeEventListener("click", once);
     if (i < total - 1) revealSequence(i + 1);
@@ -1215,8 +1258,8 @@ const manageHTML = (p, i) => `
   <div class="rowcard" style="display:flex;align-items:center;gap:8px;padding:10px">
     <div class="chip">${i + 1}</div>
     <img class="manage-avatar" src="${escapeHtml(
-      p.avatar || AVATAR_FILES.nikt
-    )}" alt="">
+  p.avatar || AVATAR_FILES.nikt
+)}" alt="">
     <input type="text" data-name="${i}" value="${escapeHtml(p.name)}"
       style="flex:1;min-width:100px;background:var(--input);border:1px solid var(--hairline);
       border-radius:10px;padding:10px;color:var(--text);font-size:16px"/>

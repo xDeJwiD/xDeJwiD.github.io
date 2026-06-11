@@ -37,9 +37,9 @@
         <!-- <button class="btn secondary full" id="btn-new">Nowa gra</button> -->
         <br />
         <button class="btn ghost full" id="btn-continue" disabled>Kontynuuj poprzednią grę</button>
-        
+
         <br />
-        
+
       </div>
 
       <!-- <div class="divider"></div> -->
@@ -49,10 +49,10 @@
     <!-- SETUP -->
     <section id="view-setup" class="menu screen" style="display: none">
       <div>
-        <div class="menu-logo">
+        <!-- <div class="menu-logo">
           <img src="./impostor_logo.png" alt="Impostor Logo" />
         </div>
-        <div class="divider"></div>
+        <div class="divider"></div> -->
 
 
         <div class="settings-section">
@@ -113,6 +113,30 @@
         </div>
 
 
+        <div class="settings-section">
+
+          <div class="settings-title">
+            Kategorie słów
+          </div>
+
+          <div class="checkbox-group">
+
+            <input type="checkbox" id="words-default" name="wordSet" value="default" checked>
+
+            <label for="words-default" class="radio-btn">
+              Standardowe
+            </label>
+
+            <input type="checkbox" id="words-custom" name="wordSet" value="custom">
+
+            <label for="words-custom" class="radio-btn">
+              Własne
+            </label>
+
+          </div>
+
+        </div>
+
 
 
         <div class="settings-title">
@@ -126,7 +150,7 @@
         <button class="btn full" id="btn-begin-entry">Wpisz gracza 1</button>
         <button class="btn ghost full" id="back-to-menu">◀ Wróć</button>
       </div>
-      
+
       <!-- <label class="row" style="align-items: center">
         <input type="checkbox" id="partyMode" style="width: 20px; height: 20px; accent-color: #7dd3fc" />
         <span>Tryb imprezowy <strong>18+</strong> (shoty)</span>
@@ -267,7 +291,11 @@
     <div class="loader-text">Ładowanie</div>
 
   </div>
-  <script src="words.js"></script>
+  <script src="words_default.js"></script>
+  <script src="words_custom.js"></script>
+
+
+
   <script src="impostor.js"></script>
 </body>
 

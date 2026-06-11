@@ -305,6 +305,28 @@ input:focus {
   display: none;
 }
 
+
+.checkbox-group {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  display:none;
+}
+
+.checkbox-group input[type="checkbox"]:checked + .radio-btn {
+
+  background: var(--accent);
+
+  color: #052e16;
+
+  transform: translateY(6px);
+
+  box-shadow: 0 2px 0 var(--accent-pressed);
+}
+
 .radio-btn {
   flex: 1;
   min-width: 140px;
