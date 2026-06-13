@@ -1,0 +1,28 @@
+const WORDS_ANIMAL = [
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+    {   word: "USA",   category: "Państwa",    hint: "AMERYKA"  },
+
+
+];

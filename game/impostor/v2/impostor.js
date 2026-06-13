@@ -1,8 +1,35 @@
 let ALL_WORDS = [];
+
 const WORD_SETS = {
   default: WORDS_DEFAULT,
   custom: WORDS_CUSTOM,
+  country: WORDS_COUNTRY,
+  food: WORDS_FOOD,
+  animal: WORDS_ANIMAL,
 };
+
+function updateWordCounts() {
+
+  console.log("updateWordCounts");
+
+  Object.entries(WORD_SETS)
+    .forEach(([key, words]) => {
+
+      console.log(key, words.length);
+
+      const elCount =
+        document.getElementById(
+          `words-count-${key}`
+        );
+
+      console.log(elCount);
+
+      if (!elCount) return;
+
+      elCount.textContent =
+        '[ ' + words.length + ' ]';
+    });
+}
 
 function rebuildWordPool() {
 
@@ -434,7 +461,7 @@ function initMenu() {
 
 window.addEventListener("load", () => {
   initMenu();
-
+  updateWordCounts();
   // preload w tle – bez czekania
   // preloadAvatarsInBackground();
 });
@@ -470,6 +497,7 @@ if (btnTest) {
       Math.max(3, parseInt(el("playerCount").value) || 5)
     );
     el("playerCount").value = state.targetCount;
+    updateWordCounts();
     show("view-setup");
   });
 }

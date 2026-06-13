@@ -1,0 +1,21 @@
+const WORDS_FOOD = [
+{ word: "Pizza", category: "Jedzenie", hint: "WŁOCHY" },
+{ word: "Hamburger", category: "Jedzenie", hint: "FAST FOOD" },
+{ word: "Hot Dog", category: "Jedzenie", hint: "PARÓWA" },
+{ word: "Spaghetti", category: "Jedzenie", hint: "MAKARON" },
+{ word: "Pierogi", category: "Jedzenie", hint: "POLSKA" },
+{ word: "Sushi", category: "Jedzenie", hint: "JAPONIA" },
+{ word: "Kebab", category: "Jedzenie", hint: "TUREK" },
+{ word: "Lasagne", category: "Jedzenie", hint: "GARFIELD" },
+{ word: "Taco", category: "Jedzenie", hint: "MEKSYK" },
+{ word: "Naleśniki", category: "Jedzenie", hint: "SŁODKIE" },
+{ word: "Gofry", category: "Jedzenie", hint: "DESER" },
+{ word: "Rosół", category: "Jedzenie", hint: "ZUPA" },
+{ word: "Żurek", category: "Jedzenie", hint: "ZUPA" },
+{ word: "Schabowy", category: "Jedzenie", hint: "POLSKA" },
+{ word: "Zapiekanka", category: "Jedzenie", hint: "Z PIECA" },
+{ word: "Frytki", category: "Jedzenie", hint: "ZIEMNIAKI" },
+{ word: "Tortilla", category: "Jedzenie", hint: "PLACEK" },
+{ word: "Pączek", category: "Jedzenie", hint: "SŁODKIE" },
+{ word: "Lody", category: "Jedzenie", hint: "ZIMNE" }
+];

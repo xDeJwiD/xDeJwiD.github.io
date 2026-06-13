@@ -218,7 +218,7 @@ input:focus {
 }
 
 .btn:active {
-  transform: translateY(6px);
+  transform: translateY(4px);
   box-shadow: 0 2px 0 var(--accent-pressed);
 }
 
@@ -306,9 +306,10 @@ input:focus {
 }
 
 
+
 .checkbox-group {
-  display:flex;
-  flex-wrap:wrap;
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
   gap:10px;
 }
 
@@ -322,7 +323,7 @@ input:focus {
 
   color: #052e16;
 
-  transform: translateY(6px);
+  transform: translateY(4px);
 
   box-shadow: 0 2px 0 var(--accent-pressed);
 }
@@ -332,6 +333,7 @@ input:focus {
   min-width: 140px;
 
   margin: 0;
+  margin-bottom: 5px;
   padding: 14px;
 
   border-radius: var(--btn-radius);
@@ -373,7 +375,7 @@ input:focus {
 /* klik */
 
 .radio-btn:active {
-  transform: translateY(6px);
+  transform: translateY(4px);
   box-shadow: 0 2px 0 var(--gray-pressed);
 }
 
@@ -385,7 +387,7 @@ input:focus {
 
   color: #052e16;
 
-  transform: translateY(6px);
+  transform: translateY(4px);
 
   box-shadow: 0 2px 0 var(--accent-pressed); 
 }
@@ -818,6 +820,22 @@ td > span {
 }
 
 
+
+.category-name {
+  display: block;
+  line-height: 1;
+}
+
+.category-count {
+  display: block;
+
+  margin-top: 5px;
+
+  font-size: 10px;
+  line-height: 1;
+
+  opacity: .65;
+}
 
 
 

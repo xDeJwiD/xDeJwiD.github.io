@@ -69,22 +69,22 @@
 
             <input type="radio" id="count-1" name="impostorCount" value="1">
             <label for="count-1" class="radio-btn">
-              Zawsze 1
+              1
             </label>
 
             <input type="radio" id="count-2" name="impostorCount" value="2">
             <label for="count-2" class="radio-btn">
-              Zawsze 2
+              2
             </label>
 
             <input type="radio" id="count-many" name="impostorCount" value="many">
             <label for="count-many" class="radio-btn">
-              Więcej niż 1
+              1+
             </label>
 
           </div>
         </div>
-
+        <div class="divider"></div>
 
 
         <div class="settings-section">
@@ -101,17 +101,17 @@
 
             <input type="radio" id="info-category" name="impostorInfo" value="category" checked>
             <label for="info-category" class="radio-btn">
-              Dostaje kategorię
+              Kategoria
             </label>
 
             <input type="radio" id="info-hint" name="impostorInfo" value="hint">
             <label for="info-hint" class="radio-btn">
-              Dostaje podpowiedź
+              Podpowiedź
             </label>
 
           </div>
         </div>
-
+        <div class="divider"></div>
 
         <div class="settings-section">
 
@@ -124,19 +124,88 @@
             <input type="checkbox" id="words-default" name="wordSet" value="default" checked>
 
             <label for="words-default" class="radio-btn">
-              Standardowe
+              <span class="category-name">
+                Standardowe
+              </span>
+
+              <span class="category-count" id="words-count-default">
+              </span>
             </label>
+
 
             <input type="checkbox" id="words-custom" name="wordSet" value="custom">
 
             <label for="words-custom" class="radio-btn">
-              Własne
+              <span class="category-name">
+                Custom
+              </span>
+
+              <span class="category-count" id="words-count-custom">
+              </span>
             </label>
+
+
+            <input type="checkbox" id="words-country" name="wordSet" value="country">
+
+            <label for="words-country" class="radio-btn">
+              <span class="category-name">
+                Państwa
+              </span>
+
+              <span class="category-count" id="words-count-country">
+              </span>
+            </label>
+
+
+
+            <input type="checkbox" id="words-food" name="wordSet" value="food">
+
+            <label for="words-food" class="radio-btn">
+              <span class="category-name">
+                Jedzenie
+              </span>
+
+              <span class="category-count" id="words-count-food">
+              </span>
+            </label>
+
+
+
+            <input type="checkbox" id="words-animal" name="wordSet" value="animal">
+
+            <label for="words-animal" class="radio-btn">
+              <span class="category-name">
+                Zwierzęta
+              </span>
+
+              <span class="category-count" id="words-count-animal">
+              </span>
+            </label>
+
+
+
+            <input type="checkbox" id="words-AAA" name="wordSet" value="AAA">
+
+            <label for="words-AAA" class="radio-btn">
+              AAA
+            </label>
+
+
+
+            <input type="checkbox" id="words-BBB" name="wordSet" value="BBB">
+
+            <label for="words-BBB" class="radio-btn">
+              BBB
+            </label>
+
+
+
+
 
           </div>
 
         </div>
-
+        <div class="divider"></div>
 
 
         <div class="settings-title">
@@ -146,10 +215,13 @@
 
 
       </div>
+      <div class="divider"></div>
       <div class="row" style="margin-top: 8px">
         <button class="btn full" id="btn-begin-entry">Wpisz gracza 1</button>
         <button class="btn ghost full" id="back-to-menu">◀ Wróć</button>
       </div>
+
+      <br />
 
       <!-- <label class="row" style="align-items: center">
         <input type="checkbox" id="partyMode" style="width: 20px; height: 20px; accent-color: #7dd3fc" />
@@ -291,8 +363,11 @@
     <div class="loader-text">Ładowanie</div>
 
   </div>
-  <script src="words_default.js"></script>
-  <script src="words_custom.js"></script>
+  <script src="words/words_default.js"></script>
+  <script src="words/words_custom.js"></script>
+  <script src="words/words_country.js"></script>
+  <script src="words/words_food.js"></script>
+  <script src="words/words_animal.js"></script>
 
 
 
