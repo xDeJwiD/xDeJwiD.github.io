@@ -43,19 +43,6 @@ function rebuildWordPool() {
 
   });
 
-  if (ALL_WORDS.length === 0) {
-    ALL_WORDS.push(...WORDS_DEFAULT);
-  }
-
-  console.log(
-    "Wybrane zestawy:",
-    state.selectedWordSets
-  );
-
-  console.log(
-    "Łączna liczba słów:",
-    ALL_WORDS.length
-  );
 }
 
 /* ======= STORAGE KEY ======= */
@@ -205,6 +192,7 @@ const norm = (s) => (s || "").toLowerCase().replace(/[^a-ząćęłńóśźż]/g,
 const state = {
   players: [],
   targetCount: 5,
+  settingsMode: false,
   entryIndex: 0,
   wordData: null,
   impostorIndices: [],
@@ -369,10 +357,21 @@ function guessAvatarForName(name) {
 
 /* ======= SŁOWA – bez powtórek ======= */
 function pickUniqueWord() {
+
   const used = new Set(state.usedWords || []);
   const pool = ALL_WORDS.filter(
-    (w) => !used.has(w.word)
+    (w) => !used.has(
+      w.word + "|" + w.category
+    )
   );
+  if (ALL_WORDS.length === 0) {
+
+    alert(
+      "Brak dostępnych słów. Sprawdź wybrane kategorie."
+    );
+
+    return null;
+  }
   if (pool.length === 0) {
     state.usedWords = [];
     save();
@@ -383,10 +382,39 @@ function pickUniqueWord() {
   }
   const word = pool[rand(pool.length)];
 
-  used.add(word.word);
+  used.add(
+    word.word + "|" + word.category
+  );
   state.usedWords = Array.from(used);
   save();
   return word;
+}
+
+function syncSettingsUI() {
+
+  document
+    .querySelector(
+      `input[name="impostorInfo"][value="${state.impostorInfo}"]`
+    )
+    ?.click();
+
+  document
+    .querySelector(
+      `input[name="impostorCount"][value="${state.impostorCount}"]`
+    )
+    ?.click();
+
+  document
+    .querySelectorAll(
+      'input[name="wordSet"]'
+    )
+    .forEach(cb => {
+      cb.checked =
+        state.selectedWordSets.includes(
+          cb.value
+        );
+    });
+
 }
 
 /* ======= storage ======= */
@@ -399,6 +427,9 @@ const save = () =>
       lastImpostorIndices: state.lastImpostorIndices,
       // partyMode: state.partyMode,
       usedWords: state.usedWords,
+      selectedWordSets: state.selectedWordSets,
+      impostorInfo: state.impostorInfo,
+      impostorCount: state.impostorCount,
     })
   );
 const load = () => {
@@ -417,7 +448,17 @@ const load = () => {
       state.lastImpostorIndices = [d.lastImpostorIndex];
     else state.lastImpostorIndices = [];
     // state.partyMode = !!d.partyMode;
+    if (Array.isArray(d.selectedWordSets))
+      state.selectedWordSets = d.selectedWordSets;
+
+    if (d.impostorInfo)
+      state.impostorInfo = d.impostorInfo;
+
+    if (d.impostorCount)
+      state.impostorCount = d.impostorCount;
     state.usedWords = Array.isArray(d.usedWords) ? d.usedWords : [];
+    rebuildWordPool();
+    setTimeout(syncSettingsUI, 0);
     return true;
   } catch (e) {
     return false;
@@ -437,6 +478,39 @@ function show(id) {
     if (v) v.style.display = s === id ? "" : "none";
   }
 }
+
+function updateSetupView() {
+
+  const playerSection =
+    el("player-count-section");
+
+  if (!playerSection) return;
+
+  if (state.settingsMode) {
+
+    playerSection.style.display = "none";
+
+    el("btn-begin-entry").style.display = "none";
+    el("back-to-menu").style.display = "none";
+
+    el("setup-save").style.display = "";
+    el("setup-cancel").style.display = "";
+
+  }
+  else {
+
+    playerSection.style.display = "";
+
+    el("btn-begin-entry").style.display = "";
+    el("back-to-menu").style.display = "";
+
+    el("setup-save").style.display = "none";
+    el("setup-cancel").style.display = "none";
+
+  }
+
+}
+
 function showOverlay(id, on = true) {
   const ov = el(id);
   if (on) {
@@ -461,11 +535,75 @@ function initMenu() {
 
 window.addEventListener("load", () => {
   initMenu();
+
   updateWordCounts();
-  // preload w tle – bez czekania
-  // preloadAvatarsInBackground();
+
+  initPlayerSlider();
 });
 
+function initPlayerSlider() {
+
+  const slider =
+    document.getElementById("playerCount");
+
+  const value =
+    document.getElementById(
+      "playerCountValue"
+    );
+
+  const dots =
+    document.getElementById(
+      "playerDots"
+    );
+
+  if (!slider || !value || !dots)
+    return;
+
+  dots.innerHTML = "";
+
+  for (let i = 3; i <= 12; i++) {
+
+    const dot =
+      document.createElement("div");
+
+    dot.className = "player-dot";
+    dot.dataset.value = i;
+
+    dots.appendChild(dot);
+
+  }
+
+  function update() {
+
+    const current =
+      parseInt(slider.value);
+
+      
+
+    value.textContent =
+      `${current} graczy`;
+
+    document
+      .querySelectorAll(".player-dot")
+      .forEach(dot => {
+
+        dot.classList.toggle(
+          "active",
+          parseInt(dot.dataset.value)
+            === current
+        );
+
+      });
+
+  }
+
+  slider.addEventListener(
+    "input",
+    update
+  );
+
+  update();
+}
 
 let heroHandoffTimeout = null;
 
@@ -491,6 +629,7 @@ let heroHandoffTimeout = null;
 const btnTest = document.getElementById("btn-test");
 if (btnTest) {
   btnTest.addEventListener("click", () => {
+    state.settingsMode = false;
     state.testMode = true;
     state.targetCount = Math.min(
       12,
@@ -498,6 +637,7 @@ if (btnTest) {
     );
     el("playerCount").value = state.targetCount;
     updateWordCounts();
+    updateSetupView();
     show("view-setup");
   });
 }
@@ -505,6 +645,7 @@ if (btnTest) {
 el("back-to-menu").addEventListener("click", initMenu);
 
 el("btn-begin-entry").addEventListener("click", () => {
+
   const selectedInfo =
     document.querySelector(
       'input[name="impostorInfo"]:checked'
@@ -760,6 +901,32 @@ el("entry-confirm").addEventListener("click", () => {
 el("entry-name").addEventListener("keydown", (e) => {
   if (e.key === "Enter") el("entry-confirm").click();
 });
+
+
+document
+  .querySelectorAll('input[name="wordSet"]')
+  .forEach(cb => {
+
+    cb.addEventListener("change", () => {
+
+      const checked =
+        document.querySelectorAll(
+          'input[name="wordSet"]:checked'
+        );
+
+      if (checked.length === 0) {
+
+        cb.checked = true;
+
+        alert(
+          "Musisz wybrać przynajmniej jedną kategorię."
+        );
+
+      }
+
+    });
+
+  });
 
 /* ======= SECRET OVERLAY ======= */
 
@@ -1143,9 +1310,7 @@ function animateWheelTo(targetIndex, done) {
   }
   let step = 0,
     delay = startDelay;
-  el("start-hint").textContent = state.testMode
-    ? "Losowanie avatara kto zaczyna…"
-    : "Trwa losowanie…";
+
   (function tick() {
     items.forEach((n) => n.classList.remove("active"));
     items[pos % len].classList.add("active");
@@ -1158,9 +1323,7 @@ function animateWheelTo(targetIndex, done) {
       items.forEach((n) => n.classList.remove("active"));
       items[targetIndex].classList.add("active");
       const winnerName = state.players[targetIndex].name;
-      el("start-hint").textContent = state.testMode
-        ? "Zaczyna: " + winnerName
-        : "Zaczyna: " + winnerName;
+
       vibrate(30);
       if (done) done();
     }
@@ -1322,6 +1485,67 @@ el("btn-manage").addEventListener("click", () => {
   renderManage();
   show("view-manage");
 });
+
+el("btn-settings").addEventListener("click", () => {
+
+  state.settingsMode = true;
+
+  updateWordCounts();
+
+  updateSetupView();
+
+  show("view-setup");
+
+});
+
+el("setup-save").addEventListener("click", () => {
+
+  const selectedInfo =
+    document.querySelector(
+      'input[name="impostorInfo"]:checked'
+    );
+
+  state.impostorInfo =
+    selectedInfo?.value || "category";
+
+  const selectedCount =
+    document.querySelector(
+      'input[name="impostorCount"]:checked'
+    );
+
+  state.impostorCount =
+    selectedCount?.value || "default";
+
+  const selectedSets = [
+    ...document.querySelectorAll(
+      'input[name="wordSet"]:checked'
+    )
+  ].map(cb => cb.value);
+
+  state.selectedWordSets =
+    selectedSets;
+
+  rebuildWordPool();
+
+  save();
+
+  state.settingsMode = false;
+
+  show("view-lobby");
+
+});
+
+el("setup-cancel").addEventListener(
+  "click",
+  () => {
+
+    state.settingsMode = false;
+
+    show("view-lobby");
+
+  }
+);
+
 function renderManage() {
   const box = el("manage-list");
   box.innerHTML = "";

@@ -208,10 +208,23 @@
         <div class="divider"></div>
 
 
-        <div class="settings-title">
-          Ilość graczy
+        <div id="player-count-section">
+
+          <div class="settings-title">
+            Ilość graczy
+          </div>
+
+          <div id="playerCountValue" class="player-count-value">
+            5 graczy
+          </div>
+
+          
+          <div id="playerDots" class="player-dots"></div>
+
+
+          <input id="playerCount" class="player-range" type="range" min="3" max="12" value="5" />
+
         </div>
-        <input id="playerCount" inputmode="numeric" type="number" min="3" max="12" value="5" />
 
 
       </div>
@@ -219,6 +232,9 @@
       <div class="row" style="margin-top: 8px">
         <button class="btn full" id="btn-begin-entry">Wpisz gracza 1</button>
         <button class="btn ghost full" id="back-to-menu">◀ Wróć</button>
+
+        <button class="btn full" id="setup-save" style="display:none">Zapisz i wróć</button>
+        <button class="btn ghost full" id="setup-cancel" style="display:none">Anuluj</button>
       </div>
 
       <br />
@@ -257,24 +273,18 @@
     <section id="view-start" class="menu screen" style="display: none">
       <h2 class="title">Losowanie kto zaczyna…</h2>
       <div class="wheel" id="start-wheel"></div>
-      <p class="muted" id="start-hint" style="margin-top: 8px">
-        Trwa losowanie…
-      </p>
     </section>
 
     <!-- LOBBY -->
     <section id="view-lobby" class="menu screen" style="display: none">
-      <h2 class="title">Lobby</h2>
+
+
       <div class="row" style="margin-bottom: 0px">
         <span class="chip">Zaczyna: <strong id="starter-name">–</strong></span>
       </div>
-      <div class="row">
-        <button class="btn full" id="btn-new-round">Nowa gra</button>
-        <button class="btn ghost full" id="btn-manage">
-          Zmień kolejność/ilość
-        </button>
-      </div>
+
       <div class="divider"></div>
+
       <h3 class="title">Statystyki</h3>
       <table class="table">
         <thead id="stats-head">
@@ -286,6 +296,33 @@
         </thead>
         <tbody id="stats-body"></tbody>
       </table>
+
+      <div class="divider"></div>
+
+      <div class="row">
+        <button class="btn full" id="btn-new-round">
+          Nowa gra
+        </button>
+      </div>
+
+
+
+
+      <div class="row">
+
+        <button class="btn ghost full radio-btn" id="btn-settings">
+          Zmień tryb
+        </button>
+
+        <button class="btn ghost full radio-btn" id="btn-manage">
+          Zmień graczy
+        </button>
+
+      </div>
+
+
+
+
     </section>
   </div>
 

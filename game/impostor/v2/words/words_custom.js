@@ -5,24 +5,9 @@ const WORDS_CUSTOM = [
         hint: "TEST"
     },
     {
-        word: "TEST",
-        category: "TEST",
-        hint: "TEST"
-    },
-    {
-        word: "TEST",
-        category: "TEST",
-        hint: "TEST"
-    },
-    {
-        word: "TEST",
-        category: "TEST",
-        hint: "TEST"
-    },
-    {
-        word: "TEST",
-        category: "TEST",
-        hint: "TEST"
+        word: "TEST22",
+        category: "TEST22",
+        hint: "TEST22"
     }
 
 
