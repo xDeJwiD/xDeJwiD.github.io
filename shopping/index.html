@@ -17,7 +17,7 @@
       document.querySelector("#appleStatusBarMeta").content = pageInitialTheme === "dark" ? "black-translucent" : "default";
     } catch {}
   </script>
-  <meta name="description" content="Prosta, rodzinna lista zakupów.">
+  <meta name="description" content="Prosta, wspólna lista zakupów.">
   <title>Lista Zakupów</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" href="ikon.png">
@@ -61,11 +61,40 @@
         </div>
       </header>
 
+      <section class="list-selection-view is-hidden" id="listSelectionView" aria-labelledby="listSelectionTitle">
+        <div class="list-selection-intro">
+          <span>Wspólne zakupy</span>
+          <h1 id="listSelectionTitle">Wybierz listę</h1>
+          <p>Każda lista ma własne produkty, kategorie, sklepy i historię.</p>
+        </div>
+        <div class="list-cards" id="listCards"></div>
+        <p class="list-selection-message is-hidden" id="listSelectionMessage">Nie przypisano Ci jeszcze żadnej listy.</p>
+      </section>
+
+      <section class="admin-view is-hidden" id="adminView" aria-labelledby="adminTitle">
+        <div class="admin-intro">
+          <span class="admin-badge">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 5.5 5.7v5.7c0 4.2 2.7 7.9 6.5 9.6 3.8-1.7 6.5-5.4 6.5-9.6V5.7L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9.4 12 1.7 1.7 3.7-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Administrator
+          </span>
+          <h1 id="adminTitle">Edycja katalogu</h1>
+          <p>Zmiany zostaną zapisane razem po wyjściu z trybu przez menu użytkownika.</p>
+        </div>
+        <nav class="admin-tabs" aria-label="Sekcje katalogu">
+          <button class="is-active" type="button" data-admin-tab="categories">Kategorie</button>
+          <button type="button" data-admin-tab="products">Produkty</button>
+          <button type="button" data-admin-tab="stores">Sklepy</button>
+        </nav>
+        <p class="admin-message" id="adminMessage" role="alert"></p>
+        <div class="admin-list" id="adminList"></div>
+      </section>
+
       <div class="app-content">
         <div class="welcome-row">
-          <div>
-            <h1 id="listTitle">Lista zakupów</h1>
-          </div>
+          <button class="list-back-button is-hidden" id="listBackButton" type="button" aria-label="Wróć do wyboru list">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 5-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <h1 id="listTitle">Lista zakupów</h1>
         </div>
 
         <section class="list-section" aria-labelledby="activeTitle">
@@ -144,6 +173,18 @@
           <button id="addStoreMenuButton" type="button">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9.5h16l-1.2-5H5.2l-1.2 5ZM5.5 9.5V20h13V9.5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
             Dodaj sklep
+          </button>
+          <button class="create-list-menu-button is-hidden" id="createListMenuButton" type="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 7.5h9M7 4h7l.4 4M5.5 11l.9 9h8.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 10v8M14 14h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Utwórz listę
+          </button>
+          <button class="create-list-menu-button is-hidden" id="createUserMenuButton" type="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.5 9a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM3.5 20c.5-3.1 3-5 7-5 1.1 0 2.1.1 2.9.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M18 13v7M14.5 16.5h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Dodaj użytkownika
+          </button>
+          <button class="admin-mode-menu-button is-hidden" id="adminModeButton" type="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 5.5 5.7v5.7c0 4.2 2.7 7.9 6.5 9.6 3.8-1.7 6.5-5.4 6.5-9.6V5.7L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 12h6M12 9v6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <b id="adminModeLabel">Tryb edycji</b>
           </button>
           <button class="profile-logout" id="logoutButton" type="button">Wyloguj się</button>
         </div>

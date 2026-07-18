@@ -46,6 +46,16 @@ const syncStatus = document.querySelector("#syncStatus");
 const updateNotice = document.querySelector("#updateNotice");
 const updateNoticeText = document.querySelector("#updateNoticeText");
 const updateButton = document.querySelector("#updateButton");
+const adminView = document.querySelector("#adminView");
+const adminList = document.querySelector("#adminList");
+const adminMessage = document.querySelector("#adminMessage");
+const adminModeButton = document.querySelector("#adminModeButton");
+const listSelectionView = document.querySelector("#listSelectionView");
+const listCards = document.querySelector("#listCards");
+const listSelectionMessage = document.querySelector("#listSelectionMessage");
+const listBackButton = document.querySelector("#listBackButton");
+const createListMenuButton = document.querySelector("#createListMenuButton");
+const createUserMenuButton = document.querySelector("#createUserMenuButton");
 
 let items = [];
 let productCatalog = DEMO_PRODUCT_CATALOG;
@@ -79,10 +89,27 @@ let realtimeGeneration = 0;
 let realtimeReconnectTimer = null;
 let realtimeReconnectAttempts = 0;
 let lastRealtimeConnectedAt = 0;
+let managementCatalog = { categories: [], products: [], stores: [] };
+let adminDraft = null;
+let adminTab = "categories";
+let adminEditingItem = null;
+let adminPendingDelete = null;
+let currentUserIsAdmin = false;
+let isAdminEditMode = false;
+let isAdminSaving = false;
+let adminPressState = null;
+let adminDragState = null;
+let adminSuppressClickUntil = 0;
+let availableLists = [];
+let currentList = null;
+let currentProfile = null;
+let listOpenInProgress = false;
+let currentUserIsDev = false;
+let manageableUsers = [];
 
 function hasActiveUserInteraction() {
   const inputFocused = document.activeElement?.matches?.("input, select, textarea");
-  return Boolean(dragState || pressState || inputFocused || !pickerSheet.classList.contains("is-hidden"));
+  return Boolean(listOpenInProgress || isAdminEditMode || adminDragState || adminPressState || dragState || pressState || inputFocused || !pickerSheet.classList.contains("is-hidden"));
 }
 
 function reloadToUpdate() {
@@ -163,7 +190,8 @@ function setTheme(theme) {
   document.documentElement.dataset.theme = theme;
   themeButton.setAttribute("aria-pressed", String(theme === "dark"));
   themeButton.setAttribute("aria-label", theme === "dark" ? "Włącz tryb jasny" : "Włącz tryb ciemny");
-  document.querySelector("#themeColorMeta")?.setAttribute("content", theme === "dark" ? "#151814" : "#f6f5f0");
+  const themeColor = isAdminEditMode ? (theme === "dark" ? "#ef6b62" : "#d84a42") : (theme === "dark" ? "#151814" : "#f6f5f0");
+  document.querySelector("#themeColorMeta")?.setAttribute("content", themeColor);
   document.querySelector("#appleStatusBarMeta")?.setAttribute("content", theme === "dark" ? "black-translucent" : "default");
   localStorage.setItem(THEME_KEY, theme);
 }
@@ -177,12 +205,69 @@ function showApp() {
 }
 
 function closeApp() {
+  closeAdminModeWithoutSaving();
   appView.classList.add("is-hidden");
   authView.classList.remove("is-hidden");
   profilePopover.classList.add("is-hidden");
   loginForm.reset();
   loginMessage.textContent = "";
+  document.body.classList.remove("choosing-list");
+  listSelectionView.classList.add("is-hidden");
+  availableLists = [];
+  currentList = null;
+  currentProfile = null;
+  currentUserIsDev = false;
+  manageableUsers = [];
+  createListMenuButton.classList.add("is-hidden");
+  createUserMenuButton.classList.add("is-hidden");
+  window.ShoppingDB?.setActiveList(null);
   document.title = "Lista zakupów";
+}
+
+function selectedStoreStorageKey() {
+  return currentList && !isDemoMode ? `${STORE_KEY}:${currentList.id}` : STORE_KEY;
+}
+
+function renderListSelection() {
+  listCards.innerHTML = availableLists.map((list) => `
+    <button class="list-card" type="button" data-list-id="${escapeAttribute(list.id)}">
+      <span class="list-card-icon">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 7.5h14M7 4h10l1.5 16h-13L7 4Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 10.5v.1M15 10.5v.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </span>
+      <span class="list-card-copy">
+        <strong>${escapeHtml(list.name)}</strong>
+        <small>${list.role === "admin" ? "Administrator listy" : "Wspólna lista zakupów"}</small>
+      </span>
+      <svg class="list-card-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>`).join("");
+  listSelectionMessage.classList.toggle("is-hidden", availableLists.length > 0);
+}
+
+async function showListSelection() {
+  if (isDemoMode) return;
+  closeAdminModeWithoutSaving();
+  realtimeGeneration += 1;
+  const stopSubscription = unsubscribeRealtime;
+  unsubscribeRealtime = null;
+  await stopSubscription?.();
+  window.clearTimeout(realtimeRefreshTimer);
+  currentList = null;
+  window.ShoppingDB?.setActiveList(null);
+  items = [];
+  currentUserIsAdmin = false;
+  adminModeButton.classList.add("is-hidden");
+  const displayName = currentProfile?.display_name || currentProfile?.username || "Użytkownik";
+  document.querySelector("#profileMode").textContent = `${displayName}${currentUserIsDev ? " · Dev" : ""}`;
+  document.querySelector("#profileDescription").textContent = "Wybierz listę zakupów.";
+  profilePopover.classList.add("is-hidden");
+  listBackButton.classList.add("is-hidden");
+  document.querySelector("#listTitle").textContent = "Lista zakupów";
+  document.body.classList.add("choosing-list");
+  listSelectionView.classList.remove("is-hidden");
+  renderListSelection();
+  setConnectionStatus("online", "połączono");
+  document.title = "Wybierz listę";
+  window.scrollTo(0, 0);
 }
 
 function setConnectionStatus(state, label) {
@@ -198,6 +283,7 @@ function applyRemoteData(data) {
   storeNames = data.stores;
   productIdByKey = data.productIdByKey;
   storeIdByName = data.storeIdByName;
+  managementCatalog = data.managementCatalog || managementCatalog;
   if (!storeNames.includes(selectedStore)) {
     selectedStore = storeNames[0] || "";
     hasDefaultStore = false;
@@ -208,7 +294,7 @@ function applyRemoteData(data) {
 }
 
 async function refreshRemoteItems() {
-  if (isDemoMode || !window.ShoppingDB) return;
+  if (isDemoMode || !currentList || !window.ShoppingDB) return;
   try {
     const remoteItems = await window.ShoppingDB.loadItems();
     items = remoteItems.filter((item) => !pendingDeletionIds.has(item.id));
@@ -247,7 +333,7 @@ function queueItemDeletion(itemId) {
 }
 
 async function refreshRemoteData() {
-  if (isDemoMode || !window.ShoppingDB) return;
+  if (isDemoMode || !currentList || !window.ShoppingDB) return;
   try {
     const data = await window.ShoppingDB.loadInitialData();
     applyRemoteData(data);
@@ -258,23 +344,7 @@ async function refreshRemoteData() {
   }
 }
 
-async function enterDatabaseMode(session) {
-  isDemoMode = false;
-  currentSession = session;
-  setConnectionStatus("syncing", "łączenie…");
-  const data = await window.ShoppingDB.loadInitialData();
-  const currentMember = data.members.find((member) => member.user_id === session.user.id);
-  if (!currentMember) {
-    throw new Error("Użytkownik nie należy do rodziny.");
-  }
-  setTheme(currentMember.theme || "light");
-  applyRemoteData(data);
-  const username = session.user.email?.split("@")[0] || "U";
-  document.querySelector("#profileButton").textContent = username.slice(0, 1).toUpperCase();
-  document.querySelector("#profileMode").textContent = currentMember.display_name || username.slice(0, 1).toUpperCase() + username.slice(1);
-  document.querySelector("#profileDescription").textContent = "Lista jest synchronizowana z Supabase.";
-  setConnectionStatus("online", "połączono");
-  showApp();
+async function startRealtimeForCurrentList() {
   const generation = ++realtimeGeneration;
   const stopPreviousSubscription = unsubscribeRealtime;
   unsubscribeRealtime = null;
@@ -309,6 +379,79 @@ async function enterDatabaseMode(session) {
   syncStatus.disabled = isReconnectRunning;
 }
 
+async function openShoppingList(list) {
+  if (!list || listOpenInProgress || isDemoMode) return;
+  listOpenInProgress = true;
+  listCards.querySelectorAll("button").forEach((button) => { button.disabled = true; });
+  listSelectionMessage.classList.add("is-hidden");
+  setConnectionStatus("syncing", "ładowanie…");
+  try {
+    window.ShoppingDB.setActiveList(list.id);
+    const savedStore = localStorage.getItem(`${STORE_KEY}:${list.id}`) || localStorage.getItem(STORE_KEY);
+    selectedStore = savedStore || "";
+    hasDefaultStore = Boolean(savedStore);
+    storeConfirmed = hasDefaultStore;
+    selectedProduct = null;
+    selectedCategory = null;
+    selectedQuantity = 1;
+    pendingProductName = "";
+    const data = await window.ShoppingDB.loadInitialData();
+    currentList = list;
+    currentUserIsAdmin = currentUserIsDev || list.role === "admin";
+    adminModeButton.classList.toggle("is-hidden", !currentUserIsAdmin);
+    document.querySelector("#listTitle").textContent = list.name;
+    listBackButton.classList.toggle("is-hidden", availableLists.length < 2);
+    document.body.classList.remove("choosing-list");
+    listSelectionView.classList.add("is-hidden");
+    applyRemoteData(data);
+    const displayName = currentProfile?.display_name || currentProfile?.username || "Użytkownik";
+    document.querySelector("#profileMode").textContent = `${displayName}${currentUserIsDev ? " · Dev" : (currentUserIsAdmin ? " · Admin" : "")}`;
+    document.querySelector("#profileDescription").textContent = `Lista „${list.name}” jest synchronizowana z Supabase.`;
+    setConnectionStatus("online", "połączono");
+    showApp();
+    document.title = `${list.name} · Lista zakupów`;
+    await startRealtimeForCurrentList();
+  } catch (error) {
+    console.error(error);
+    currentList = null;
+    window.ShoppingDB.setActiveList(null);
+    document.body.classList.add("choosing-list");
+    listSelectionView.classList.remove("is-hidden");
+    listSelectionMessage.textContent = error.message || "Nie udało się otworzyć listy.";
+    listSelectionMessage.classList.remove("is-hidden");
+    setConnectionStatus("offline", "błąd listy");
+  } finally {
+    listOpenInProgress = false;
+    listCards.querySelectorAll("button").forEach((button) => { button.disabled = false; });
+  }
+}
+
+async function enterDatabaseMode(session) {
+  const previousListId = currentList?.id;
+  isDemoMode = false;
+  currentSession = session;
+  setConnectionStatus("syncing", "łączenie…");
+  const context = await window.ShoppingDB.loadUserContext();
+  if (!context.profile) throw new Error("Użytkownik nie ma profilu aplikacji.");
+  currentProfile = context.profile;
+  currentUserIsDev = currentProfile.role === "dev";
+  createListMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
+  createUserMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
+  availableLists = context.lists;
+  if (!availableLists.length) throw new Error("Użytkownik nie jest przypisany do żadnej listy.");
+  setTheme(currentProfile.theme || "light");
+  const username = session.user.email?.split("@")[0] || "U";
+  const displayName = currentProfile.display_name || username.slice(0, 1).toUpperCase() + username.slice(1);
+  document.querySelector("#profileButton").textContent = username.slice(0, 1).toUpperCase();
+  document.querySelector("#profileMode").textContent = `${displayName}${currentUserIsDev ? " · Dev" : ""}`;
+  document.querySelector("#profileDescription").textContent = "Wybierz listę zakupów.";
+  showApp();
+  const listToRestore = previousListId && availableLists.find((list) => list.id === previousListId);
+  if (listToRestore) await openShoppingList(listToRestore);
+  else if (availableLists.length === 1) await openShoppingList(availableLists[0]);
+  else await showListSelection();
+}
+
 function scheduleRealtimeReconnect() {
   if (realtimeReconnectTimer || !currentSession || isDemoMode) return;
   const delay = Math.min(30000, 1200 * (2 ** realtimeReconnectAttempts));
@@ -321,7 +464,7 @@ function scheduleRealtimeReconnect() {
 }
 
 function refreshConnectionAfterResume() {
-  if (isDemoMode || !currentSession || !navigator.onLine || document.visibilityState !== "visible") return;
+  if (isDemoMode || !currentSession || !currentList || !navigator.onLine || document.visibilityState !== "visible") return;
   const connectionIsStale = Date.now() - lastRealtimeConnectedAt > 30000;
   if (connectionState === "offline" || connectionIsStale) void reconnectDatabase();
   else void refreshRemoteItems();
@@ -330,6 +473,11 @@ function refreshConnectionAfterResume() {
 function showDatabaseRecovery(session) {
   isDemoMode = false;
   currentSession = session;
+  currentUserIsAdmin = false;
+  currentUserIsDev = false;
+  adminModeButton.classList.add("is-hidden");
+  createListMenuButton.classList.add("is-hidden");
+  createUserMenuButton.classList.add("is-hidden");
   syncStatus.disabled = false;
   const username = session.user.email?.split("@")[0] || "U";
   document.querySelector("#profileButton").textContent = username.slice(0, 1).toUpperCase();
@@ -361,6 +509,19 @@ async function reconnectDatabase() {
 function enterDemoMode() {
   isDemoMode = true;
   currentSession = null;
+  availableLists = [];
+  currentList = { id: "demo", name: "Podgląd", role: "member" };
+  currentProfile = null;
+  window.ShoppingDB?.setActiveList(null);
+  document.body.classList.remove("choosing-list");
+  listSelectionView.classList.add("is-hidden");
+  listBackButton.classList.add("is-hidden");
+  document.querySelector("#listTitle").textContent = "Lista zakupów";
+  currentUserIsAdmin = false;
+  currentUserIsDev = false;
+  adminModeButton.classList.add("is-hidden");
+  createListMenuButton.classList.add("is-hidden");
+  createUserMenuButton.classList.add("is-hidden");
   syncStatus.disabled = true;
   productCatalog = DEMO_PRODUCT_CATALOG;
   storeNames = DEMO_STORES;
@@ -376,8 +537,292 @@ function enterDemoMode() {
 
 function escapeHtml(text) {
   const element = document.createElement("div");
-  element.textContent = text;
+  element.textContent = String(text ?? "");
   return element.innerHTML;
+}
+
+function escapeAttribute(text) {
+  return String(text ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function adminActionIcon(action) {
+  if (action === "edit") {
+    return '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 16.5-.8 3.3 3.3-.8L18 8.5 15.5 6 5 16.5Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="m13.8 7.7 2.5 2.5" stroke="currentColor" stroke-width="1.7"/></svg>';
+  }
+  return '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>';
+}
+
+function renderAdminInlineForm(type, item) {
+  const hasIcon = type === "categories";
+  return `
+    <form class="admin-inline-form ${hasIcon ? "has-icon" : ""}" data-admin-form="${type}" data-id="${item.id}">
+      <input name="name" type="text" minlength="2" maxlength="60" value="${escapeAttribute(item.name)}" aria-label="Nowa nazwa" required>
+      ${hasIcon ? `<input name="icon" type="text" maxlength="8" value="${escapeAttribute(item.icon)}" aria-label="Nowa ikonka">` : ""}
+      <span class="admin-inline-buttons">
+        <button type="button" data-admin-action="cancel-edit">Anuluj</button>
+        <button type="submit">OK</button>
+      </span>
+    </form>`;
+}
+
+function renderAdminRow(type, item, meta, icon = "") {
+  if (adminEditingItem?.type === type && adminEditingItem.id === item.id) {
+    return `<div class="admin-row">${renderAdminInlineForm(type, item)}</div>`;
+  }
+
+  const deletePending = adminPendingDelete?.type === type && adminPendingDelete.id === item.id;
+  return `
+    <div class="admin-row" data-admin-type="${type}" data-id="${item.id}">
+      <span class="admin-drag-handle" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="7" r="1.35"/><circle cx="15" cy="7" r="1.35"/><circle cx="9" cy="12" r="1.35"/><circle cx="15" cy="12" r="1.35"/><circle cx="9" cy="17" r="1.35"/><circle cx="15" cy="17" r="1.35"/></svg>
+      </span>
+      <span class="admin-row-copy">
+        <strong>${icon ? `${escapeHtml(icon)} ` : ""}${escapeHtml(item.name)}</strong>
+        <small>${escapeHtml(meta)}</small>
+      </span>
+      <span class="admin-row-actions">
+        <button type="button" data-admin-action="edit" aria-label="Edytuj ${escapeAttribute(item.name)}">${adminActionIcon("edit")}</button>
+        <button class="admin-delete" type="button" data-admin-action="delete" aria-label="Usuń ${escapeAttribute(item.name)}">${adminActionIcon("delete")}</button>
+      </span>
+      ${deletePending ? `
+        <span class="admin-delete-confirm">
+          <span>${type === "categories" ? "Kategoria i jej produkty znikną z wyboru." : "Pozycja zniknie z wyboru."}</span>
+          <button type="button" data-admin-action="cancel-delete">Anuluj</button>
+          <button class="is-danger" type="button" data-admin-action="confirm-delete">Usuń</button>
+        </span>` : ""}
+    </div>`;
+}
+
+function renderAdminList() {
+  if (!adminDraft) return;
+  adminMessage.textContent = "";
+  document.querySelectorAll("[data-admin-tab]").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.adminTab === adminTab);
+  });
+
+  if (adminTab === "categories") {
+    const categories = adminDraft.categories.filter((category) => category.is_active).sort((a, b) => a.position - b.position);
+    adminList.innerHTML = categories.length
+      ? `<div class="admin-sort-list" data-admin-list="categories">${categories.map((category) => {
+        const productCount = adminDraft.products.filter((product) => product.is_active && product.category_id === category.id).length;
+        return renderAdminRow("categories", category, `${productCount} produktów`, category.icon);
+      }).join("")}</div>`
+      : '<div class="admin-empty">Brak aktywnych kategorii.</div>';
+    return;
+  }
+
+  if (adminTab === "stores") {
+    const stores = adminDraft.stores.filter((store) => store.is_active).sort((a, b) => a.position - b.position);
+    adminList.innerHTML = stores.length
+      ? `<div class="admin-sort-list" data-admin-list="stores">${stores.map((store) => renderAdminRow("stores", store, "Sklep")).join("")}</div>`
+      : '<div class="admin-empty">Brak aktywnych sklepów.</div>';
+    return;
+  }
+
+  const categories = adminDraft.categories.filter((category) => category.is_active).sort((a, b) => a.position - b.position);
+  const groups = categories.map((category) => {
+    const products = adminDraft.products
+      .filter((product) => product.is_active && product.category_id === category.id)
+      .sort((a, b) => a.position - b.position);
+    if (!products.length) return "";
+    return `
+      <section class="admin-group">
+        <h2 class="admin-group-title"><span>${escapeHtml(category.icon)}</span>${escapeHtml(category.name)}</h2>
+        <div class="admin-sort-list" data-admin-list="products" data-category-id="${category.id}">${products.map((product) => renderAdminRow("products", product, category.name)).join("")}</div>
+      </section>`;
+  }).join("");
+  adminList.innerHTML = groups || '<div class="admin-empty">Brak aktywnych produktów.</div>';
+}
+
+function markAdminItemDeleted(type, id) {
+  const item = adminDraft[type].find((entry) => entry.id === id);
+  if (!item) return;
+  item.is_active = false;
+  if (type === "categories") {
+    adminDraft.products.forEach((product) => {
+      if (product.category_id === id) product.is_active = false;
+    });
+  }
+  adminPendingDelete = null;
+  renderAdminList();
+}
+
+function validateAdminName(type, item, name) {
+  const duplicate = adminDraft[type].some((entry) => {
+    if (!entry.is_active || entry.id === item.id || entry.name.toLowerCase() !== name.toLowerCase()) return false;
+    return type !== "products" || entry.category_id === item.category_id;
+  });
+  if (duplicate) throw new Error("Taka nazwa już istnieje.");
+}
+
+function normalizeAdminDraftPositions() {
+  ["categories", "stores"].forEach((type) => {
+    adminDraft[type]
+      .filter((entry) => entry.is_active)
+      .sort((a, b) => a.position - b.position)
+      .forEach((entry, index) => { entry.position = (index + 1) * 10; });
+  });
+  adminDraft.categories.forEach((category) => {
+    adminDraft.products
+      .filter((product) => product.is_active && product.category_id === category.id)
+      .sort((a, b) => a.position - b.position)
+      .forEach((product, index) => { product.position = (index + 1) * 10; });
+  });
+}
+
+function settleAdminListAnimations(list) {
+  list?.querySelectorAll(".admin-row:not(.is-admin-dragging)").forEach((row) => {
+    row.getAnimations?.()
+      .filter((animation) => animation.id === "admin-list-shift")
+      .forEach((animation) => animation.cancel());
+  });
+}
+
+function animateAdminListShift(list, beforePositions) {
+  list.querySelectorAll(".admin-row[data-id]:not(.is-admin-dragging)").forEach((row) => {
+    const before = beforePositions.get(row.dataset.id);
+    if (!before) return;
+    const after = row.getBoundingClientRect();
+    const deltaY = before.top - after.top;
+    if (Math.abs(deltaY) < 1 || !row.animate) return;
+    const animation = row.animate(
+      [{ transform: `translate3d(0, ${deltaY}px, 0)` }, { transform: "translate3d(0, 0, 0)" }],
+      { duration: 190, easing: "cubic-bezier(.2, .8, .2, 1)" }
+    );
+    animation.id = "admin-list-shift";
+  });
+}
+
+function cancelAdminLongPress() {
+  if (!adminPressState) return;
+  clearTimeout(adminPressState.timer);
+  adminPressState.row.classList.remove("is-admin-pressing");
+  adminPressState = null;
+}
+
+function updateAdminDraftOrder(list) {
+  if (!adminDraft) return;
+  const type = list.dataset.adminList;
+  [...list.querySelectorAll(".admin-row[data-id]")].forEach((row, index) => {
+    const item = adminDraft[type]?.find((entry) => entry.id === row.dataset.id);
+    if (item) item.position = (index + 1) * 10;
+  });
+}
+
+function finishAdminDrag({ applyOrder = true } = {}) {
+  if (!adminDragState) return;
+  const { row, placeholder, list, scrollLock } = adminDragState;
+  settleAdminListAnimations(list);
+  if (placeholder.isConnected) placeholder.replaceWith(row);
+  row.classList.remove("is-admin-dragging");
+  row.removeAttribute("style");
+  list.classList.remove("is-admin-sorting");
+  document.body.classList.remove("admin-reordering");
+  adminDragState = null;
+  unlockPageScroll(scrollLock);
+  adminSuppressClickUntil = Date.now() + 350;
+  if (applyOrder) {
+    updateAdminDraftOrder(list);
+    renderAdminList();
+  }
+}
+
+function startAdminDragFromPress() {
+  if (!adminPressState || !adminDraft) return;
+  const { row, pointerId, startX, startY, captureTarget } = adminPressState;
+  const list = row.closest(".admin-sort-list");
+  if (!list) return cancelAdminLongPress();
+  const rect = row.getBoundingClientRect();
+  const placeholder = document.createElement("div");
+  placeholder.className = "admin-row-placeholder";
+  placeholder.style.height = `${rect.height}px`;
+  row.after(placeholder);
+
+  try { captureTarget.setPointerCapture(pointerId); } catch { /* wskaźnik mógł zostać zwolniony */ }
+  row.classList.remove("is-admin-pressing");
+  row.classList.add("is-admin-dragging");
+  list.classList.add("is-admin-sorting");
+  document.body.classList.add("admin-reordering");
+  const scrollLock = lockPageScroll();
+  Object.assign(row.style, {
+    position: "fixed",
+    top: `${rect.top}px`,
+    left: `${rect.left}px`,
+    width: `${rect.width}px`,
+    height: `${rect.height}px`,
+    margin: "0",
+    pointerEvents: "none",
+    transform: "translate3d(0, 0, 0) scale(1.015)"
+  });
+  adminDragState = { row, list, placeholder, startX, startY, scrollLock, lastPlacement: "" };
+  adminPressState = null;
+  if (navigator.vibrate) navigator.vibrate(25);
+}
+
+function openAdminMode() {
+  if (!currentUserIsAdmin || isDemoMode || isAdminEditMode) return;
+  adminDraft = JSON.parse(JSON.stringify(managementCatalog));
+  normalizeAdminDraftPositions();
+  adminTab = "categories";
+  adminEditingItem = null;
+  adminPendingDelete = null;
+  adminMessage.textContent = "";
+  isAdminEditMode = true;
+  document.body.classList.add("admin-editing");
+  adminView.classList.remove("is-hidden");
+  document.querySelector("#adminModeLabel").textContent = "Zapisz i wyjdź";
+  document.querySelector("#themeColorMeta")?.setAttribute("content", "#d84a42");
+  profilePopover.classList.add("is-hidden");
+  renderAdminList();
+  window.scrollTo(0, 0);
+}
+
+function closeAdminModeWithoutSaving() {
+  cancelAdminLongPress();
+  finishAdminDrag({ applyOrder: false });
+  isAdminEditMode = false;
+  isAdminSaving = false;
+  adminDraft = null;
+  adminEditingItem = null;
+  adminPendingDelete = null;
+  document.body.classList.remove("admin-editing");
+  adminView.classList.add("is-hidden");
+  adminModeButton.disabled = false;
+  document.querySelector("#adminModeLabel").textContent = "Tryb edycji";
+  setTheme(document.documentElement.dataset.theme || "light");
+}
+
+async function saveAndCloseAdminMode() {
+  if (!isAdminEditMode || isAdminSaving || !adminDraft) return;
+  if (adminEditingItem || adminPendingDelete) {
+    adminMessage.textContent = "Najpierw zatwierdź albo anuluj otwartą zmianę.";
+    profilePopover.classList.add("is-hidden");
+    return;
+  }
+  isAdminSaving = true;
+  profilePopover.classList.add("is-hidden");
+  adminModeButton.disabled = true;
+  document.querySelector("#adminModeLabel").textContent = "Zapisywanie…";
+  setConnectionStatus("syncing", "zapisywanie…");
+  try {
+    await window.ShoppingDB.saveAdminCatalog(adminDraft);
+    closeAdminModeWithoutSaving();
+    await refreshRemoteData();
+  } catch (error) {
+    console.error(error);
+    isAdminSaving = false;
+    adminModeButton.disabled = false;
+    document.querySelector("#adminModeLabel").textContent = "Spróbuj zapisać";
+    adminMessage.textContent = error.code === "23505"
+      ? "Nazwa kategorii, produktu lub sklepu już istnieje."
+      : (error.message || "Nie udało się zapisać zmian.");
+    setConnectionStatus("offline", "błąd zapisu");
+    profilePopover.classList.add("is-hidden");
+  }
 }
 
 function itemMarkup(item) {
@@ -396,7 +841,7 @@ function itemMarkup(item) {
         </div>
         <span class="item-meta">${escapeHtml(item.category)} · dodał(a): ${escapeHtml(item.addedBy)}</span>
       </div>
-      <button class="delete-button" type="button" aria-label="Usuń ${escapeHtml(item.name)}" data-action="delete">
+      <button class="delete-button" type="button" aria-label="Usuń ${escapeAttribute(item.name)}" data-action="delete">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 7h14M9 7V4h6v3m2 0-1 13H8L7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </article>`;
@@ -411,7 +856,7 @@ function groupedItemsMarkup(list) {
   return [...groups.entries()].map(([store, storeItems]) => `
     <div class="store-group">
       <div class="store-heading"><i>${escapeHtml(store.slice(0, 1))}</i><h3>${escapeHtml(store)}</h3></div>
-      <div class="items-list" data-store="${escapeHtml(store)}">${storeItems.map(itemMarkup).join("")}</div>
+      <div class="items-list" data-store="${escapeAttribute(store)}">${storeItems.map(itemMarkup).join("")}</div>
     </div>
   `).join("");
 }
@@ -451,7 +896,7 @@ function renderProductPicker(category) {
   pickerTitle.textContent = category.name;
   pickerBack.classList.remove("is-hidden");
   pickerContent.innerHTML = `<div class="picker-options">${category.products.map((product) => `
-    <button class="picker-option" type="button" data-picker-action="product" data-value="${escapeHtml(product)}">
+    <button class="picker-option" type="button" data-picker-action="product" data-value="${escapeAttribute(product)}">
       <span class="picker-option-icon">${escapeHtml(category.icon)}</span>
       <span class="picker-option-copy"><strong>${escapeHtml(product)}</strong><small>Wybierz produkt</small></span>
       ${optionArrow()}
@@ -482,7 +927,7 @@ function renderStorePicker() {
   pickerTitle.textContent = "Wybierz sklep";
   pickerBack.classList.add("is-hidden");
   pickerContent.innerHTML = `<div class="picker-options">${storeNames.map((store) => `
-    <button class="picker-option ${store === selectedStore ? "is-selected" : ""}" type="button" data-picker-action="store" data-value="${escapeHtml(store)}">
+    <button class="picker-option ${store === selectedStore ? "is-selected" : ""}" type="button" data-picker-action="store" data-value="${escapeAttribute(store)}">
       <span class="picker-option-icon">🏪</span>
       <span class="picker-option-copy"><strong>${escapeHtml(store)}</strong><small>${store === selectedStore ? "Aktualnie wybrany" : "Ustaw jako domyślny"}</small></span>
       ${store === selectedStore ? '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12 4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ""}
@@ -535,6 +980,94 @@ function renderAddCategoryForm() {
       <button class="catalog-form-submit" type="submit">Zapisz kategorię</button>
     </form>`;
   window.setTimeout(() => document.querySelector("#newCategoryName")?.focus(), 50);
+}
+
+function renderCreateListForm() {
+  pickerMode = "create-list";
+  pickerTitle.textContent = "Utwórz listę";
+  pickerBack.classList.add("is-hidden");
+  const selectableUsers = manageableUsers.filter((user) => user.user_id !== currentSession?.user?.id);
+  pickerContent.innerHTML = `
+    <form class="list-create-form">
+      <label for="newListName">Nazwa listy</label>
+      <input id="newListName" name="name" type="text" minlength="2" maxlength="60" placeholder="Np. Znajomi" autocomplete="off" required>
+      <fieldset class="list-members-fieldset">
+        <legend>Dodaj użytkowników</legend>
+        <p>Ty zostaniesz administratorem. Pozostałe osoby możesz zaznaczyć poniżej.</p>
+        <div class="list-member-options">
+          ${selectableUsers.length ? selectableUsers.map((user) => `
+            <label class="list-member-option">
+              <input type="checkbox" name="memberIds" value="${escapeAttribute(user.user_id)}">
+              <span><strong>${escapeHtml(user.display_name)}</strong><small>@${escapeHtml(user.username)}</small></span>
+            </label>`).join("") : '<span class="list-members-empty">Brak innych użytkowników do dodania.</span>'}
+        </div>
+      </fieldset>
+      <p class="catalog-form-message" role="alert"></p>
+      <button class="catalog-form-submit" type="submit">Utwórz listę</button>
+    </form>`;
+  window.setTimeout(() => document.querySelector("#newListName")?.focus(), 50);
+}
+
+async function openCreateListForm() {
+  if (!currentUserIsDev || isDemoMode) return;
+  profilePopover.classList.add("is-hidden");
+  pickerMode = "create-list-loading";
+  pickerTitle.textContent = "Utwórz listę";
+  pickerBack.classList.add("is-hidden");
+  pickerContent.innerHTML = '<div class="list-form-loading">Ładowanie użytkowników…</div>';
+  pickerBackdrop.classList.remove("is-hidden");
+  pickerSheet.classList.remove("is-hidden");
+  document.body.classList.add("picker-open");
+  try {
+    manageableUsers = await window.ShoppingDB.loadManageableUsers();
+    renderCreateListForm();
+  } catch (error) {
+    console.error(error);
+    pickerContent.innerHTML = `<div class="list-form-error">${escapeHtml(error.message || "Nie udało się pobrać użytkowników.")}</div>`;
+  }
+}
+
+function renderCreateUserForm() {
+  pickerMode = "create-user";
+  pickerTitle.textContent = "Dodaj użytkownika";
+  pickerBack.classList.add("is-hidden");
+  pickerContent.innerHTML = `
+    <form class="list-create-form user-create-form">
+      <label for="newUserDisplayName">Nazwa użytkownika</label>
+      <input id="newUserDisplayName" name="displayName" type="text" minlength="2" maxlength="60" placeholder="Np. Patryk" autocomplete="off" required>
+      <label for="newUserLogin">Login</label>
+      <input id="newUserLogin" name="login" type="text" minlength="2" maxlength="30" pattern="[a-zA-Z0-9_-]+" placeholder="Np. patryk" autocapitalize="none" autocomplete="off" required>
+      <label for="newUserPassword">Hasło startowe</label>
+      <input id="newUserPassword" name="password" type="password" minlength="8" maxlength="72" placeholder="Minimum 8 znaków" autocomplete="new-password" required>
+      <label for="newUserListRole">Rola na wybranych listach</label>
+      <select id="newUserListRole" name="listRole">
+        <option value="member">Użytkownik</option>
+        <option value="admin">Administrator katalogu</option>
+      </select>
+      <fieldset class="list-members-fieldset">
+        <legend>Przypisz do list</legend>
+        <p>Użytkownik od razu otrzyma dostęp do wszystkich zaznaczonych list.</p>
+        <div class="list-member-options">
+          ${availableLists.map((list) => `
+            <label class="list-member-option">
+              <input type="checkbox" name="listIds" value="${escapeAttribute(list.id)}" ${list.id === currentList?.id ? "checked" : ""}>
+              <span><strong>${escapeHtml(list.name)}</strong><small>Dostęp do listy zakupów</small></span>
+            </label>`).join("")}
+        </div>
+      </fieldset>
+      <p class="catalog-form-message" role="alert"></p>
+      <button class="catalog-form-submit" type="submit">Utwórz użytkownika</button>
+    </form>`;
+  window.setTimeout(() => document.querySelector("#newUserDisplayName")?.focus(), 50);
+}
+
+function openCreateUserForm() {
+  if (!currentUserIsDev || isDemoMode) return;
+  profilePopover.classList.add("is-hidden");
+  renderCreateUserForm();
+  pickerBackdrop.classList.remove("is-hidden");
+  pickerSheet.classList.remove("is-hidden");
+  document.body.classList.add("picker-open");
 }
 
 function openCatalogEditor(type) {
@@ -826,7 +1359,7 @@ loginForm.addEventListener("submit", async (event) => {
     console.error(error);
     if (signedInSession) showDatabaseRecovery(signedInSession);
     else {
-      loginMessage.textContent = "Nieprawidłowy login lub hasło albo brak dostępu do rodziny.";
+      loginMessage.textContent = "Nieprawidłowy login lub hasło albo brak dostępu do aplikacji.";
       await window.ShoppingDB.signOut().catch(() => {});
     }
   } finally {
@@ -835,6 +1368,20 @@ loginForm.addEventListener("submit", async (event) => {
 });
 
 document.querySelector("#demoButton").addEventListener("click", enterDemoMode);
+listCards.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-list-id]");
+  if (!button) return;
+  const list = availableLists.find((entry) => entry.id === button.dataset.listId);
+  if (list) void openShoppingList(list);
+});
+listBackButton.addEventListener("click", async () => {
+  if (isDemoMode || availableLists.length < 2) return;
+  listBackButton.disabled = true;
+  if (pendingDeletionIds.size) setConnectionStatus("syncing", "kończenie zapisu…");
+  await deletionQueue;
+  await showListSelection();
+  listBackButton.disabled = false;
+});
 document.querySelector("#logoutButton").addEventListener("click", async () => {
   realtimeGeneration += 1;
   unsubscribeRealtime?.();
@@ -876,6 +1423,10 @@ pickerContent.addEventListener("click", (event) => {
   const option = event.target.closest("[data-picker-action]");
   if (!option) return;
   const { pickerAction, value } = option.dataset;
+  if (pickerAction === "close") {
+    closePicker();
+    return;
+  }
   if (pickerAction === "category") {
     const category = productCatalog.find((item) => item.id === value);
     if (category) renderProductPicker(category);
@@ -894,13 +1445,90 @@ pickerContent.addEventListener("click", (event) => {
     selectedStore = value;
     hasDefaultStore = true;
     storeConfirmed = true;
-    localStorage.setItem(STORE_KEY, value);
+    localStorage.setItem(selectedStoreStorageKey(), value);
     updateProductDraft();
     closePicker();
   }
 });
 
 pickerContent.addEventListener("submit", async (event) => {
+  const userForm = event.target.closest(".user-create-form");
+  if (userForm) {
+    event.preventDefault();
+    if (!userForm.checkValidity()) {
+      userForm.reportValidity();
+      return;
+    }
+    const message = userForm.querySelector(".catalog-form-message");
+    const submitButton = userForm.querySelector("button[type='submit']");
+    const listIds = [...userForm.querySelectorAll("input[name='listIds']:checked")].map((input) => input.value);
+    if (!listIds.length) {
+      message.textContent = "Wybierz przynajmniej jedną listę.";
+      return;
+    }
+    const login = userForm.elements.login.value.trim().toLowerCase();
+    const displayName = userForm.elements.displayName.value.trim();
+    const password = userForm.elements.password.value;
+    const listRole = userForm.elements.listRole.value;
+    submitButton.disabled = true;
+    message.textContent = "";
+    try {
+      setConnectionStatus("syncing", "tworzenie konta…");
+      await window.ShoppingDB.createUser({ login, displayName, password, listIds, listRole });
+      manageableUsers = [];
+      pickerTitle.textContent = "Użytkownik dodany";
+      pickerContent.innerHTML = `
+        <div class="user-create-success">
+          <span>✓</span>
+          <strong>${escapeHtml(displayName)}</strong>
+          <p>Nowe konto może zalogować się loginem <b>${escapeHtml(login)}</b> i ustawionym hasłem.</p>
+          <button class="catalog-form-submit" type="button" data-picker-action="close">Gotowe</button>
+        </div>`;
+      setConnectionStatus("online", "połączono");
+    } catch (error) {
+      console.error(error);
+      message.textContent = error.message || "Nie udało się utworzyć użytkownika.";
+      setConnectionStatus("offline", "błąd zapisu");
+    } finally {
+      submitButton.disabled = false;
+    }
+    return;
+  }
+
+  const listForm = event.target.closest(".list-create-form");
+  if (listForm) {
+    event.preventDefault();
+    if (!listForm.checkValidity()) {
+      listForm.reportValidity();
+      return;
+    }
+    const message = listForm.querySelector(".catalog-form-message");
+    const submitButton = listForm.querySelector("button[type='submit']");
+    const name = listForm.elements.name.value.trim();
+    const memberIds = [...listForm.querySelectorAll("input[name='memberIds']:checked")].map((input) => input.value);
+    submitButton.disabled = true;
+    message.textContent = "";
+    try {
+      setConnectionStatus("syncing", "tworzenie listy…");
+      const newListId = await window.ShoppingDB.createShoppingList(name, memberIds);
+      const context = await window.ShoppingDB.loadUserContext();
+      currentProfile = context.profile;
+      availableLists = context.lists;
+      closePicker();
+      await showListSelection();
+      const newList = availableLists.find((list) => list.id === newListId);
+      if (!newList) throw new Error("Lista powstała, ale nie udało się jej od razu otworzyć. Odśwież połączenie.");
+      await openShoppingList(newList);
+    } catch (error) {
+      console.error(error);
+      message.textContent = error.message || "Nie udało się utworzyć listy.";
+      setConnectionStatus("offline", "błąd zapisu");
+    } finally {
+      submitButton.disabled = false;
+    }
+    return;
+  }
+
   const form = event.target.closest(".catalog-form");
   if (!form) return;
   event.preventDefault();
@@ -1095,7 +1723,7 @@ document.querySelectorAll(".section-toggle").forEach((button) => {
 });
 
 document.addEventListener("touchmove", (event) => {
-  if (dragState) event.preventDefault();
+  if (dragState || adminDragState) event.preventDefault();
 }, { passive: false });
 
 clearButton.addEventListener("click", async () => {
@@ -1115,12 +1743,161 @@ clearButton.addEventListener("click", async () => {
   }
 });
 
+document.querySelector(".admin-tabs").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-admin-tab]");
+  if (!button || !isAdminEditMode) return;
+  if (adminEditingItem || adminPendingDelete) {
+    adminMessage.textContent = "Najpierw zatwierdź albo anuluj otwartą zmianę.";
+    return;
+  }
+  adminTab = button.dataset.adminTab;
+  renderAdminList();
+});
+
+adminList.addEventListener("click", (event) => {
+  if (Date.now() < adminSuppressClickUntil && event.target.closest(".admin-row")) {
+    event.preventDefault();
+    event.stopPropagation();
+    return;
+  }
+  const actionButton = event.target.closest("[data-admin-action]");
+  if (!actionButton || !adminDraft) return;
+  const action = actionButton.dataset.adminAction;
+
+  if (action === "cancel-edit") {
+    adminEditingItem = null;
+    renderAdminList();
+    return;
+  }
+
+  const row = actionButton.closest("[data-admin-type]");
+  if (!row) return;
+  const type = row.dataset.adminType;
+  const id = row.dataset.id;
+
+  if (action === "edit") {
+    adminPendingDelete = null;
+    adminEditingItem = { type, id };
+    renderAdminList();
+    window.setTimeout(() => adminList.querySelector(".admin-inline-form input[name='name']")?.focus(), 20);
+  }
+  if (action === "delete") {
+    adminEditingItem = null;
+    adminPendingDelete = { type, id };
+    renderAdminList();
+  }
+  if (action === "cancel-delete") {
+    adminPendingDelete = null;
+    renderAdminList();
+  }
+  if (action === "confirm-delete") markAdminItemDeleted(type, id);
+});
+
+adminList.addEventListener("pointerdown", (event) => {
+  const row = event.target.closest(".admin-row[data-admin-type]");
+  if (!row || event.button !== 0 || !adminDraft || adminEditingItem || adminPendingDelete) return;
+  if (event.target.closest("button, input, select, textarea, a, .admin-row-actions, .admin-delete-confirm, .admin-inline-form")) return;
+  cancelAdminLongPress();
+  try { row.setPointerCapture(event.pointerId); } catch { /* starsza przeglądarka */ }
+  row.classList.add("is-admin-pressing");
+  adminPressState = {
+    row,
+    pointerId: event.pointerId,
+    startX: event.clientX,
+    startY: event.clientY,
+    captureTarget: row,
+    timer: setTimeout(startAdminDragFromPress, 380)
+  };
+});
+
+adminList.addEventListener("pointermove", (event) => {
+  if (!adminDragState && adminPressState) {
+    const distance = Math.hypot(
+      event.clientX - adminPressState.startX,
+      event.clientY - adminPressState.startY
+    );
+    if (distance > 9) cancelAdminLongPress();
+    return;
+  }
+  if (!adminDragState) return;
+  event.preventDefault();
+  const { row, list, placeholder, startX, startY } = adminDragState;
+  row.style.transform = `translate3d(${event.clientX - startX}px, ${event.clientY - startY}px, 0) scale(1.015)`;
+
+  const targetList = document.elementsFromPoint(event.clientX, event.clientY)
+    .map((element) => element.closest?.(".admin-sort-list"))
+    .find(Boolean);
+  if (targetList !== list) return;
+
+  settleAdminListAnimations(list);
+  const siblings = [...list.querySelectorAll(".admin-row[data-id]:not(.is-admin-dragging)")];
+  const insertBefore = siblings.find((element) => {
+    const rect = element.getBoundingClientRect();
+    return event.clientY < rect.top + rect.height / 2;
+  });
+  const placementKey = insertBefore?.dataset.id || "end";
+  if (placementKey === adminDragState.lastPlacement) return;
+
+  const beforePositions = new Map();
+  siblings.forEach((element) => beforePositions.set(element.dataset.id, element.getBoundingClientRect()));
+  if (insertBefore) insertBefore.before(placeholder);
+  else list.append(placeholder);
+  adminDragState.lastPlacement = placementKey;
+  animateAdminListShift(list, beforePositions);
+});
+
+adminList.addEventListener("pointerup", () => {
+  if (adminDragState) finishAdminDrag();
+  else cancelAdminLongPress();
+});
+
+adminList.addEventListener("pointercancel", () => {
+  if (adminDragState) finishAdminDrag();
+  else cancelAdminLongPress();
+});
+
+adminList.addEventListener("submit", (event) => {
+  const form = event.target.closest("[data-admin-form]");
+  if (!form || !adminDraft) return;
+  event.preventDefault();
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
+  const type = form.dataset.adminForm;
+  const item = adminDraft[type].find((entry) => entry.id === form.dataset.id);
+  if (!item) return;
+  const name = form.elements.name.value.trim();
+  try {
+    validateAdminName(type, item, name);
+    item.name = name;
+    if (type === "categories") item.icon = form.elements.icon.value.trim() || "🛒";
+    adminEditingItem = null;
+    renderAdminList();
+  } catch (error) {
+    adminMessage.textContent = error.message;
+  }
+});
+
+adminModeButton.addEventListener("click", () => {
+  if (isAdminEditMode) void saveAndCloseAdminMode();
+  else openAdminMode();
+});
+
 document.querySelector("#profileButton").addEventListener("click", () => profilePopover.classList.toggle("is-hidden"));
 document.querySelector("#addProductMenuButton").addEventListener("click", () => openCatalogEditor("product"));
 document.querySelector("#addCategoryMenuButton").addEventListener("click", () => openCatalogEditor("category"));
 document.querySelector("#addStoreMenuButton").addEventListener("click", () => openCatalogEditor("store"));
+createListMenuButton.addEventListener("click", () => void openCreateListForm());
+createUserMenuButton.addEventListener("click", openCreateUserForm);
 document.addEventListener("click", (event) => {
   if (!event.target.closest("#profileButton") && !event.target.closest("#profilePopover")) profilePopover.classList.add("is-hidden");
+});
+
+window.addEventListener("beforeunload", (event) => {
+  if (!isAdminEditMode || isAdminSaving) return;
+  event.preventDefault();
+  event.returnValue = "";
 });
 
 const savedTheme = localStorage.getItem(THEME_KEY);
@@ -1158,7 +1935,7 @@ window.setInterval(() => {
   if (document.visibilityState === "visible") void checkForAppUpdate();
 }, 15 * 60 * 1000);
 window.setInterval(() => {
-  if (document.visibilityState === "visible" && !isDemoMode && currentSession && navigator.onLine && connectionState !== "syncing") {
+  if (document.visibilityState === "visible" && !isDemoMode && currentSession && currentList && navigator.onLine && connectionState !== "syncing") {
     void refreshRemoteItems();
   }
 }, 60 * 1000);

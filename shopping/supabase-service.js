@@ -18,24 +18,67 @@
   let memberById = new Map();
   let categoryNameById = new Map();
   let categoryById = new Map();
+  let activeListId = null;
 
   function assertNoError(result) {
     if (result.error) throw result.error;
     return result.data;
   }
 
+  function requireActiveList() {
+    if (!activeListId) throw new Error("Najpierw wybierz listę zakupów.");
+    return activeListId;
+  }
+
+  function setActiveList(listId) {
+    activeListId = listId || null;
+    productById = new Map();
+    storeById = new Map();
+    memberById = new Map();
+    categoryNameById = new Map();
+    categoryById = new Map();
+  }
+
+  async function loadUserContext() {
+    const { data: userData, error: userError } = await client.auth.getUser();
+    if (userError || !userData.user) throw userError || new Error("Brak sesji użytkownika.");
+    const userId = userData.user.id;
+    const [profileResult, listsResult, membershipsResult] = await Promise.all([
+      client.from("profiles").select("user_id,username,display_name,theme,role").eq("user_id", userId).maybeSingle(),
+      client.from("shopping_lists").select("id,name,position,created_at").order("position").order("created_at"),
+      client.from("members").select("list_id,role").eq("user_id", userId)
+    ]);
+    const profile = assertNoError(profileResult);
+    const memberships = assertNoError(membershipsResult);
+    const roleByListId = new Map(memberships.map((membership) => [membership.list_id, membership.role]));
+    const lists = assertNoError(listsResult)
+      .filter((list) => roleByListId.has(list.id))
+      .map((list) => ({ ...list, role: roleByListId.get(list.id) || "member" }));
+    return { profile, lists };
+  }
+
   async function loadCatalog() {
-    const [storesResult, categoriesResult, productsResult, membersResult] = await Promise.all([
-      client.from("stores").select("id,name,position").eq("is_active", true).order("position"),
-      client.from("categories").select("id,name,icon,position").eq("is_active", true).order("position"),
-      client.from("products").select("id,category_id,name,position").eq("is_active", true).order("position"),
-      client.from("family_members").select("user_id,username,display_name,theme")
+    const listId = requireActiveList();
+    const [storesResult, categoriesResult, productsResult, membershipsResult] = await Promise.all([
+      client.from("stores").select("id,name,position,is_active").eq("list_id", listId).order("position"),
+      client.from("categories").select("id,name,icon,position,is_active").eq("list_id", listId).order("position"),
+      client.from("products").select("id,category_id,name,position,is_active").eq("list_id", listId).order("position"),
+      client.from("members").select("user_id,role").eq("list_id", listId)
     ]);
 
     const stores = assertNoError(storesResult);
     const categories = assertNoError(categoriesResult);
     const products = assertNoError(productsResult);
-    const members = assertNoError(membersResult);
+    const memberships = assertNoError(membershipsResult);
+    const memberIds = memberships.map((membership) => membership.user_id);
+    const membersResult = memberIds.length
+      ? await client.from("profiles").select("user_id,username,display_name,theme").in("user_id", memberIds)
+      : { data: [], error: null };
+    const memberRoles = new Map(memberships.map((member) => [member.user_id, member.role]));
+    const members = assertNoError(membersResult).map((member) => ({
+      ...member,
+      role: memberRoles.get(member.user_id) || "member"
+    }));
 
     storeById = new Map(stores.map((store) => [store.id, store]));
     productById = new Map(products.map((product) => [product.id, product]));
@@ -43,10 +86,14 @@
     categoryNameById = new Map(categories.map((category) => [category.id, category.name]));
     categoryById = new Map(categories.map((category) => [category.id, category]));
 
+    const activeStores = stores.filter((store) => store.is_active);
+    const activeCategories = categories.filter((category) => category.is_active);
+    const activeCategoryIds = new Set(activeCategories.map((category) => category.id));
+    const activeProducts = products.filter((product) => product.is_active && activeCategoryIds.has(product.category_id));
     const productIdByKey = new Map();
-    const catalog = categories.map((category) => {
+    const catalog = activeCategories.map((category) => {
       const categoryProducts = products
-        .filter((product) => product.category_id === category.id)
+        .filter((product) => product.is_active && product.category_id === category.id)
         .map((product) => {
           productIdByKey.set(`${category.name}|${product.name}`, product.id);
           return product.name;
@@ -56,17 +103,24 @@
 
     return {
       catalog,
-      stores: stores.map((store) => store.name),
+      stores: activeStores.map((store) => store.name),
       productIdByKey,
-      storeIdByName: new Map(stores.map((store) => [store.name, store.id])),
-      members
+      storeIdByName: new Map(activeStores.map((store) => [store.name, store.id])),
+      members,
+      managementCatalog: {
+        categories: activeCategories.map((category) => ({ ...category })),
+        products: activeProducts.map((product) => ({ ...product })),
+        stores: activeStores.map((store) => ({ ...store }))
+      }
     };
   }
 
   async function loadItems() {
+    const listId = requireActiveList();
     const rows = assertNoError(await client
       .from("shopping_items")
       .select("id,product_id,store_id,quantity,is_purchased,position,added_by,created_at")
+      .eq("list_id", listId)
       .order("is_purchased")
       .order("position"));
 
@@ -120,9 +174,11 @@
   }
 
   async function addItem(item) {
+    const listId = requireActiveList();
     const { data: userData, error: userError } = await client.auth.getUser();
     if (userError || !userData.user) throw userError || new Error("Brak sesji użytkownika.");
     assertNoError(await client.from("shopping_items").insert({
+      list_id: listId,
       product_id: item.productId,
       store_id: item.storeId,
       quantity: item.quantity,
@@ -133,7 +189,8 @@
   }
 
   async function updateItem(id, changes) {
-    const save = async () => assertNoError(await client.from("shopping_items").update(changes).eq("id", id));
+    const listId = requireActiveList();
+    const save = async () => assertNoError(await client.from("shopping_items").update(changes).eq("id", id).eq("list_id", listId));
     try {
       await save();
     } catch (firstError) {
@@ -145,7 +202,8 @@
   }
 
   async function deleteItem(id) {
-    const remove = async () => assertNoError(await client.from("shopping_items").delete().eq("id", id));
+    const listId = requireActiveList();
+    const remove = async () => assertNoError(await client.from("shopping_items").delete().eq("id", id).eq("list_id", listId));
     try {
       await remove();
     } catch (firstError) {
@@ -157,15 +215,18 @@
   }
 
   async function clearPurchased() {
-    assertNoError(await client.from("shopping_items").delete().eq("is_purchased", true));
+    const listId = requireActiveList();
+    assertNoError(await client.from("shopping_items").delete().eq("list_id", listId).eq("is_purchased", true));
   }
 
   async function addProduct(categoryId, name) {
+    const listId = requireActiveList();
     const positions = [...productById.values()]
       .filter((product) => product.category_id === categoryId)
       .map((product) => product.position || 0);
     const position = (positions.length ? Math.max(...positions) : 0) + 10;
     assertNoError(await client.from("products").insert({
+      list_id: listId,
       category_id: categoryId,
       name: name.trim(),
       position,
@@ -174,9 +235,11 @@
   }
 
   async function addCategory(name, icon) {
+    const listId = requireActiveList();
     const positions = [...categoryById.values()].map((category) => category.position || 0);
     const position = (positions.length ? Math.max(...positions) : 0) + 10;
     assertNoError(await client.from("categories").insert({
+      list_id: listId,
       name: name.trim(),
       icon: icon.trim() || "🛒",
       position,
@@ -185,9 +248,11 @@
   }
 
   async function addStore(name) {
+    const listId = requireActiveList();
     const positions = [...storeById.values()].map((store) => store.position || 0);
     const position = (positions.length ? Math.max(...positions) : 0) + 10;
     assertNoError(await client.from("stores").insert({
+      list_id: listId,
       name: name.trim(),
       position,
       is_active: true
@@ -199,9 +264,62 @@
     const { data: userData, error: userError } = await client.auth.getUser();
     if (userError || !userData.user) throw userError || new Error("Brak sesji użytkownika.");
     assertNoError(await client
-      .from("family_members")
+      .from("profiles")
       .update({ theme })
       .eq("user_id", userData.user.id));
+  }
+
+  async function loadManageableUsers() {
+    return assertNoError(await client.rpc("get_manageable_users"));
+  }
+
+  async function createShoppingList(name, memberIds) {
+    return assertNoError(await client.rpc("create_shopping_list", {
+      p_name: name.trim(),
+      p_member_ids: memberIds
+    }));
+  }
+
+  async function createUser({ login, displayName, password, listIds, listRole }) {
+    const { data, error } = await client.functions.invoke("create-shopping-user", {
+      body: { login, displayName, password, listIds, listRole }
+    });
+    if (error) {
+      let message = error.message || "Nie udało się utworzyć użytkownika.";
+      try {
+        const details = await error.context?.json?.();
+        if (details?.error) message = details.error;
+      } catch { /* odpowiedź bez JSON */ }
+      throw new Error(message);
+    }
+    if (data?.error) throw new Error(data.error);
+    return data;
+  }
+
+  async function saveAdminCatalog(managementCatalog) {
+    const listId = requireActiveList();
+    assertNoError(await client.rpc("save_catalog_admin_changes", {
+      p_list_id: listId,
+      p_categories: managementCatalog.categories.map((category) => ({
+        id: category.id,
+        name: category.name.trim(),
+        icon: category.icon.trim() || "🛒",
+        position: category.position,
+        is_active: category.is_active
+      })),
+      p_products: managementCatalog.products.map((product) => ({
+        id: product.id,
+        name: product.name.trim(),
+        position: product.position,
+        is_active: product.is_active
+      })),
+      p_stores: managementCatalog.stores.map((store) => ({
+        id: store.id,
+        name: store.name.trim(),
+        position: store.position,
+        is_active: store.is_active
+      }))
+    }));
   }
 
   async function updateOrder(changes) {
@@ -212,16 +330,18 @@
   }
 
   function subscribe(onChange, onStatus) {
+    const listId = requireActiveList();
+    const filter = `list_id=eq.${listId}`;
     const itemsChannel = client
-      .channel("family-shopping-items")
-      .on("postgres_changes", { event: "*", schema: "public", table: "shopping_items" }, onChange)
+      .channel(`shopping-items-${listId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "shopping_items", filter }, onChange)
       .subscribe((status) => onStatus?.(status));
 
     const catalogChannel = client
-      .channel("family-shopping-catalog")
-      .on("postgres_changes", { event: "*", schema: "public", table: "stores" }, onChange)
-      .on("postgres_changes", { event: "*", schema: "public", table: "categories" }, onChange)
-      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, onChange)
+      .channel(`shopping-catalog-${listId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "stores", filter }, onChange)
+      .on("postgres_changes", { event: "*", schema: "public", table: "categories", filter }, onChange)
+      .on("postgres_changes", { event: "*", schema: "public", table: "products", filter }, onChange)
       .subscribe();
 
     return () => Promise.all([
@@ -236,6 +356,8 @@
     signOut,
     getSession,
     refreshSession,
+    loadUserContext,
+    setActiveList,
     loadInitialData,
     loadItems,
     addItem,
@@ -246,6 +368,10 @@
     addProduct,
     addStore,
     updateTheme,
+    loadManageableUsers,
+    createShoppingList,
+    createUser,
+    saveAdminCatalog,
     updateOrder,
     subscribe
   };
