@@ -56,6 +56,7 @@ const listSelectionMessage = document.querySelector("#listSelectionMessage");
 const listBackButton = document.querySelector("#listBackButton");
 const createListMenuButton = document.querySelector("#createListMenuButton");
 const createUserMenuButton = document.querySelector("#createUserMenuButton");
+const renameListMenuButton = document.querySelector("#renameListMenuButton");
 
 let items = [];
 let productCatalog = DEMO_PRODUCT_CATALOG;
@@ -220,6 +221,7 @@ function closeApp() {
   manageableUsers = [];
   createListMenuButton.classList.add("is-hidden");
   createUserMenuButton.classList.add("is-hidden");
+  renameListMenuButton.classList.add("is-hidden");
   window.ShoppingDB?.setActiveList(null);
   document.title = "Lista zakupów";
 }
@@ -253,6 +255,7 @@ async function showListSelection() {
   window.clearTimeout(realtimeRefreshTimer);
   currentList = null;
   window.ShoppingDB?.setActiveList(null);
+  renameListMenuButton.classList.add("is-hidden");
   items = [];
   currentUserIsAdmin = false;
   adminModeButton.classList.add("is-hidden");
@@ -398,6 +401,7 @@ async function openShoppingList(list) {
     const data = await window.ShoppingDB.loadInitialData();
     currentList = list;
     currentUserIsAdmin = currentUserIsDev || list.role === "admin";
+    renameListMenuButton.classList.toggle("is-hidden", !currentUserIsAdmin);
     adminModeButton.classList.toggle("is-hidden", !currentUserIsAdmin);
     document.querySelector("#listTitle").textContent = list.name;
     listBackButton.classList.toggle("is-hidden", availableLists.length < 2);
@@ -406,7 +410,7 @@ async function openShoppingList(list) {
     applyRemoteData(data);
     const displayName = currentProfile?.display_name || currentProfile?.username || "Użytkownik";
     document.querySelector("#profileMode").textContent = `${displayName}${currentUserIsDev ? " · Dev" : (currentUserIsAdmin ? " · Admin" : "")}`;
-    document.querySelector("#profileDescription").textContent = `Lista „${list.name}” jest synchronizowana z Supabase.`;
+    document.querySelector("#profileDescription").textContent = `Aktualna lista: „${list.name}”.`;
     setConnectionStatus("online", "połączono");
     showApp();
     document.title = `${list.name} · Lista zakupów`;
@@ -414,6 +418,7 @@ async function openShoppingList(list) {
   } catch (error) {
     console.error(error);
     currentList = null;
+    renameListMenuButton.classList.add("is-hidden");
     window.ShoppingDB.setActiveList(null);
     document.body.classList.add("choosing-list");
     listSelectionView.classList.remove("is-hidden");
@@ -437,6 +442,7 @@ async function enterDatabaseMode(session) {
   currentUserIsDev = currentProfile.role === "dev";
   createListMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
   createUserMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
+  renameListMenuButton.classList.add("is-hidden");
   availableLists = context.lists;
   if (!availableLists.length) throw new Error("Użytkownik nie jest przypisany do żadnej listy.");
   setTheme(currentProfile.theme || "light");
@@ -478,6 +484,7 @@ function showDatabaseRecovery(session) {
   adminModeButton.classList.add("is-hidden");
   createListMenuButton.classList.add("is-hidden");
   createUserMenuButton.classList.add("is-hidden");
+  renameListMenuButton.classList.add("is-hidden");
   syncStatus.disabled = false;
   const username = session.user.email?.split("@")[0] || "U";
   document.querySelector("#profileButton").textContent = username.slice(0, 1).toUpperCase();
@@ -522,6 +529,7 @@ function enterDemoMode() {
   adminModeButton.classList.add("is-hidden");
   createListMenuButton.classList.add("is-hidden");
   createUserMenuButton.classList.add("is-hidden");
+  renameListMenuButton.classList.add("is-hidden");
   syncStatus.disabled = true;
   productCatalog = DEMO_PRODUCT_CATALOG;
   storeNames = DEMO_STORES;
@@ -1070,6 +1078,29 @@ function openCreateUserForm() {
   document.body.classList.add("picker-open");
 }
 
+function openRenameListForm() {
+  if (!currentUserIsAdmin || !currentList || isDemoMode) return;
+  profilePopover.classList.add("is-hidden");
+  pickerMode = "rename-list";
+  pickerTitle.textContent = "Zmień nazwę listy";
+  pickerBack.classList.add("is-hidden");
+  pickerContent.innerHTML = `
+    <form class="list-create-form rename-list-form">
+      <label for="renamedListName">Nowa nazwa</label>
+      <input id="renamedListName" name="name" type="text" minlength="2" maxlength="60" value="${escapeAttribute(currentList.name)}" autocomplete="off" required>
+      <p class="catalog-form-message" role="alert"></p>
+      <button class="catalog-form-submit" type="submit">Zapisz nazwę</button>
+    </form>`;
+  pickerBackdrop.classList.remove("is-hidden");
+  pickerSheet.classList.remove("is-hidden");
+  document.body.classList.add("picker-open");
+  window.setTimeout(() => {
+    const input = document.querySelector("#renamedListName");
+    input?.focus();
+    input?.select();
+  }, 50);
+}
+
 function openCatalogEditor(type) {
   profilePopover.classList.add("is-hidden");
   if (type === "product") renderAddProductForm();
@@ -1452,6 +1483,39 @@ pickerContent.addEventListener("click", (event) => {
 });
 
 pickerContent.addEventListener("submit", async (event) => {
+  const renameForm = event.target.closest(".rename-list-form");
+  if (renameForm) {
+    event.preventDefault();
+    if (!renameForm.checkValidity()) {
+      renameForm.reportValidity();
+      return;
+    }
+    const message = renameForm.querySelector(".catalog-form-message");
+    const submitButton = renameForm.querySelector("button[type='submit']");
+    const name = renameForm.elements.name.value.trim();
+    submitButton.disabled = true;
+    message.textContent = "";
+    try {
+      setConnectionStatus("syncing", "zmiana nazwy…");
+      await window.ShoppingDB.renameShoppingList(currentList.id, name);
+      const listEntry = availableLists.find((list) => list.id === currentList.id);
+      if (listEntry) listEntry.name = name;
+      currentList.name = name;
+      document.querySelector("#listTitle").textContent = name;
+      document.querySelector("#profileDescription").textContent = `Aktualna lista: „${name}”.`;
+      document.title = `${name} · Lista zakupów`;
+      closePicker();
+      setConnectionStatus("online", "połączono");
+    } catch (error) {
+      console.error(error);
+      message.textContent = error.message || "Nie udało się zmienić nazwy listy.";
+      setConnectionStatus("offline", "błąd zapisu");
+    } finally {
+      submitButton.disabled = false;
+    }
+    return;
+  }
+
   const userForm = event.target.closest(".user-create-form");
   if (userForm) {
     event.preventDefault();
@@ -1890,6 +1954,7 @@ document.querySelector("#addCategoryMenuButton").addEventListener("click", () =>
 document.querySelector("#addStoreMenuButton").addEventListener("click", () => openCatalogEditor("store"));
 createListMenuButton.addEventListener("click", () => void openCreateListForm());
 createUserMenuButton.addEventListener("click", openCreateUserForm);
+renameListMenuButton.addEventListener("click", openRenameListForm);
 document.addEventListener("click", (event) => {
   if (!event.target.closest("#profileButton") && !event.target.closest("#profilePopover")) profilePopover.classList.add("is-hidden");
 });

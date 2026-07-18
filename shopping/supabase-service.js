@@ -139,7 +139,7 @@
         quantity: row.quantity,
         done: row.is_purchased,
         position: row.position,
-        addedBy: member?.display_name || member?.username || "Rodzina"
+        addedBy: member?.display_name || member?.username || "Grupa"
       };
     });
   }
@@ -280,6 +280,13 @@
     }));
   }
 
+  async function renameShoppingList(listId, name) {
+    assertNoError(await client.rpc("rename_shopping_list", {
+      p_list_id: listId,
+      p_name: name.trim()
+    }));
+  }
+
   async function createUser({ login, displayName, password, listIds, listRole }) {
     const { data, error } = await client.functions.invoke("create-shopping-user", {
       body: { login, displayName, password, listIds, listRole }
@@ -370,6 +377,7 @@
     updateTheme,
     loadManageableUsers,
     createShoppingList,
+    renameShoppingList,
     createUser,
     saveAdminCatalog,
     updateOrder,

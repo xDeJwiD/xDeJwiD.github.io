@@ -341,7 +341,8 @@ html[data-theme="dark"] body.admin-editing {
 body.admin-editing .app-content,
 body.admin-editing .composer-shell { display: none; }
 body.admin-editing #createListMenuButton,
-body.admin-editing #createUserMenuButton { display: none; }
+body.admin-editing #createUserMenuButton,
+body.admin-editing #renameListMenuButton { display: none; }
 body.admin-editing .app-header { border-bottom-color: color-mix(in srgb, var(--accent) 35%, var(--line)); }
 .profile-menu-actions .admin-mode-menu-button { margin-top: 14px; border-color: color-mix(in srgb, var(--danger) 45%, var(--line)); color: var(--danger); }
 .profile-menu-actions .admin-mode-menu-button:hover { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, var(--paper)); }
