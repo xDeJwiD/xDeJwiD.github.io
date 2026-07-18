@@ -58,6 +58,15 @@ button { color: inherit; }
 .is-hidden { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
+.session-splash { display: none; }
+.session-loading > main,
+.session-loading > .install-prompt-backdrop,
+.session-loading > .update-notice { visibility: hidden; }
+.session-loading .session-splash { position: fixed; inset: 0; z-index: 300; display: grid; place-content: center; justify-items: center; gap: 20px; background: var(--paper); }
+.session-splash img { width: 76px; height: 76px; border-radius: 19px; box-shadow: 0 12px 32px rgba(0, 189, 164, .17); }
+.session-splash span { width: 25px; height: 25px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: session-spinner .72s linear infinite; }
+@keyframes session-spinner { to { transform: rotate(360deg); } }
+
 .auth-view {
   min-height: 100vh;
   display: grid;
@@ -350,6 +359,8 @@ body.admin-editing .app-header { border-bottom-color: color-mix(in srgb, var(--a
 .profile-menu-actions .create-list-menu-button + .create-list-menu-button { margin-top: 0; }
 .profile-menu-actions .create-list-menu-button:hover { border-color: var(--accent); background: var(--accent-soft); }
 .profile-menu-actions .profile-logout { margin-top: 14px; }
+.profile-menu-actions .change-password-menu-button { margin-top: 14px; }
+.profile-menu-actions .change-password-menu-button + .profile-logout { margin-top: 7px; }
 
 .admin-view { width: min(100% - 40px, 672px); min-height: calc(100dvh - 66px); margin: 0 auto; padding: 42px 0 max(52px, env(safe-area-inset-bottom)); }
 .admin-intro { padding: 23px; border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line)); border-radius: 20px; background: color-mix(in srgb, var(--accent-soft) 54%, var(--card)); box-shadow: 0 14px 40px rgba(var(--danger-rgb), .08); }
@@ -401,6 +412,24 @@ body.admin-reordering { overflow: hidden; touch-action: none; user-select: none;
 .update-notice button:hover { background: var(--accent-dark); }
 @keyframes update-notice-in { from { opacity: 0; transform: translateY(10px); } }
 
+.install-prompt-open { overflow: hidden; }
+.install-prompt-backdrop { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: max(20px, env(safe-area-inset-top)) 18px max(20px, env(safe-area-inset-bottom)); background: rgba(10, 14, 11, .56); backdrop-filter: blur(5px); animation: fade-in .2s ease both; }
+.install-prompt { position: relative; width: min(100%, 390px); padding: 29px 25px 20px; border: 1px solid var(--line); border-radius: 25px; background: var(--card); box-shadow: 0 24px 80px rgba(0, 0, 0, .24); text-align: center; animation: install-prompt-in .26s cubic-bezier(.2,.8,.2,1) both; }
+.install-prompt-close { position: absolute; top: 12px; right: 12px; display: grid; width: 36px; height: 36px; place-items: center; padding: 0; border: 0; border-radius: 10px; color: var(--muted); background: transparent; cursor: pointer; }
+.install-prompt-close:hover { background: var(--accent-soft); }
+.install-prompt-close svg { width: 18px; }
+.install-prompt-icon { display: block; width: 72px; height: 72px; margin: 0 auto 18px; border-radius: 18px; box-shadow: 0 9px 25px rgba(0, 189, 164, .18); }
+.install-prompt h2 { margin: 0 20px 9px; font: 700 22px/1.2 Manrope, sans-serif; letter-spacing: -.6px; }
+.install-prompt > p { margin: 0 auto 20px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+.install-ios-guide { display: grid; grid-template-columns: 27px minmax(0, 1fr); align-items: center; gap: 9px 10px; margin: 2px 0 20px; padding: 13px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); text-align: left; font-size: 11px; line-height: 1.4; }
+.install-guide-step { display: grid; width: 25px; height: 25px; place-items: center; border-radius: 50%; color: var(--accent-contrast); background: var(--accent); font-size: 10px; font-weight: 800; }
+.install-ios-guide svg { width: 18px; margin-left: 3px; color: var(--accent); vertical-align: middle; }
+.install-prompt-action { width: 100%; height: 50px; border: 0; border-radius: 13px; color: var(--accent-contrast); background: var(--accent); font-weight: 800; cursor: pointer; }
+.install-prompt-action:hover { background: var(--accent-dark); }
+.install-prompt-action:disabled { opacity: .6; cursor: wait; }
+.install-prompt-later { margin-top: 7px; padding: 9px 16px; border: 0; color: var(--muted); background: transparent; font-size: 11px; font-weight: 700; cursor: pointer; }
+@keyframes install-prompt-in { from { opacity: 0; transform: translateY(14px) scale(.98); } }
+
 @media (max-width: 560px) {
   .auth-view { padding: 0; place-items: stretch; background: var(--card); }
   .auth-card { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; width: 100%; padding: 34px 24px; border: 0; border-radius: 0; box-shadow: none; }
@@ -427,6 +456,8 @@ body.admin-reordering { overflow: hidden; touch-action: none; user-select: none;
   .profile-popover { top: 59px; right: 14px; }
   .list-section { margin-top: 34px; }
   .update-notice { right: 12px; bottom: calc(84px + env(safe-area-inset-bottom)); max-width: calc(100% - 24px); }
+  .install-prompt-backdrop { place-items: end center; padding: 0; }
+  .install-prompt { width: 100%; padding: 28px 22px max(17px, env(safe-area-inset-bottom)); border-right: 0; border-bottom: 0; border-left: 0; border-radius: 25px 25px 0 0; }
   .admin-view { width: calc(100% - 28px); min-height: calc(100dvh - 66px - env(safe-area-inset-top)); padding-top: 26px; }
   .admin-intro { padding: 19px; }
   .admin-intro h1 { font-size: 26px; }

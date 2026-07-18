@@ -3,6 +3,8 @@ const PREVIOUS_STORAGE_KEY = "razem-shopping-items-v2";
 const THEME_KEY = "razem-theme";
 const STORE_KEY = "razem-selected-store";
 const APP_VERSION_KEY = "razem-app-version";
+const INSTALL_PROMPT_DISMISSED_KEY = "razem-install-prompt-dismissed";
+const INSTALL_PROMPT_RETRY_AFTER = 7 * 24 * 60 * 60 * 1000;
 const createId = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
 // Dane demonstracyjne. Później zastąpimy je kategoriami i produktami z Supabase.
@@ -57,6 +59,11 @@ const listBackButton = document.querySelector("#listBackButton");
 const createListMenuButton = document.querySelector("#createListMenuButton");
 const createUserMenuButton = document.querySelector("#createUserMenuButton");
 const renameListMenuButton = document.querySelector("#renameListMenuButton");
+const changePasswordMenuButton = document.querySelector("#changePasswordMenuButton");
+const installPromptBackdrop = document.querySelector("#installPromptBackdrop");
+const installPromptAction = document.querySelector("#installPromptAction");
+const installIosGuide = document.querySelector("#installIosGuide");
+const installPromptDescription = document.querySelector("#installPromptDescription");
 
 let items = [];
 let productCatalog = DEMO_PRODUCT_CATALOG;
@@ -107,6 +114,73 @@ let currentProfile = null;
 let listOpenInProgress = false;
 let currentUserIsDev = false;
 let manageableUsers = [];
+let deferredInstallPrompt = null;
+let installPromptMode = null;
+let installPromptPreview = false;
+
+function isAppInstalled() {
+  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+}
+
+function isIosDevice() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+}
+
+function isIosSafari() {
+  return isIosDevice() && /Safari/i.test(navigator.userAgent) && !/CriOS|FxiOS|EdgiOS|OPiOS/i.test(navigator.userAgent);
+}
+
+function isMobileDevice() {
+  return isIosDevice() || /Android|Mobile/i.test(navigator.userAgent) || window.matchMedia("(max-width: 760px) and (pointer: coarse)").matches;
+}
+
+function canShowInstallPrompt() {
+  if (isAppInstalled() || !isMobileDevice()) return false;
+  const dismissedAt = Number(localStorage.getItem(INSTALL_PROMPT_DISMISSED_KEY));
+  return !dismissedAt || Date.now() - dismissedAt >= INSTALL_PROMPT_RETRY_AFTER;
+}
+
+function showInstallPrompt(mode, preview = false) {
+  if ((!preview && !canShowInstallPrompt()) || !installPromptBackdrop.classList.contains("is-hidden")) return;
+  installPromptMode = mode;
+  installPromptPreview = preview;
+  const isIos = mode === "ios";
+  installIosGuide.classList.toggle("is-hidden", !isIos);
+  installPromptDescription.textContent = isIos && !preview && !isIosSafari()
+    ? "Na iPhonie otwórz tę stronę w Safari, a następnie wykonaj poniższe kroki."
+    : "Aplikacja będzie dostępna z ekranu głównego i otworzy się bez paska przeglądarki.";
+  installPromptAction.textContent = isIos ? "Rozumiem" : "Zainstaluj aplikację";
+  installPromptBackdrop.classList.remove("is-hidden");
+  document.body.classList.add("install-prompt-open");
+  window.setTimeout(() => installPromptAction.focus(), 50);
+}
+
+function closeInstallPrompt(remember = true) {
+  installPromptBackdrop.classList.add("is-hidden");
+  document.body.classList.remove("install-prompt-open");
+  if (remember && !installPromptPreview) localStorage.setItem(INSTALL_PROMPT_DISMISSED_KEY, String(Date.now()));
+  installPromptPreview = false;
+}
+
+async function handleInstallPromptAction() {
+  if (installPromptMode === "ios") {
+    closeInstallPrompt();
+    return;
+  }
+  if (!deferredInstallPrompt) {
+    if (installPromptPreview) closeInstallPrompt(false);
+    return;
+  }
+  installPromptAction.disabled = true;
+  try {
+    await deferredInstallPrompt.prompt();
+    const choice = await deferredInstallPrompt.userChoice;
+    closeInstallPrompt(choice.outcome !== "accepted");
+  } finally {
+    deferredInstallPrompt = null;
+    installPromptAction.disabled = false;
+  }
+}
 
 function hasActiveUserInteraction() {
   const inputFocused = document.activeElement?.matches?.("input, select, textarea");
@@ -222,6 +296,7 @@ function closeApp() {
   createListMenuButton.classList.add("is-hidden");
   createUserMenuButton.classList.add("is-hidden");
   renameListMenuButton.classList.add("is-hidden");
+  changePasswordMenuButton.classList.add("is-hidden");
   window.ShoppingDB?.setActiveList(null);
   document.title = "Lista zakupów";
 }
@@ -443,6 +518,7 @@ async function enterDatabaseMode(session) {
   createListMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
   createUserMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
   renameListMenuButton.classList.add("is-hidden");
+  changePasswordMenuButton.classList.remove("is-hidden");
   availableLists = context.lists;
   if (!availableLists.length) throw new Error("Użytkownik nie jest przypisany do żadnej listy.");
   setTheme(currentProfile.theme || "light");
@@ -485,6 +561,7 @@ function showDatabaseRecovery(session) {
   createListMenuButton.classList.add("is-hidden");
   createUserMenuButton.classList.add("is-hidden");
   renameListMenuButton.classList.add("is-hidden");
+  changePasswordMenuButton.classList.remove("is-hidden");
   syncStatus.disabled = false;
   const username = session.user.email?.split("@")[0] || "U";
   document.querySelector("#profileButton").textContent = username.slice(0, 1).toUpperCase();
@@ -530,6 +607,7 @@ function enterDemoMode() {
   createListMenuButton.classList.add("is-hidden");
   createUserMenuButton.classList.add("is-hidden");
   renameListMenuButton.classList.add("is-hidden");
+  changePasswordMenuButton.classList.add("is-hidden");
   syncStatus.disabled = true;
   productCatalog = DEMO_PRODUCT_CATALOG;
   storeNames = DEMO_STORES;
@@ -1101,6 +1179,29 @@ function openRenameListForm() {
   }, 50);
 }
 
+function openChangePasswordForm() {
+  if (isDemoMode || !currentSession) return;
+  profilePopover.classList.add("is-hidden");
+  pickerMode = "change-password";
+  pickerTitle.textContent = "Zmień hasło";
+  pickerBack.classList.add("is-hidden");
+  pickerContent.innerHTML = `
+    <form class="list-create-form password-change-form">
+      <label for="currentPassword">Obecne hasło</label>
+      <input id="currentPassword" name="currentPassword" type="password" minlength="6" maxlength="72" autocomplete="current-password" required>
+      <label for="newPassword">Nowe hasło</label>
+      <input id="newPassword" name="newPassword" type="password" minlength="8" maxlength="72" autocomplete="new-password" required>
+      <label for="repeatPassword">Powtórz nowe hasło</label>
+      <input id="repeatPassword" name="repeatPassword" type="password" minlength="8" maxlength="72" autocomplete="new-password" required>
+      <p class="catalog-form-message" role="alert"></p>
+      <button class="catalog-form-submit" type="submit">Zapisz nowe hasło</button>
+    </form>`;
+  pickerBackdrop.classList.remove("is-hidden");
+  pickerSheet.classList.remove("is-hidden");
+  document.body.classList.add("picker-open");
+  window.setTimeout(() => document.querySelector("#currentPassword")?.focus(), 50);
+}
+
 function openCatalogEditor(type) {
   profilePopover.classList.add("is-hidden");
   if (type === "product") renderAddProductForm();
@@ -1483,6 +1584,53 @@ pickerContent.addEventListener("click", (event) => {
 });
 
 pickerContent.addEventListener("submit", async (event) => {
+  const passwordForm = event.target.closest(".password-change-form");
+  if (passwordForm) {
+    event.preventDefault();
+    if (!passwordForm.checkValidity()) {
+      passwordForm.reportValidity();
+      return;
+    }
+    const message = passwordForm.querySelector(".catalog-form-message");
+    const submitButton = passwordForm.querySelector("button[type='submit']");
+    const currentPassword = passwordForm.elements.currentPassword.value;
+    const newPassword = passwordForm.elements.newPassword.value;
+    const repeatPassword = passwordForm.elements.repeatPassword.value;
+    if (newPassword !== repeatPassword) {
+      message.textContent = "Nowe hasła nie są takie same.";
+      return;
+    }
+    if (newPassword === currentPassword) {
+      message.textContent = "Nowe hasło musi być inne niż obecne.";
+      return;
+    }
+    submitButton.disabled = true;
+    message.textContent = "";
+    try {
+      setConnectionStatus("syncing", "zmiana hasła…");
+      currentSession = await window.ShoppingDB.changePassword(currentPassword, newPassword);
+      pickerTitle.textContent = "Hasło zmienione";
+      pickerContent.innerHTML = `
+        <div class="user-create-success">
+          <span>✓</span>
+          <strong>Gotowe</strong>
+          <p>Nowe hasło zostało zapisane. Nadal jesteś zalogowany na tym urządzeniu.</p>
+          <button class="catalog-form-submit" type="button" data-picker-action="close">Zamknij</button>
+        </div>`;
+      setConnectionStatus("online", "połączono");
+    } catch (error) {
+      console.error(error);
+      const errorText = String(error.message || "").toLowerCase();
+      message.textContent = errorText.includes("invalid login credentials")
+        ? "Obecne hasło jest nieprawidłowe."
+        : (error.message || "Nie udało się zmienić hasła.");
+      setConnectionStatus("online", "połączono");
+    } finally {
+      submitButton.disabled = false;
+    }
+    return;
+  }
+
   const renameForm = event.target.closest(".rename-list-form");
   if (renameForm) {
     event.preventDefault();
@@ -1955,6 +2103,7 @@ document.querySelector("#addStoreMenuButton").addEventListener("click", () => op
 createListMenuButton.addEventListener("click", () => void openCreateListForm());
 createUserMenuButton.addEventListener("click", openCreateUserForm);
 renameListMenuButton.addEventListener("click", openRenameListForm);
+changePasswordMenuButton.addEventListener("click", openChangePasswordForm);
 document.addEventListener("click", (event) => {
   if (!event.target.closest("#profileButton") && !event.target.closest("#profilePopover")) profilePopover.classList.add("is-hidden");
 });
@@ -1982,6 +2131,22 @@ syncStatus.addEventListener("click", () => {
   if (!isDemoMode) void reconnectDatabase();
 });
 updateButton.addEventListener("click", reloadToUpdate);
+installPromptAction.addEventListener("click", () => void handleInstallPromptAction());
+document.querySelector("#installPromptClose").addEventListener("click", () => closeInstallPrompt());
+document.querySelector("#installPromptLater").addEventListener("click", () => closeInstallPrompt());
+installPromptBackdrop.addEventListener("click", (event) => {
+  if (event.target === installPromptBackdrop) closeInstallPrompt();
+});
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  window.setTimeout(() => showInstallPrompt("native"), 1200);
+});
+window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  closeInstallPrompt(false);
+  localStorage.removeItem(INSTALL_PROMPT_DISMISSED_KEY);
+});
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") {
     void checkForAppUpdate();
@@ -1995,6 +2160,12 @@ window.addEventListener("pageshow", () => {
 window.addEventListener("load", () => {
   void registerAppWorker();
   void checkForAppUpdate();
+  const installPreview = new URLSearchParams(window.location.search).get("install-preview");
+  if (installPreview === "android" || installPreview === "ios") {
+    window.setTimeout(() => showInstallPrompt(installPreview === "ios" ? "ios" : "native", true), 350);
+  } else if (isIosDevice() && canShowInstallPrompt()) {
+    window.setTimeout(() => showInstallPrompt("ios"), 1800);
+  }
 });
 window.setInterval(() => {
   if (document.visibilityState === "visible") void checkForAppUpdate();
@@ -2006,7 +2177,10 @@ window.setInterval(() => {
 }, 60 * 1000);
 
 (async function restoreSession() {
-  if (!window.ShoppingDB) return;
+  if (!window.ShoppingDB) {
+    document.body.classList.remove("session-loading");
+    return;
+  }
   try {
     const session = await window.ShoppingDB.getSession();
     if (!session) return;
@@ -2019,5 +2193,7 @@ window.setInterval(() => {
   } catch (error) {
     console.error(error);
     loginMessage.textContent = "Nie udało się sprawdzić zapisanej sesji. Spróbuj ponownie po odzyskaniu internetu.";
+  } finally {
+    document.body.classList.remove("session-loading");
   }
 })();

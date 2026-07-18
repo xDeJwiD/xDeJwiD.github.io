@@ -173,6 +173,24 @@
     assertNoError(await client.auth.signOut());
   }
 
+  async function changePassword(currentPassword, newPassword) {
+    const session = await getSession();
+    if (!session?.user?.email) throw new Error("Brak aktywnej sesji użytkownika.");
+
+    assertNoError(await client.auth.signInWithPassword({
+      email: session.user.email,
+      password: currentPassword
+    }));
+    assertNoError(await client.auth.updateUser({ password: newPassword }));
+
+    // Zmiana hasła może unieważnić poprzednią sesję. Natychmiast tworzymy nową,
+    // aby użytkownik pozostał zalogowany na tym urządzeniu.
+    return assertNoError(await client.auth.signInWithPassword({
+      email: session.user.email,
+      password: newPassword
+    })).session;
+  }
+
   async function addItem(item) {
     const listId = requireActiveList();
     const { data: userData, error: userError } = await client.auth.getUser();
@@ -361,6 +379,7 @@
     client,
     signIn,
     signOut,
+    changePassword,
     getSession,
     refreshSession,
     loadUserContext,

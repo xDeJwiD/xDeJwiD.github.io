@@ -6,7 +6,7 @@
   <meta name="theme-color" id="themeColorMeta" content="#f6f5f0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Lista zakupów">
+  <meta name="apple-mobile-web-app-title" content="Lista Zakupów">
   <meta name="apple-mobile-web-app-status-bar-style" id="appleStatusBarMeta" content="default">
   <script>
     try {
@@ -27,7 +27,12 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="session-loading">
+  <div class="session-splash" id="sessionSplash" aria-label="Uruchamianie aplikacji">
+    <img src="ikon.png" alt="">
+    <span aria-hidden="true"></span>
+  </div>
+
   <main>
     <section class="auth-view" id="authView" aria-labelledby="authTitle">
       <div class="auth-card">
@@ -190,11 +195,34 @@
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 5.5 5.7v5.7c0 4.2 2.7 7.9 6.5 9.6 3.8-1.7 6.5-5.4 6.5-9.6V5.7L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 12h6M12 9v6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
             <b id="adminModeLabel">Tryb edycji</b>
           </button>
+          <button class="change-password-menu-button is-hidden" id="changePasswordMenuButton" type="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 10V8a5 5 0 0 1 10 0v2M5 10h14v11H5V10Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 14v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            Zmień hasło
+          </button>
           <button class="profile-logout" id="logoutButton" type="button">Wyloguj się</button>
         </div>
       </div>
     </section>
   </main>
+
+  <div class="install-prompt-backdrop is-hidden" id="installPromptBackdrop">
+    <section class="install-prompt" role="dialog" aria-modal="true" aria-labelledby="installPromptTitle" aria-describedby="installPromptDescription">
+      <button class="install-prompt-close" id="installPromptClose" type="button" aria-label="Zamknij">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+      <img class="install-prompt-icon" src="ikon.png" alt="">
+      <h2 id="installPromptTitle">Dodaj Listę Zakupów do telefonu</h2>
+      <p id="installPromptDescription">Aplikacja będzie dostępna z ekranu głównego i otworzy się bez paska przeglądarki.</p>
+      <div class="install-ios-guide is-hidden" id="installIosGuide">
+        <span class="install-guide-step">1</span>
+        <span>Naciśnij <b>Udostępnij</b> <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 15V3m0 0L8 7m4-4 4 4M5 11v9h14v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="install-guide-step">2</span>
+        <span>Wybierz <b>Do ekranu początkowego</b></span>
+      </div>
+      <button class="install-prompt-action" id="installPromptAction" type="button">Zainstaluj aplikację</button>
+      <button class="install-prompt-later" id="installPromptLater" type="button">Nie teraz</button>
+    </section>
+  </div>
 
   <aside class="update-notice is-hidden" id="updateNotice" role="status" aria-live="polite">
     <span id="updateNoticeText">Dostępna jest nowa wersja aplikacji.</span>

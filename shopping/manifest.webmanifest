@@ -1,6 +1,6 @@
 {
-  "name": "Grupowa lista zakupów",
-  "short_name": "Zakupy",
+  "name": "Lista Zakupów",
+  "short_name": "Lista Zakupów",
   "description": "Wspólna lista zakupów.",
   "lang": "pl",
   "id": "./",
@@ -12,8 +12,14 @@
   "theme_color": "#00bda4",
   "icons": [
     {
-      "src": "ikon.png",
-      "sizes": "1024x1024",
+      "src": "ikon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "ikon-512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     }

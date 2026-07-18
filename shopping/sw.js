@@ -1,4 +1,4 @@
-const CACHE_NAME = "grupowa-lista-2026.07.19.4";
+const CACHE_NAME = "grupowa-lista-2026.07.19.8";
 const APP_SHELL = [
   "./",
   "index.html",
@@ -7,6 +7,8 @@ const APP_SHELL = [
   "supabase-config.js",
   "supabase-service.js",
   "manifest.webmanifest",
+  "ikon-192.png",
+  "ikon-512.png",
   "ikon.png"
 ];
 
