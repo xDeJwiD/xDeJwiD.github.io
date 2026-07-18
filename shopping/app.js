@@ -18,10 +18,10 @@ const DEMO_PRODUCT_CATALOG = [
 const DEMO_STORES = ["Biedronka", "Lidl", "Kaufland", "Carrefour", "Rossmann", "Inny sklep"];
 
 const defaultItems = [
-  { id: createId(), name: "Mleko", quantity: 2, done: false, addedBy: "Mama", category: "Nabiał", store: "Biedronka" },
+  { id: createId(), name: "Mleko", quantity: 2, done: false, addedBy: "Ja", category: "Nabiał", store: "Biedronka" },
   { id: createId(), name: "Chleb żytni", quantity: 1, done: false, addedBy: "Ja", category: "Pieczywo", store: "Biedronka" },
-  { id: createId(), name: "Pomidory", quantity: 4, done: false, addedBy: "Tata", category: "Warzywa i owoce", store: "Lidl" },
-  { id: createId(), name: "Kawa", quantity: 1, done: true, addedBy: "Mama", category: "Spiżarnia", store: "Lidl" }
+  { id: createId(), name: "Pomidory", quantity: 4, done: false, addedBy: "Ja", category: "Warzywa i owoce", store: "Lidl" },
+  { id: createId(), name: "Kawa", quantity: 1, done: true, addedBy: "Ja", category: "Spiżarnia", store: "Lidl" }
 ];
 
 const authView = document.querySelector("#authView");
