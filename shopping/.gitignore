@@ -1,0 +1,12 @@
+# Lokalne sekrety i pliki środowiskowe — nigdy nie publikuj ich w repozytorium.
+.env
+.env.*
+!.env.example
+*.secret.js
+*.local.js
+supabase/.temp/
+supabase-audit-theme.sql
+supabase-catalog-write.sql
+supabase-schema.sql
+*.sql
+SUPABASE_SETUP.md

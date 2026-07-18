@@ -1,0 +1,21 @@
+{
+  "name": "Rodzinna lista zakupów",
+  "short_name": "Zakupy",
+  "description": "Wspólna lista zakupów.",
+  "lang": "pl",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f6f5f0",
+  "theme_color": "#00bda4",
+  "icons": [
+    {
+      "src": "ikon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

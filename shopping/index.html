@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" id="themeColorMeta" content="#f6f5f0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Lista zakupów">
+  <meta name="apple-mobile-web-app-status-bar-style" id="appleStatusBarMeta" content="default">
+  <script>
+    try {
+      const initialSavedTheme = localStorage.getItem("razem-theme");
+      const pageInitialTheme = initialSavedTheme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.dataset.theme = pageInitialTheme;
+      document.querySelector("#themeColorMeta").content = pageInitialTheme === "dark" ? "#151814" : "#f6f5f0";
+      document.querySelector("#appleStatusBarMeta").content = pageInitialTheme === "dark" ? "black-translucent" : "default";
+    } catch {}
+  </script>
+  <meta name="description" content="Prosta, rodzinna lista zakupów.">
+  <title>Lista Zakupów</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="ikon.png">
+  <link rel="apple-touch-icon" href="ikon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <section class="auth-view" id="authView" aria-labelledby="authTitle">
+      <div class="auth-card">
+        <form class="auth-form" id="loginForm" novalidate>
+          <h1 class="sr-only" id="authTitle">Logowanie</h1>
+          <label for="username">Login</label>
+          <input id="username" name="username" type="text" autocomplete="username" placeholder="Twój login" minlength="2" maxlength="30" required>
+
+          <label for="password">Hasło</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Wpisz hasło" minlength="6" required>
+
+          <p class="form-message" id="loginMessage" role="alert"></p>
+          <button class="primary-button" type="submit">Zaloguj się <span aria-hidden="true">→</span></button>
+        </form>
+        <button class="demo-button auth-demo-button" id="demoButton" type="button">Otwórz podgląd aplikacji</button>
+      </div>
+    </section>
+
+    <section class="app-view is-hidden" id="appView" aria-labelledby="listTitle">
+      <header class="app-header">
+        <button class="theme-button" id="themeButton" type="button" aria-label="Włącz tryb ciemny" aria-pressed="false">
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="3.5" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.5v2M12 19.5v2M21.5 12h-2M4.5 12h-2M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4M18.7 18.7l-1.4-1.4M6.7 6.7 5.3 5.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 15.7A8.4 8.4 0 0 1 8.3 4a8.5 8.5 0 1 0 11.7 11.7Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="header-actions">
+          <button class="sync-status" id="syncStatus" type="button" aria-label="Odśwież połączenie" title="Odśwież połączenie">
+            <i></i><span>lokalnie</span>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 8a7 7 0 1 0 .4 7M19 8V3m0 5h-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="avatar-button" id="profileButton" type="button" aria-label="Otwórz profil">D</button>
+        </div>
+      </header>
+
+      <div class="app-content">
+        <div class="welcome-row">
+          <div>
+            <h1 id="listTitle">Lista zakupów</h1>
+          </div>
+        </div>
+
+        <section class="list-section" aria-labelledby="activeTitle">
+          <div class="section-heading">
+            <button class="section-toggle" type="button" aria-expanded="true">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 10 5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <h2 id="activeTitle">Do kupienia</h2>
+              <span id="activeCount">0</span>
+            </button>
+          </div>
+          <div class="section-body">
+            <div id="activeItems" aria-live="polite"></div>
+            <div class="section-empty is-hidden" id="activeEmpty">Nic więcej do kupienia.</div>
+          </div>
+        </section>
+
+        <section class="list-section purchased-section" aria-labelledby="purchasedTitle">
+          <div class="section-heading">
+            <button class="section-toggle" type="button" aria-expanded="true">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 10 5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <h2 id="purchasedTitle">Kupione</h2>
+              <span id="purchasedCount">0</span>
+            </button>
+            <button class="clear-button is-hidden" id="clearButton" type="button">Wyczyść</button>
+          </div>
+          <div class="section-body">
+            <div id="purchasedItems" aria-live="polite"></div>
+            <div class="section-empty is-hidden" id="purchasedEmpty">Kupione produkty pojawią się tutaj.</div>
+          </div>
+        </section>
+      </div>
+
+      <div class="composer-shell">
+        <div class="composer-actions">
+          <button class="composer-button composer-button--primary" id="categoryButton" type="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 5h5v5H5V5Zm9 0h5v5h-5V5ZM5 14h5v5H5v-5Zm9 0h5v5h-5v-5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+            <span><small>Produkt</small><strong id="selectedProductLabel">Wybierz produkt</strong></span>
+          </button>
+          <button class="composer-button" id="storeButton" type="button" disabled>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9.5h16l-1.2-5H5.2l-1.2 5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M5.5 9.5V20h13V9.5M9 20v-6h6v6" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+            <span><small>Sklep</small><strong id="selectedStoreLabel">Wybierz sklep</strong></span>
+          </button>
+          <button class="composer-add" id="addSelectedButton" type="button" aria-label="Dodaj wybrany produkt do listy" disabled>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="picker-backdrop is-hidden" id="pickerBackdrop"></div>
+      <section class="picker-sheet is-hidden" id="pickerSheet" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
+        <div class="picker-handle" aria-hidden="true"></div>
+        <header class="picker-header">
+          <button class="picker-back is-hidden" id="pickerBack" type="button" aria-label="Wróć">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 5-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <h2 id="pickerTitle">Wybierz</h2>
+          <button class="picker-close" id="pickerClose" type="button" aria-label="Zamknij">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <div class="picker-content" id="pickerContent"></div>
+      </section>
+
+      <div class="profile-popover is-hidden" id="profilePopover">
+        <strong id="profileMode">Tryb demonstracyjny</strong>
+        <span id="profileDescription">Dane są zapisane tylko na tym urządzeniu.</span>
+        <div class="profile-menu-actions">
+          <button id="addProductMenuButton" type="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Dodaj produkt
+          </button>
+          <button id="addCategoryMenuButton" type="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 5h5v5H5V5Zm9 0h5v5h-5V5ZM5 14h5v5H5v-5Zm9 0h5v5h-5v-5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+            Dodaj kategorię
+          </button>
+          <button id="addStoreMenuButton" type="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9.5h16l-1.2-5H5.2l-1.2 5ZM5.5 9.5V20h13V9.5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+            Dodaj sklep
+          </button>
+          <button class="profile-logout" id="logoutButton" type="button">Wyloguj się</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="update-notice is-hidden" id="updateNotice" role="status" aria-live="polite">
+    <span id="updateNoticeText">Dostępna jest nowa wersja aplikacji.</span>
+    <button id="updateButton" type="button">Odśwież</button>
+  </aside>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-service.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
