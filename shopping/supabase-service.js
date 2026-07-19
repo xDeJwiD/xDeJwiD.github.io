@@ -43,11 +43,15 @@
     const { data: userData, error: userError } = await client.auth.getUser();
     if (userError || !userData.user) throw userError || new Error("Brak sesji użytkownika.");
     const userId = userData.user.id;
-    const [profileResult, listsResult, membershipsResult] = await Promise.all([
+    const [profileResult, initialListsResult, membershipsResult] = await Promise.all([
       client.from("profiles").select("user_id,username,display_name,theme,role").eq("user_id", userId).maybeSingle(),
-      client.from("shopping_lists").select("id,name,position,created_at").order("position").order("created_at"),
+      client.from("shopping_lists").select("id,name,position,created_at,updated_at").order("position").order("created_at"),
       client.from("members").select("list_id,role").eq("user_id", userId)
     ]);
+    let listsResult = initialListsResult;
+    if (listsResult.error?.code === "42703" || /updated_at/i.test(listsResult.error?.message || "")) {
+      listsResult = await client.from("shopping_lists").select("id,name,position,created_at").order("position").order("created_at");
+    }
     const profile = assertNoError(profileResult);
     const memberships = assertNoError(membershipsResult);
     const roleByListId = new Map(memberships.map((membership) => [membership.list_id, membership.role]));
@@ -173,14 +177,10 @@
     assertNoError(await client.auth.signOut());
   }
 
-  async function changePassword(currentPassword, newPassword) {
+  async function changePassword(newPassword) {
     const session = await getSession();
     if (!session?.user?.email) throw new Error("Brak aktywnej sesji użytkownika.");
 
-    assertNoError(await client.auth.signInWithPassword({
-      email: session.user.email,
-      password: currentPassword
-    }));
     assertNoError(await client.auth.updateUser({ password: newPassword }));
 
     // Zmiana hasła może unieważnić poprzednią sesję. Natychmiast tworzymy nową,
@@ -189,6 +189,60 @@
       email: session.user.email,
       password: newPassword
     })).session;
+  }
+
+  function decodePushKey(value) {
+    const padding = "=".repeat((4 - value.length % 4) % 4);
+    const base64 = (value + padding).replaceAll("-", "+").replaceAll("_", "/");
+    return Uint8Array.from(atob(base64), (character) => character.charCodeAt(0));
+  }
+
+  async function invokeNotificationFunction(body) {
+    const { data, error } = await client.functions.invoke("shopping-notifications", { body });
+    if (error) {
+      let message = error.message || "Nie udało się obsłużyć powiadomień.";
+      try {
+        const details = await error.context?.json?.();
+        if (details?.error) message = details.error;
+      } catch { /* odpowiedź bez JSON */ }
+      throw new Error(message);
+    }
+    if (data?.error) throw new Error(data.error);
+    return data;
+  }
+
+  async function getPushSubscription() {
+    if (!("serviceWorker" in navigator) || !("Notification" in window)) return null;
+    const registration = await navigator.serviceWorker.ready;
+    if (!registration.pushManager) return null;
+    return registration.pushManager.getSubscription();
+  }
+
+  async function enablePushNotifications() {
+    if (!("serviceWorker" in navigator) || !("Notification" in window)) {
+      throw new Error("To urządzenie lub przeglądarka nie obsługuje powiadomień aplikacji.");
+    }
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") throw new Error("Nie udzielono zgody na powiadomienia.");
+    const registration = await navigator.serviceWorker.ready;
+    if (!registration.pushManager) {
+      throw new Error("System nie udostępnił obsługi Web Push dla tej instalacji aplikacji.");
+    }
+    let subscription = await registration.pushManager.getSubscription();
+    if (!subscription) {
+      const { publicKey } = await invokeNotificationFunction({ action: "public-key" });
+      if (!publicKey) throw new Error("Brak konfiguracji powiadomień na serwerze.");
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: decodePushKey(publicKey)
+      });
+    }
+    assertNoError(await client.rpc("save_push_subscription", { p_subscription: subscription.toJSON() }));
+    return subscription;
+  }
+
+  async function sendListNotification(listId) {
+    return invokeNotificationFunction({ action: "notify", listId });
   }
 
   async function addItem(item) {
@@ -364,6 +418,7 @@
 
     const catalogChannel = client
       .channel(`shopping-catalog-${listId}`)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "shopping_lists", filter: `id=eq.${listId}` }, onChange)
       .on("postgres_changes", { event: "*", schema: "public", table: "stores", filter }, onChange)
       .on("postgres_changes", { event: "*", schema: "public", table: "categories", filter }, onChange)
       .on("postgres_changes", { event: "*", schema: "public", table: "products", filter }, onChange)
@@ -380,6 +435,9 @@
     signIn,
     signOut,
     changePassword,
+    getPushSubscription,
+    enablePushNotifications,
+    sendListNotification,
     getSession,
     refreshSession,
     loadUserContext,

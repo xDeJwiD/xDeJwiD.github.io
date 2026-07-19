@@ -60,6 +60,8 @@ const createListMenuButton = document.querySelector("#createListMenuButton");
 const createUserMenuButton = document.querySelector("#createUserMenuButton");
 const renameListMenuButton = document.querySelector("#renameListMenuButton");
 const changePasswordMenuButton = document.querySelector("#changePasswordMenuButton");
+const notifyListButton = document.querySelector("#notifyListButton");
+const pushFeedback = document.querySelector("#pushFeedback");
 const installPromptBackdrop = document.querySelector("#installPromptBackdrop");
 const installPromptAction = document.querySelector("#installPromptAction");
 const installIosGuide = document.querySelector("#installIosGuide");
@@ -117,9 +119,13 @@ let manageableUsers = [];
 let deferredInstallPrompt = null;
 let installPromptMode = null;
 let installPromptPreview = false;
+let pushFeedbackTimer = null;
+let pushActionRunning = false;
 
 function isAppInstalled() {
-  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  return window.matchMedia("(display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui)").matches
+    || window.navigator.standalone === true
+    || document.referrer.startsWith("android-app://");
 }
 
 function isIosDevice() {
@@ -297,6 +303,7 @@ function closeApp() {
   createUserMenuButton.classList.add("is-hidden");
   renameListMenuButton.classList.add("is-hidden");
   changePasswordMenuButton.classList.add("is-hidden");
+  notifyListButton.classList.add("is-hidden");
   window.ShoppingDB?.setActiveList(null);
   document.title = "Lista zakupów";
 }
@@ -320,6 +327,106 @@ function renderListSelection() {
   listSelectionMessage.classList.toggle("is-hidden", availableLists.length > 0);
 }
 
+function updateListActivityTime(timestamp) {
+  const element = document.querySelector("#listActivityTime");
+  const date = new Date(timestamp);
+  if (!timestamp || Number.isNaN(date.getTime())) {
+    element.classList.add("is-hidden");
+    element.removeAttribute("datetime");
+    element.removeAttribute("title");
+    element.textContent = "";
+    return;
+  }
+  const now = new Date();
+  const sameDay = date.getFullYear() === now.getFullYear()
+    && date.getMonth() === now.getMonth()
+    && date.getDate() === now.getDate();
+  const hour = new Intl.DateTimeFormat("pl-PL", { hour: "2-digit", minute: "2-digit" }).format(date);
+  const label = sameDay
+    ? hour
+    : `${new Intl.DateTimeFormat("pl-PL", { day: "2-digit", month: "2-digit" }).format(date)}, ${hour}`;
+  const fullLabel = new Intl.DateTimeFormat("pl-PL", { dateStyle: "long", timeStyle: "short" }).format(date);
+  element.dateTime = date.toISOString();
+  element.title = `Ostatnia zmiana: ${fullLabel}`;
+  element.setAttribute("aria-label", `Ostatnia zmiana: ${fullLabel}`);
+  element.textContent = `Ostatnia zmiana: ${label}`;
+  element.classList.remove("is-hidden");
+}
+
+function showPushFeedback(message) {
+  window.clearTimeout(pushFeedbackTimer);
+  pushFeedback.textContent = message;
+  pushFeedback.classList.remove("is-hidden");
+  pushFeedbackTimer = window.setTimeout(() => pushFeedback.classList.add("is-hidden"), 4200);
+}
+
+function supportsPushNotifications() {
+  const apiAvailable = "serviceWorker" in navigator && "Notification" in window;
+  return apiAvailable && (!isMobileDevice() || isAppInstalled());
+}
+
+async function refreshPushButton() {
+  if (isDemoMode || !currentList) {
+    notifyListButton.classList.add("is-hidden");
+    return;
+  }
+  notifyListButton.classList.remove("is-hidden");
+  if (!supportsPushNotifications()) {
+    notifyListButton.classList.remove("is-enabled");
+    const label = isMobileDevice() && !isAppInstalled()
+      ? "Zainstaluj aplikację, aby włączyć powiadomienia"
+      : "Powiadomienia nie są obsługiwane na tym urządzeniu";
+    notifyListButton.setAttribute("aria-label", label);
+    notifyListButton.title = label;
+    return;
+  }
+  try {
+    const enabled = Notification.permission === "granted" && Boolean(await window.ShoppingDB.getPushSubscription());
+    notifyListButton.classList.toggle("is-enabled", enabled);
+    const label = enabled ? "Wyślij powiadomienie do członków listy" : "Włącz powiadomienia na tym urządzeniu";
+    notifyListButton.setAttribute("aria-label", label);
+    notifyListButton.title = label;
+  } catch {
+    notifyListButton.classList.remove("is-enabled");
+  }
+}
+
+async function handleNotifyList() {
+  if (pushActionRunning || !currentList || isDemoMode) return;
+  if (!supportsPushNotifications()) {
+    if (isMobileDevice() && !isAppInstalled()) {
+      showPushFeedback("Aby włączyć powiadomienia, zainstaluj aplikację i uruchom ją z ikony na ekranie głównym.");
+      if (canShowInstallPrompt()) showInstallPrompt(isIosDevice() ? "ios" : "native");
+    } else if (isIosDevice()) {
+      showPushFeedback("Na iPhonie powiadomienia wymagają iOS 16.4 lub nowszego oraz uruchomienia aplikacji z ikony na ekranie głównym — nie w karcie Safari.");
+    } else {
+      showPushFeedback("Ta wersja systemu lub przeglądarki nie obsługuje powiadomień aplikacji.");
+    }
+    return;
+  }
+  pushActionRunning = true;
+  notifyListButton.disabled = true;
+  try {
+    const wasEnabled = Notification.permission === "granted" && Boolean(await window.ShoppingDB.getPushSubscription());
+    await window.ShoppingDB.enablePushNotifications();
+    await refreshPushButton();
+    if (!wasEnabled) {
+      showPushFeedback("Powiadomienia są włączone na tym urządzeniu. Kliknij dzwonek ponownie, aby wysłać przypomnienie.");
+      return;
+    }
+    const result = await window.ShoppingDB.sendListNotification(currentList.id);
+    showPushFeedback(result.sent > 0
+      ? `Powiadomienie wysłano na ${result.sent} ${result.sent === 1 ? "urządzenie" : "urządzenia"}.`
+      : "Nikt z pozostałych członków tej listy nie włączył jeszcze powiadomień.");
+  } catch (error) {
+    console.error(error);
+    showPushFeedback(error.message || "Nie udało się wysłać powiadomienia.");
+  } finally {
+    pushActionRunning = false;
+    notifyListButton.disabled = false;
+  }
+}
+
 async function showListSelection() {
   if (isDemoMode) return;
   closeAdminModeWithoutSaving();
@@ -340,6 +447,8 @@ async function showListSelection() {
   profilePopover.classList.add("is-hidden");
   listBackButton.classList.add("is-hidden");
   document.querySelector("#listTitle").textContent = "Lista zakupów";
+  updateListActivityTime(null);
+  notifyListButton.classList.add("is-hidden");
   document.body.classList.add("choosing-list");
   listSelectionView.classList.remove("is-hidden");
   renderListSelection();
@@ -431,6 +540,15 @@ async function startRealtimeForCurrentList() {
   unsubscribeRealtime = window.ShoppingDB.subscribe(
     (payload) => {
       if (generation !== realtimeGeneration) return;
+      if (payload.table === "shopping_lists") {
+        const list = availableLists.find((entry) => entry.id === payload.new?.id);
+        if (list) {
+          list.name = payload.new.name || list.name;
+          list.updated_at = payload.new.updated_at || list.updated_at;
+          if (currentList?.id === list.id) updateListActivityTime(list.updated_at);
+        }
+        return;
+      }
       if (payload.table !== "shopping_items") realtimeNeedsCatalog = true;
       window.clearTimeout(realtimeRefreshTimer);
       realtimeRefreshTimer = window.setTimeout(() => {
@@ -479,6 +597,7 @@ async function openShoppingList(list) {
     renameListMenuButton.classList.toggle("is-hidden", !currentUserIsAdmin);
     adminModeButton.classList.toggle("is-hidden", !currentUserIsAdmin);
     document.querySelector("#listTitle").textContent = list.name;
+    updateListActivityTime(list.updated_at);
     listBackButton.classList.toggle("is-hidden", availableLists.length < 2);
     document.body.classList.remove("choosing-list");
     listSelectionView.classList.add("is-hidden");
@@ -490,10 +609,12 @@ async function openShoppingList(list) {
     showApp();
     document.title = `${list.name} · Lista zakupów`;
     await startRealtimeForCurrentList();
+    await refreshPushButton();
   } catch (error) {
     console.error(error);
     currentList = null;
     renameListMenuButton.classList.add("is-hidden");
+    notifyListButton.classList.add("is-hidden");
     window.ShoppingDB.setActiveList(null);
     document.body.classList.add("choosing-list");
     listSelectionView.classList.remove("is-hidden");
@@ -528,7 +649,10 @@ async function enterDatabaseMode(session) {
   document.querySelector("#profileMode").textContent = `${displayName}${currentUserIsDev ? " · Dev" : ""}`;
   document.querySelector("#profileDescription").textContent = "Wybierz listę zakupów.";
   showApp();
-  const listToRestore = previousListId && availableLists.find((list) => list.id === previousListId);
+  const requestedListId = new URLSearchParams(window.location.search).get("list");
+  const requestedList = requestedListId && availableLists.find((list) => list.id === requestedListId);
+  if (requestedListId) window.history.replaceState({}, "", window.location.pathname);
+  const listToRestore = requestedList || (previousListId && availableLists.find((list) => list.id === previousListId));
   if (listToRestore) await openShoppingList(listToRestore);
   else if (availableLists.length === 1) await openShoppingList(availableLists[0]);
   else await showListSelection();
@@ -562,6 +686,7 @@ function showDatabaseRecovery(session) {
   createUserMenuButton.classList.add("is-hidden");
   renameListMenuButton.classList.add("is-hidden");
   changePasswordMenuButton.classList.remove("is-hidden");
+  notifyListButton.classList.add("is-hidden");
   syncStatus.disabled = false;
   const username = session.user.email?.split("@")[0] || "U";
   document.querySelector("#profileButton").textContent = username.slice(0, 1).toUpperCase();
@@ -601,6 +726,8 @@ function enterDemoMode() {
   listSelectionView.classList.add("is-hidden");
   listBackButton.classList.add("is-hidden");
   document.querySelector("#listTitle").textContent = "Lista zakupów";
+  updateListActivityTime(null);
+  notifyListButton.classList.add("is-hidden");
   currentUserIsAdmin = false;
   currentUserIsDev = false;
   adminModeButton.classList.add("is-hidden");
@@ -1187,8 +1314,6 @@ function openChangePasswordForm() {
   pickerBack.classList.add("is-hidden");
   pickerContent.innerHTML = `
     <form class="list-create-form password-change-form">
-      <label for="currentPassword">Obecne hasło</label>
-      <input id="currentPassword" name="currentPassword" type="password" minlength="6" maxlength="72" autocomplete="current-password" required>
       <label for="newPassword">Nowe hasło</label>
       <input id="newPassword" name="newPassword" type="password" minlength="8" maxlength="72" autocomplete="new-password" required>
       <label for="repeatPassword">Powtórz nowe hasło</label>
@@ -1199,7 +1324,7 @@ function openChangePasswordForm() {
   pickerBackdrop.classList.remove("is-hidden");
   pickerSheet.classList.remove("is-hidden");
   document.body.classList.add("picker-open");
-  window.setTimeout(() => document.querySelector("#currentPassword")?.focus(), 50);
+  window.setTimeout(() => document.querySelector("#newPassword")?.focus(), 50);
 }
 
 function openCatalogEditor(type) {
@@ -1593,22 +1718,17 @@ pickerContent.addEventListener("submit", async (event) => {
     }
     const message = passwordForm.querySelector(".catalog-form-message");
     const submitButton = passwordForm.querySelector("button[type='submit']");
-    const currentPassword = passwordForm.elements.currentPassword.value;
     const newPassword = passwordForm.elements.newPassword.value;
     const repeatPassword = passwordForm.elements.repeatPassword.value;
     if (newPassword !== repeatPassword) {
       message.textContent = "Nowe hasła nie są takie same.";
       return;
     }
-    if (newPassword === currentPassword) {
-      message.textContent = "Nowe hasło musi być inne niż obecne.";
-      return;
-    }
     submitButton.disabled = true;
     message.textContent = "";
     try {
       setConnectionStatus("syncing", "zmiana hasła…");
-      currentSession = await window.ShoppingDB.changePassword(currentPassword, newPassword);
+      currentSession = await window.ShoppingDB.changePassword(newPassword);
       pickerTitle.textContent = "Hasło zmienione";
       pickerContent.innerHTML = `
         <div class="user-create-success">
@@ -1620,10 +1740,7 @@ pickerContent.addEventListener("submit", async (event) => {
       setConnectionStatus("online", "połączono");
     } catch (error) {
       console.error(error);
-      const errorText = String(error.message || "").toLowerCase();
-      message.textContent = errorText.includes("invalid login credentials")
-        ? "Obecne hasło jest nieprawidłowe."
-        : (error.message || "Nie udało się zmienić hasła.");
+      message.textContent = error.message || "Nie udało się zmienić hasła.";
       setConnectionStatus("online", "połączono");
     } finally {
       submitButton.disabled = false;
@@ -1648,8 +1765,11 @@ pickerContent.addEventListener("submit", async (event) => {
       await window.ShoppingDB.renameShoppingList(currentList.id, name);
       const listEntry = availableLists.find((list) => list.id === currentList.id);
       if (listEntry) listEntry.name = name;
+      if (listEntry) listEntry.updated_at = new Date().toISOString();
       currentList.name = name;
+      currentList.updated_at = listEntry?.updated_at || new Date().toISOString();
       document.querySelector("#listTitle").textContent = name;
+      updateListActivityTime(currentList.updated_at);
       document.querySelector("#profileDescription").textContent = `Aktualna lista: „${name}”.`;
       document.title = `${name} · Lista zakupów`;
       closePicker();
@@ -2104,6 +2224,7 @@ createListMenuButton.addEventListener("click", () => void openCreateListForm());
 createUserMenuButton.addEventListener("click", openCreateUserForm);
 renameListMenuButton.addEventListener("click", openRenameListForm);
 changePasswordMenuButton.addEventListener("click", openChangePasswordForm);
+notifyListButton.addEventListener("click", () => void handleNotifyList());
 document.addEventListener("click", (event) => {
   if (!event.target.closest("#profileButton") && !event.target.closest("#profilePopover")) profilePopover.classList.add("is-hidden");
 });
@@ -2146,6 +2267,7 @@ window.addEventListener("appinstalled", () => {
   deferredInstallPrompt = null;
   closeInstallPrompt(false);
   localStorage.removeItem(INSTALL_PROMPT_DISMISSED_KEY);
+  void refreshPushButton();
 });
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") {

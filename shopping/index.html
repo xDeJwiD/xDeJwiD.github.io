@@ -99,7 +99,13 @@
           <button class="list-back-button is-hidden" id="listBackButton" type="button" aria-label="Wróć do wyboru list">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 5-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
-          <h1 id="listTitle">Lista zakupów</h1>
+          <div class="list-heading-copy">
+            <h1 id="listTitle">Lista zakupów</h1>
+            <time class="list-activity-time is-hidden" id="listActivityTime"></time>
+          </div>
+          <button class="notify-list-button is-hidden" id="notifyListButton" type="button" aria-label="Włącz powiadomienia" title="Włącz powiadomienia">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 6 2.5 6 2.5 7.5H4C4 16 6.5 16 6.5 10Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 20h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          </button>
         </div>
 
         <section class="list-section" aria-labelledby="activeTitle">
@@ -228,6 +234,8 @@
     <span id="updateNoticeText">Dostępna jest nowa wersja aplikacji.</span>
     <button id="updateButton" type="button">Odśwież</button>
   </aside>
+
+  <aside class="push-feedback is-hidden" id="pushFeedback" role="status" aria-live="polite"></aside>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>

@@ -9,4 +9,4 @@ supabase-audit-theme.sql
 supabase-catalog-write.sql
 supabase-schema.sql
 *.sql
-SUPABASE_SETUP.md
+*.md

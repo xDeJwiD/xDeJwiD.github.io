@@ -1,4 +1,4 @@
-const CACHE_NAME = "grupowa-lista-2026.07.19.8";
+const CACHE_NAME = "grupowa-lista-2026.07.19.15";
 const APP_SHELL = [
   "./",
   "index.html",
@@ -48,4 +48,33 @@ self.addEventListener("fetch", (event) => {
         throw new Error("Brak połączenia i brak pliku w pamięci PWA.");
       })
   );
+});
+
+self.addEventListener("push", (event) => {
+  let payload = {};
+  try {
+    payload = event.data?.json() || {};
+  } catch {
+    payload = { body: event.data?.text() || "Lista zakupów została zaktualizowana." };
+  }
+  event.waitUntil(self.registration.showNotification(payload.title || "Lista Zakupów", {
+    body: payload.body || "Otwórz aplikację, aby sprawdzić listę.",
+    icon: "ikon-192.png",
+    tag: payload.tag || "shopping-list-update",
+    renotify: true,
+    data: { url: payload.url || "./" }
+  }));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const targetUrl = new URL(event.notification.data?.url || "./", self.location.href).href;
+  event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(async (windows) => {
+    const existing = windows.find((client) => new URL(client.url).origin === new URL(targetUrl).origin);
+    if (existing) {
+      if ("navigate" in existing) await existing.navigate(targetUrl);
+      return existing.focus();
+    }
+    return self.clients.openWindow(targetUrl);
+  }));
 });

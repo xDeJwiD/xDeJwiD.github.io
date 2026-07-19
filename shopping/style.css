@@ -176,7 +176,15 @@ html[data-theme="dark"] .moon-icon { display: block; }
 .avatar-button { width: 36px; height: 36px; border: 0; border-radius: 50%; color: var(--accent-contrast); background: var(--accent); font-weight: 700; cursor: pointer; }
 .app-content { width: min(100% - 40px, 672px); margin: 0 auto; padding: 48px 0 150px; }
 .welcome-row { display: flex; align-items: center; gap: 11px; }
-.welcome-row h1 { margin: 0; font: 700 34px/1.15 Manrope, sans-serif; letter-spacing: -1.4px; }
+.list-heading-copy { min-width: 0; flex: 1; display: grid; gap: 3px; }
+.welcome-row h1 { min-width: 0; margin: 0; overflow: hidden; font: 700 34px/1.15 Manrope, sans-serif; letter-spacing: -1.4px; text-overflow: ellipsis; white-space: nowrap; }
+.list-activity-time { color: var(--muted); font-size: 9px; font-weight: 600; line-height: 1.25; white-space: nowrap; }
+.notify-list-button { display: grid; width: 38px; height: 38px; flex: 0 0 auto; place-items: center; padding: 0; border: 1px solid var(--line); border-radius: 11px; color: var(--muted); background: var(--card); cursor: pointer; transition: border-color .16s, color .16s, background .16s, transform .16s; }
+.notify-list-button:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.notify-list-button:active { transform: scale(.96); }
+.notify-list-button:disabled { opacity: .55; cursor: wait; }
+.notify-list-button.is-enabled { border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); color: var(--accent-dark); background: var(--accent-soft); }
+.notify-list-button svg { width: 19px; }
 .list-back-button { display: grid; width: 38px; height: 38px; flex: 0 0 auto; place-items: center; padding: 0; border: 1px solid var(--line); border-radius: 11px; color: var(--ink); background: var(--card); cursor: pointer; }
 .list-back-button:hover { border-color: var(--accent); color: var(--accent); }
 .list-back-button svg { width: 19px; }
@@ -411,6 +419,7 @@ body.admin-reordering { overflow: hidden; touch-action: none; user-select: none;
 .update-notice button { flex: 0 0 auto; padding: 9px 12px; border: 0; border-radius: 9px; color: var(--accent-contrast); background: var(--accent); font-size: 10px; font-weight: 800; cursor: pointer; }
 .update-notice button:hover { background: var(--accent-dark); }
 @keyframes update-notice-in { from { opacity: 0; transform: translateY(10px); } }
+.push-feedback { position: fixed; right: 18px; bottom: max(18px, env(safe-area-inset-bottom)); z-index: 105; max-width: min(390px, calc(100% - 36px)); padding: 12px 15px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 14px; color: var(--ink); background: var(--card); box-shadow: var(--shadow); font-size: 11px; font-weight: 600; line-height: 1.45; animation: update-notice-in .24s ease both; }
 
 .install-prompt-open { overflow: hidden; }
 .install-prompt-backdrop { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: max(20px, env(safe-area-inset-top)) 18px max(20px, env(safe-area-inset-bottom)); background: rgba(10, 14, 11, .56); backdrop-filter: blur(5px); animation: fade-in .2s ease both; }
@@ -436,6 +445,7 @@ body.admin-reordering { overflow: hidden; touch-action: none; user-select: none;
   .app-header { height: calc(66px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) 20px 0; }
   .app-content { width: calc(100% - 32px); padding: 34px 0 138px; }
   .welcome-row h1 { font-size: 29px; }
+  .notify-list-button { width: 36px; height: 36px; }
   .list-selection-view { width: calc(100% - 32px); min-height: calc(100dvh - 66px - env(safe-area-inset-top)); padding-top: 36px; }
   .list-selection-intro h1 { font-size: 29px; }
   .composer-shell { padding-right: 12px; padding-left: 12px; }
@@ -456,6 +466,7 @@ body.admin-reordering { overflow: hidden; touch-action: none; user-select: none;
   .profile-popover { top: 59px; right: 14px; }
   .list-section { margin-top: 34px; }
   .update-notice { right: 12px; bottom: calc(84px + env(safe-area-inset-bottom)); max-width: calc(100% - 24px); }
+  .push-feedback { right: 12px; bottom: calc(84px + env(safe-area-inset-bottom)); max-width: calc(100% - 24px); }
   .install-prompt-backdrop { place-items: end center; padding: 0; }
   .install-prompt { width: 100%; padding: 28px 22px max(17px, env(safe-area-inset-bottom)); border-right: 0; border-bottom: 0; border-left: 0; border-radius: 25px 25px 0 0; }
   .admin-view { width: calc(100% - 28px); min-height: calc(100dvh - 66px - env(safe-area-inset-top)); padding-top: 26px; }
