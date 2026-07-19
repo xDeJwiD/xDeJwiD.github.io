@@ -11,6 +11,22 @@ function response(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), { status, headers: corsHeaders });
 }
 
+const notificationMessages = [
+  "Hej, nowa lista gotowa!",
+  "Lista czeka — czas na zakupy!",
+  "Zerknij na listę, coś się zmieniło!",
+  "Nowe rzeczy czekają na liście!",
+  "Pora zajrzeć na listę zakupów!",
+  "Lista zaktualizowana — działamy!",
+  "Małe przypomnienie: lista już czeka!",
+  "Zakupowa misja właśnie się zaczyna!"
+];
+
+function randomNotificationMessage() {
+  const randomValue = crypto.getRandomValues(new Uint32Array(1))[0];
+  return notificationMessages[randomValue % notificationMessages.length];
+}
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (request.method !== "POST") return response(405, { error: "Niedozwolona metoda." });
@@ -68,14 +84,14 @@ Deno.serve(async (request) => {
   if (cooldownError) return response(500, { error: "Nie udało się sprawdzić limitu powiadomień." });
   if (recentNotification) return response(429, { error: "Poczekaj minutę przed wysłaniem kolejnego powiadomienia." });
 
-  const [listResult, profileResult, membersResult] = await Promise.all([
-    service.from("shopping_lists").select("name").eq("id", listId).single(),
-    service.from("profiles").select("display_name,username").eq("user_id", callerId).maybeSingle(),
-    service.from("members").select("user_id").eq("list_id", listId).neq("user_id", callerId)
-  ]);
-  if (listResult.error || membersResult.error) return response(500, { error: "Nie udało się przygotować powiadomienia." });
+  const { data: members, error: membersError } = await service
+    .from("members")
+    .select("user_id")
+    .eq("list_id", listId)
+    .neq("user_id", callerId);
+  if (membersError) return response(500, { error: "Nie udało się przygotować powiadomienia." });
 
-  const recipientIds = (membersResult.data || []).map((member) => member.user_id);
+  const recipientIds = (members || []).map((member) => member.user_id);
   if (!recipientIds.length) return response(200, { sent: 0, failed: 0 });
   const { data: subscriptions, error: subscriptionsError } = await service
     .from("push_subscriptions")
@@ -87,10 +103,8 @@ Deno.serve(async (request) => {
   const { error: logError } = await service.from("push_notification_log").insert({ list_id: listId, sent_by: callerId });
   if (logError) return response(500, { error: "Nie udało się zapisać wysyłki powiadomienia." });
   webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
-  const sender = profileResult.data?.display_name || profileResult.data?.username || "Ktoś";
   const payload = JSON.stringify({
-    title: listResult.data.name,
-    body: `${sender} wysyła przypomnienie o liście zakupów.`,
+    title: randomNotificationMessage(),
     tag: `shopping-list-${listId}`,
     url: `./?list=${listId}`
   });

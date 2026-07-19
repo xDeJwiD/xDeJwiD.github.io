@@ -66,7 +66,7 @@
     const [storesResult, categoriesResult, productsResult, membershipsResult] = await Promise.all([
       client.from("stores").select("id,name,position,is_active").eq("list_id", listId).order("position"),
       client.from("categories").select("id,name,icon,position,is_active").eq("list_id", listId).order("position"),
-      client.from("products").select("id,category_id,name,position,is_active").eq("list_id", listId).order("position"),
+      client.from("products").select("id,category_id,name,icon,position,is_active").eq("list_id", listId).order("position"),
       client.from("members").select("user_id,role").eq("list_id", listId)
     ]);
 
@@ -100,7 +100,7 @@
         .filter((product) => product.is_active && product.category_id === category.id)
         .map((product) => {
           productIdByKey.set(`${category.name}|${product.name}`, product.id);
-          return product.name;
+          return { id: product.id, name: product.name, icon: product.icon || category.icon || "🛒" };
         });
       return { id: category.id, name: category.name, icon: category.icon, products: categoryProducts };
     });
@@ -123,7 +123,7 @@
     const listId = requireActiveList();
     const rows = assertNoError(await client
       .from("shopping_items")
-      .select("id,product_id,store_id,quantity,is_purchased,position,added_by,created_at")
+      .select("id,product_id,custom_name,custom_icon,store_id,quantity,is_purchased,position,added_by,created_at")
       .eq("list_id", listId)
       .order("is_purchased")
       .order("position"));
@@ -136,9 +136,11 @@
         id: row.id,
         productId: row.product_id,
         storeId: row.store_id,
-        name: product?.name || "Usunięty produkt",
+        name: product?.name || row.custom_name || "Usunięty produkt",
+        icon: product?.icon || row.custom_icon || categoryById.get(product?.category_id)?.icon || "🛒",
+        custom: !product && Boolean(row.custom_name),
         categoryId: product?.category_id || null,
-        category: categoryNameById.get(product?.category_id) || "Inne",
+        category: product ? (categoryNameById.get(product.category_id) || "Inne") : "Własny produkt",
         store: store?.name || "Nieznany sklep",
         quantity: row.quantity,
         done: row.is_purchased,
@@ -251,7 +253,9 @@
     if (userError || !userData.user) throw userError || new Error("Brak sesji użytkownika.");
     assertNoError(await client.from("shopping_items").insert({
       list_id: listId,
-      product_id: item.productId,
+      product_id: item.productId || null,
+      custom_name: item.productId ? null : item.customName,
+      custom_icon: item.productId ? null : (item.customIcon || "🛒"),
       store_id: item.storeId,
       quantity: item.quantity,
       is_purchased: false,
@@ -291,7 +295,7 @@
     assertNoError(await client.from("shopping_items").delete().eq("list_id", listId).eq("is_purchased", true));
   }
 
-  async function addProduct(categoryId, name) {
+  async function addProduct(categoryId, name, icon) {
     const listId = requireActiveList();
     const positions = [...productById.values()]
       .filter((product) => product.category_id === categoryId)
@@ -301,6 +305,7 @@
       list_id: listId,
       category_id: categoryId,
       name: name.trim(),
+      icon: icon.trim() || "🛒",
       position,
       is_active: true
     }));
@@ -316,6 +321,15 @@
       icon: icon.trim() || "🛒",
       position,
       is_active: true
+    }));
+  }
+
+  async function promoteCustomItem(itemId, categoryId, name, icon) {
+    return assertNoError(await client.rpc("promote_custom_shopping_item", {
+      p_item_id: itemId,
+      p_category_id: categoryId,
+      p_name: name.trim(),
+      p_icon: icon.trim() || "🛒"
     }));
   }
 
@@ -343,6 +357,18 @@
 
   async function loadManageableUsers() {
     return assertNoError(await client.rpc("get_manageable_users"));
+  }
+
+  async function loadManageableMemberships() {
+    return assertNoError(await client.rpc("get_manageable_memberships"));
+  }
+
+  async function addExistingUsersToList(listId, userIds, role) {
+    return assertNoError(await client.rpc("add_existing_users_to_list", {
+      p_list_id: listId,
+      p_user_ids: userIds,
+      p_role: role
+    }));
   }
 
   async function createShoppingList(name, memberIds) {
@@ -389,6 +415,7 @@
       p_products: managementCatalog.products.map((product) => ({
         id: product.id,
         name: product.name.trim(),
+        icon: (product.icon || "🛒").trim() || "🛒",
         position: product.position,
         is_active: product.is_active
       })),
@@ -449,10 +476,13 @@
     deleteItem,
     clearPurchased,
     addCategory,
+    promoteCustomItem,
     addProduct,
     addStore,
     updateTheme,
     loadManageableUsers,
+    loadManageableMemberships,
+    addExistingUsersToList,
     createShoppingList,
     renameShoppingList,
     createUser,

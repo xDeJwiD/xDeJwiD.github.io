@@ -1,4 +1,4 @@
-const CACHE_NAME = "grupowa-lista-2026.07.19.15";
+const CACHE_NAME = "grupowa-lista-2026.07.19.21";
 const APP_SHELL = [
   "./",
   "index.html",
@@ -57,13 +57,14 @@ self.addEventListener("push", (event) => {
   } catch {
     payload = { body: event.data?.text() || "Lista zakupów została zaktualizowana." };
   }
-  event.waitUntil(self.registration.showNotification(payload.title || "Lista Zakupów", {
-    body: payload.body || "Otwórz aplikację, aby sprawdzić listę.",
+  const options = {
     icon: "ikon-192.png",
     tag: payload.tag || "shopping-list-update",
     renotify: true,
     data: { url: payload.url || "./" }
-  }));
+  };
+  if (payload.body) options.body = payload.body;
+  event.waitUntil(self.registration.showNotification(payload.title || "Lista Zakupów", options));
 });
 
 self.addEventListener("notificationclick", (event) => {

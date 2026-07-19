@@ -58,6 +58,7 @@ const listSelectionMessage = document.querySelector("#listSelectionMessage");
 const listBackButton = document.querySelector("#listBackButton");
 const createListMenuButton = document.querySelector("#createListMenuButton");
 const createUserMenuButton = document.querySelector("#createUserMenuButton");
+const assignUsersMenuButton = document.querySelector("#assignUsersMenuButton");
 const renameListMenuButton = document.querySelector("#renameListMenuButton");
 const changePasswordMenuButton = document.querySelector("#changePasswordMenuButton");
 const notifyListButton = document.querySelector("#notifyListButton");
@@ -83,7 +84,9 @@ let pickerMode = "categories";
 let selectedCategory = null;
 let selectedProduct = null;
 let selectedQuantity = 1;
-let pendingProductName = "";
+let pendingProduct = null;
+let productSearchQuery = "";
+let pendingCatalogPromotion = null;
 let storeConfirmed = hasDefaultStore;
 let dragState = null;
 let pressState = null;
@@ -116,6 +119,7 @@ let currentProfile = null;
 let listOpenInProgress = false;
 let currentUserIsDev = false;
 let manageableUsers = [];
+let manageableMemberships = [];
 let deferredInstallPrompt = null;
 let installPromptMode = null;
 let installPromptPreview = false;
@@ -301,6 +305,7 @@ function closeApp() {
   manageableUsers = [];
   createListMenuButton.classList.add("is-hidden");
   createUserMenuButton.classList.add("is-hidden");
+  assignUsersMenuButton.classList.add("is-hidden");
   renameListMenuButton.classList.add("is-hidden");
   changePasswordMenuButton.classList.add("is-hidden");
   notifyListButton.classList.add("is-hidden");
@@ -590,7 +595,7 @@ async function openShoppingList(list) {
     selectedProduct = null;
     selectedCategory = null;
     selectedQuantity = 1;
-    pendingProductName = "";
+    pendingProduct = null;
     const data = await window.ShoppingDB.loadInitialData();
     currentList = list;
     currentUserIsAdmin = currentUserIsDev || list.role === "admin";
@@ -638,6 +643,7 @@ async function enterDatabaseMode(session) {
   currentUserIsDev = currentProfile.role === "dev";
   createListMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
   createUserMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
+  assignUsersMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
   renameListMenuButton.classList.add("is-hidden");
   changePasswordMenuButton.classList.remove("is-hidden");
   availableLists = context.lists;
@@ -684,6 +690,7 @@ function showDatabaseRecovery(session) {
   adminModeButton.classList.add("is-hidden");
   createListMenuButton.classList.add("is-hidden");
   createUserMenuButton.classList.add("is-hidden");
+  assignUsersMenuButton.classList.add("is-hidden");
   renameListMenuButton.classList.add("is-hidden");
   changePasswordMenuButton.classList.remove("is-hidden");
   notifyListButton.classList.add("is-hidden");
@@ -733,6 +740,7 @@ function enterDemoMode() {
   adminModeButton.classList.add("is-hidden");
   createListMenuButton.classList.add("is-hidden");
   createUserMenuButton.classList.add("is-hidden");
+  assignUsersMenuButton.classList.add("is-hidden");
   renameListMenuButton.classList.add("is-hidden");
   changePasswordMenuButton.classList.add("is-hidden");
   syncStatus.disabled = true;
@@ -770,7 +778,7 @@ function adminActionIcon(action) {
 }
 
 function renderAdminInlineForm(type, item) {
-  const hasIcon = type === "categories";
+  const hasIcon = type === "categories" || type === "products";
   return `
     <form class="admin-inline-form ${hasIcon ? "has-icon" : ""}" data-admin-form="${type}" data-id="${item.id}">
       <input name="name" type="text" minlength="2" maxlength="60" value="${escapeAttribute(item.name)}" aria-label="Nowa nazwa" required>
@@ -845,7 +853,7 @@ function renderAdminList() {
     return `
       <section class="admin-group">
         <h2 class="admin-group-title"><span>${escapeHtml(category.icon)}</span>${escapeHtml(category.name)}</h2>
-        <div class="admin-sort-list" data-admin-list="products" data-category-id="${category.id}">${products.map((product) => renderAdminRow("products", product, category.name)).join("")}</div>
+        <div class="admin-sort-list" data-admin-list="products" data-category-id="${category.id}">${products.map((product) => renderAdminRow("products", product, category.name, product.icon || category.icon)).join("")}</div>
       </section>`;
   }).join("");
   adminList.innerHTML = groups || '<div class="admin-empty">Brak aktywnych produktów.</div>';
@@ -1047,6 +1055,7 @@ function itemMarkup(item) {
       <button class="check-button" type="button" aria-label="${item.done ? "Przywróć do aktywnych" : "Oznacz jako kupione"}" data-action="toggle">
         ${item.done ? '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6.5 12.5 3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ""}
       </button>
+      <span class="item-product-icon" aria-hidden="true">${escapeHtml(item.icon || "🛒")}</span>
       <div class="item-copy">
         <div class="item-main">
           <span class="item-name">${escapeHtml(item.name)}</span>
@@ -1054,6 +1063,10 @@ function itemMarkup(item) {
         </div>
         <span class="item-meta">${escapeHtml(item.category)} · dodał(a): ${escapeHtml(item.addedBy)}</span>
       </div>
+      ${currentUserIsAdmin && item.custom ? `
+        <button class="promote-product-button" type="button" aria-label="Dodaj ${escapeAttribute(item.name)} na stałe do katalogu" title="Dodaj do katalogu" data-action="promote-custom">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>` : ""}
       <button class="delete-button" type="button" aria-label="Usuń ${escapeAttribute(item.name)}" data-action="delete">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 7h14M9 7V4h6v3m2 0-1 13H8L7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -1090,17 +1103,74 @@ function optionArrow() {
   return '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 }
 
-function renderCategoryPicker() {
-  pickerMode = "categories";
-  selectedCategory = null;
-  pickerTitle.textContent = "Wybierz kategorię";
-  pickerBack.classList.add("is-hidden");
-  pickerContent.innerHTML = `<div class="picker-options">${productCatalog.map((category) => `
+function normalizedCatalogProduct(product, category) {
+  return typeof product === "string"
+    ? { id: null, key: product, name: product, icon: category.icon || "🛒" }
+    : { ...product, key: product.id || product.name, icon: product.icon || category.icon || "🛒" };
+}
+
+function categoryOptionsMarkup() {
+  return productCatalog.map((category) => `
     <button class="picker-option" type="button" data-picker-action="category" data-value="${category.id}">
       <span class="picker-option-icon">${escapeHtml(category.icon)}</span>
       <span class="picker-option-copy"><strong>${escapeHtml(category.name)}</strong><small>${category.products.length} produktów</small></span>
       ${optionArrow()}
-    </button>`).join("")}</div>`;
+    </button>`).join("");
+}
+
+function normalizeProductSearch(text) {
+  return String(text || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLocaleLowerCase("pl-PL");
+}
+
+function productSearchResultsMarkup(query) {
+  const normalizedQuery = normalizeProductSearch(query);
+  if (!normalizedQuery) return `<div class="picker-options">${categoryOptionsMarkup()}</div>`;
+
+  const matches = productCatalog.flatMap((category) => category.products
+    .map((entry) => ({ category, product: normalizedCatalogProduct(entry, category) })))
+    .filter(({ product }) => normalizeProductSearch(product.name).includes(normalizedQuery));
+  const exactMatch = matches.some(({ product }) => normalizeProductSearch(product.name) === normalizedQuery);
+  const saveToCatalogButton = currentUserIsAdmin
+    ? `<button class="picker-custom-save" type="button" data-picker-action="save-custom-product" data-value="${escapeAttribute(query.trim())}" aria-label="Dodaj ${escapeAttribute(query.trim())} na stałe do katalogu" title="Dodaj na stałe do katalogu">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>`
+    : "";
+  const customOption = query.trim().length >= 2 && !exactMatch
+    ? `<div class="picker-custom-row ${currentUserIsAdmin ? "has-save-action" : ""}">
+        <button class="picker-option picker-option--custom" type="button" data-picker-action="custom-product" data-value="${escapeAttribute(query.trim())}">
+          <span class="picker-option-icon">✏️</span>
+          <span class="picker-option-copy"><strong>Dodaj „${escapeHtml(query.trim())}”</strong><small>Jednorazowo, bez zapisywania w katalogu</small></span>
+          ${optionArrow()}
+        </button>
+        ${saveToCatalogButton}
+      </div>`
+    : "";
+  const resultOptions = matches.map(({ category, product }) => `
+    <button class="picker-option" type="button" data-picker-action="search-product" data-category-id="${category.id}" data-value="${escapeAttribute(product.key)}">
+      <span class="picker-option-icon">${escapeHtml(product.icon)}</span>
+      <span class="picker-option-copy"><strong>${escapeHtml(product.name)}</strong><small>${escapeHtml(category.name)}</small></span>
+      ${optionArrow()}
+    </button>`).join("");
+
+  return `<div class="picker-options">${resultOptions}${customOption}</div>${!matches.length && !customOption ? '<div class="picker-search-empty">Wpisz co najmniej 2 znaki, aby dodać własny produkt.</div>' : ""}`;
+}
+
+function renderCategoryPicker(query = "") {
+  pickerMode = "categories";
+  selectedCategory = null;
+  productSearchQuery = query;
+  pickerTitle.textContent = "Wybierz produkt";
+  pickerBack.classList.add("is-hidden");
+  pickerContent.innerHTML = `
+    <label class="product-search">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input id="productSearchInput" type="search" maxlength="60" placeholder="Szukaj lub wpisz własny produkt" value="${escapeAttribute(query)}" autocomplete="off" enterkeyhint="search">
+    </label>
+    <div id="productSearchResults">${productSearchResultsMarkup(query)}</div>`;
 }
 
 function renderProductPicker(category) {
@@ -1108,19 +1178,22 @@ function renderProductPicker(category) {
   selectedCategory = category;
   pickerTitle.textContent = category.name;
   pickerBack.classList.remove("is-hidden");
-  pickerContent.innerHTML = `<div class="picker-options">${category.products.map((product) => `
-    <button class="picker-option" type="button" data-picker-action="product" data-value="${escapeAttribute(product)}">
-      <span class="picker-option-icon">${escapeHtml(category.icon)}</span>
-      <span class="picker-option-copy"><strong>${escapeHtml(product)}</strong><small>Wybierz produkt</small></span>
+  pickerContent.innerHTML = `<div class="picker-options">${category.products.map((entry) => {
+    const product = normalizedCatalogProduct(entry, category);
+    return `
+    <button class="picker-option" type="button" data-picker-action="product" data-value="${escapeAttribute(product.key)}">
+      <span class="picker-option-icon">${escapeHtml(product.icon)}</span>
+      <span class="picker-option-copy"><strong>${escapeHtml(product.name)}</strong><small>Wybierz produkt</small></span>
       ${optionArrow()}
-    </button>`).join("")}</div>`;
+    </button>`;
+  }).join("")}</div>`;
 }
 
-function renderQuantityPicker(productName) {
+function renderQuantityPicker(product) {
   pickerMode = "quantity";
-  pendingProductName = productName;
+  pendingProduct = product;
   selectedQuantity = 1;
-  pickerTitle.textContent = productName;
+  pickerTitle.textContent = product.name;
   pickerBack.classList.remove("is-hidden");
   pickerContent.innerHTML = `
     <div class="quantity-picker">
@@ -1147,14 +1220,16 @@ function renderStorePicker() {
     </button>`).join("")}</div>`;
 }
 
-function renderAddProductForm() {
-  pickerMode = "add-product";
-  pickerTitle.textContent = "Dodaj produkt";
-  pickerBack.classList.add("is-hidden");
+function renderAddProductForm(prefilledName = "", fromSearch = false) {
+  pickerMode = fromSearch ? "add-product-from-search" : "add-product";
+  pickerTitle.textContent = fromSearch ? "Dodaj do katalogu" : "Dodaj produkt";
+  pickerBack.classList.toggle("is-hidden", !fromSearch);
   pickerContent.innerHTML = `
     <form class="catalog-form" id="addProductForm">
       <label for="newProductName">Nazwa produktu</label>
-      <input id="newProductName" name="name" type="text" minlength="2" maxlength="60" placeholder="Np. Mozzarella" autocomplete="off" required>
+      <input id="newProductName" name="name" type="text" minlength="2" maxlength="60" placeholder="Np. Mozzarella" value="${escapeAttribute(prefilledName)}" autocomplete="off" required>
+      <label for="newProductIcon">Ikonka</label>
+      <input class="catalog-icon-input" id="newProductIcon" name="icon" type="text" maxlength="8" value="🛒" aria-label="Ikonka produktu">
       <label for="newProductCategory">Kategoria</label>
       <select id="newProductCategory" name="categoryId" required>
         ${productCatalog.map((category) => `<option value="${category.id}">${escapeHtml(category.name)}</option>`).join("")}
@@ -1162,7 +1237,11 @@ function renderAddProductForm() {
       <p class="catalog-form-message" role="alert"></p>
       <button class="catalog-form-submit" type="submit">Zapisz produkt</button>
     </form>`;
-  window.setTimeout(() => document.querySelector("#newProductName")?.focus(), 50);
+  window.setTimeout(() => {
+    const input = document.querySelector(fromSearch ? "#newProductIcon" : "#newProductName");
+    input?.focus();
+    input?.select();
+  }, 50);
 }
 
 function renderAddStoreForm() {
@@ -1237,6 +1316,69 @@ async function openCreateListForm() {
   } catch (error) {
     console.error(error);
     pickerContent.innerHTML = `<div class="list-form-error">${escapeHtml(error.message || "Nie udało się pobrać użytkowników.")}</div>`;
+  }
+}
+
+function managedListLabel(list) {
+  const duplicateName = availableLists.some((entry) => entry.id !== list.id && entry.name === list.name);
+  return duplicateName ? `${list.name} · ${list.id.slice(0, 4)}` : list.name;
+}
+
+function renderAssignUsersForm(listId = availableLists[0]?.id, role = "member") {
+  pickerMode = "assign-users";
+  pickerTitle.textContent = "Przypisz do listy";
+  pickerBack.classList.add("is-hidden");
+  const selectedListId = availableLists.some((list) => list.id === listId) ? listId : availableLists[0]?.id;
+  const existingUserIds = new Set(manageableMemberships
+    .filter((membership) => membership.list_id === selectedListId)
+    .map((membership) => membership.user_id));
+  const selectableUsers = manageableUsers.filter((user) => !existingUserIds.has(user.user_id));
+  pickerContent.innerHTML = `
+    <form class="list-create-form assign-users-form">
+      <label for="assignUsersList">Lista</label>
+      <select id="assignUsersList" name="listId" required>
+        ${availableLists.map((list) => `<option value="${list.id}" ${list.id === selectedListId ? "selected" : ""}>${escapeHtml(managedListLabel(list))}</option>`).join("")}
+      </select>
+      <label for="assignUsersRole">Rola na liście</label>
+      <select id="assignUsersRole" name="role">
+        <option value="member" ${role === "member" ? "selected" : ""}>Użytkownik</option>
+        <option value="admin" ${role === "admin" ? "selected" : ""}>Administrator katalogu</option>
+      </select>
+      <fieldset class="list-members-fieldset">
+        <legend>Istniejący użytkownicy</legend>
+        <p>Wyświetlane są tylko osoby, które nie należą jeszcze do wybranej listy.</p>
+        <div class="list-member-options">
+          ${selectableUsers.length ? selectableUsers.map((user) => `
+            <label class="list-member-option">
+              <input type="checkbox" name="userIds" value="${escapeAttribute(user.user_id)}">
+              <span><strong>${escapeHtml(user.display_name)}</strong><small>@${escapeHtml(user.username)}</small></span>
+            </label>`).join("") : '<span class="list-members-empty">Wszyscy istniejący użytkownicy są już przypisani do tej listy.</span>'}
+        </div>
+      </fieldset>
+      <p class="catalog-form-message" role="alert"></p>
+      <button class="catalog-form-submit" type="submit" ${selectableUsers.length ? "" : "disabled"}>Dodaj do listy</button>
+    </form>`;
+}
+
+async function openAssignUsersForm() {
+  if (!currentUserIsDev || isDemoMode) return;
+  profilePopover.classList.add("is-hidden");
+  pickerMode = "assign-users-loading";
+  pickerTitle.textContent = "Przypisz do listy";
+  pickerBack.classList.add("is-hidden");
+  pickerContent.innerHTML = '<div class="list-form-loading">Ładowanie użytkowników i list…</div>';
+  pickerBackdrop.classList.remove("is-hidden");
+  pickerSheet.classList.remove("is-hidden");
+  document.body.classList.add("picker-open");
+  try {
+    [manageableUsers, manageableMemberships] = await Promise.all([
+      window.ShoppingDB.loadManageableUsers(),
+      window.ShoppingDB.loadManageableMemberships()
+    ]);
+    renderAssignUsersForm(currentList?.id || availableLists[0]?.id);
+  } catch (error) {
+    console.error(error);
+    pickerContent.innerHTML = `<div class="list-form-error">${escapeHtml(error.message || "Nie udało się pobrać przypisań użytkowników.")}</div>`;
   }
 }
 
@@ -1337,6 +1479,18 @@ function openCatalogEditor(type) {
   document.body.classList.add("picker-open");
 }
 
+function openPromoteCustomProductForm(item) {
+  if (!currentUserIsAdmin || !item?.custom || isDemoMode) return;
+  pendingCatalogPromotion = { itemId: item.id, name: item.name };
+  renderAddProductForm(item.name, true);
+  pickerMode = "promote-custom-product";
+  pickerTitle.textContent = "Dodaj do katalogu";
+  pickerBack.classList.add("is-hidden");
+  pickerBackdrop.classList.remove("is-hidden");
+  pickerSheet.classList.remove("is-hidden");
+  document.body.classList.add("picker-open");
+}
+
 function openPicker(mode) {
   if (mode === "stores") renderStorePicker();
   else renderCategoryPicker();
@@ -1345,9 +1499,24 @@ function openPicker(mode) {
   document.body.classList.add("picker-open");
 }
 
+function updatePickerViewport() {
+  const viewport = window.visualViewport;
+  const visibleHeight = viewport?.height || window.innerHeight;
+  const offsetTop = viewport?.offsetTop || 0;
+  const keyboardInset = Math.max(0, window.innerHeight - visibleHeight - offsetTop);
+  const focusedElement = document.activeElement;
+  const keyboardActive = pickerSheet.contains(focusedElement)
+    && focusedElement?.matches?.("input, textarea, select");
+  pickerSheet.style.setProperty("--picker-visible-height", `${Math.max(260, visibleHeight)}px`);
+  pickerSheet.style.setProperty("--picker-keyboard-inset", `${keyboardInset}px`);
+  pickerSheet.classList.toggle("is-keyboard-active", keyboardActive);
+}
+
 function closePicker() {
+  if (pickerMode === "promote-custom-product") pendingCatalogPromotion = null;
   pickerBackdrop.classList.add("is-hidden");
   pickerSheet.classList.add("is-hidden");
+  pickerSheet.classList.remove("is-keyboard-active");
   document.body.classList.remove("picker-open");
 }
 
@@ -1361,10 +1530,14 @@ function updateProductDraft() {
 }
 
 function confirmProductDraft() {
+  if (!pendingProduct) return;
   selectedProduct = {
-    name: pendingProductName,
+    productId: pendingProduct.id || null,
+    name: pendingProduct.name,
+    icon: pendingProduct.icon || "🛒",
+    custom: Boolean(pendingProduct.custom),
     quantity: selectedQuantity,
-    category: selectedCategory?.name || "Inne"
+    category: pendingProduct.custom ? "Własny produkt" : (selectedCategory?.name || "Inne")
   };
   storeConfirmed = hasDefaultStore;
   updateProductDraft();
@@ -1377,6 +1550,8 @@ async function addSelectedProduct() {
     items.unshift({
       id: createId(),
       name: selectedProduct.name,
+      icon: selectedProduct.icon,
+      custom: selectedProduct.custom,
       quantity: selectedProduct.quantity,
       done: false,
       addedBy: "Ja",
@@ -1386,14 +1561,15 @@ async function addSelectedProduct() {
     saveItems();
     renderItems();
   } else {
-    const productId = productIdByKey.get(`${selectedProduct.category}|${selectedProduct.name}`);
     const storeId = storeIdByName.get(selectedStore);
-    if (!productId || !storeId) return;
+    if ((!selectedProduct.productId && !selectedProduct.custom) || !storeId) return;
     try {
       setConnectionStatus("syncing", "zapisywanie…");
       const nextPosition = items.reduce((max, item) => Math.max(max, item.position || 0), 0) + 10;
       await window.ShoppingDB.addItem({
-        productId,
+        productId: selectedProduct.productId,
+        customName: selectedProduct.custom ? selectedProduct.name : null,
+        customIcon: selectedProduct.custom ? selectedProduct.icon : null,
         storeId,
         quantity: selectedProduct.quantity,
         position: nextPosition
@@ -1407,7 +1583,7 @@ async function addSelectedProduct() {
   }
   selectedProduct = null;
   selectedQuantity = 1;
-  pendingProductName = "";
+  pendingProduct = null;
   storeConfirmed = hasDefaultStore;
   updateProductDraft();
 }
@@ -1528,11 +1704,12 @@ function finishSwipe() {
   pressState = null;
   suppressItemClickUntil = Date.now() + 400;
 
-  if (currentX <= -72) {
+  if (Math.abs(currentX) >= 72) {
     item.classList.remove("is-swiping");
     item.classList.remove("is-delete-ready");
     item.classList.add("is-swipe-removing");
-    item.style.transform = "translate3d(-110vw, 0, 0)";
+    const removalDirection = currentX < 0 ? -110 : 110;
+    item.style.transform = `translate3d(${removalDirection}vw, 0, 0)`;
     window.setTimeout(async () => {
       items = items.filter((entry) => entry.id !== itemId);
       saveItems();
@@ -1673,8 +1850,30 @@ document.querySelector("#pickerClose").addEventListener("click", closePicker);
 pickerBackdrop.addEventListener("click", closePicker);
 pickerBack.addEventListener("click", () => {
   if (pickerMode === "quantity" && selectedCategory) renderProductPicker(selectedCategory);
-  else renderCategoryPicker();
+  else renderCategoryPicker(productSearchQuery);
 });
+
+pickerContent.addEventListener("input", (event) => {
+  if (event.target.id !== "productSearchInput") return;
+  productSearchQuery = event.target.value;
+  const results = document.querySelector("#productSearchResults");
+  if (results) results.innerHTML = productSearchResultsMarkup(productSearchQuery);
+});
+
+pickerContent.addEventListener("change", (event) => {
+  if (event.target.id !== "assignUsersList") return;
+  const role = document.querySelector("#assignUsersRole")?.value || "member";
+  renderAssignUsersForm(event.target.value, role);
+});
+
+pickerContent.addEventListener("focusin", (event) => window.setTimeout(() => {
+  updatePickerViewport();
+  event.target.scrollIntoView({ block: "nearest" });
+}, 80));
+pickerContent.addEventListener("focusout", () => window.setTimeout(updatePickerViewport, 180));
+window.visualViewport?.addEventListener("resize", updatePickerViewport);
+window.visualViewport?.addEventListener("scroll", updatePickerViewport);
+window.addEventListener("resize", updatePickerViewport);
 
 pickerContent.addEventListener("click", (event) => {
   const option = event.target.closest("[data-picker-action]");
@@ -1688,7 +1887,30 @@ pickerContent.addEventListener("click", (event) => {
     const category = productCatalog.find((item) => item.id === value);
     if (category) renderProductPicker(category);
   }
-  if (pickerAction === "product") renderQuantityPicker(value);
+  if (pickerAction === "product" && selectedCategory) {
+    const product = selectedCategory.products
+      .map((entry) => normalizedCatalogProduct(entry, selectedCategory))
+      .find((entry) => entry.key === value);
+    if (product) renderQuantityPicker(product);
+  }
+  if (pickerAction === "search-product") {
+    const category = productCatalog.find((entry) => entry.id === option.dataset.categoryId);
+    const product = category?.products
+      .map((entry) => normalizedCatalogProduct(entry, category))
+      .find((entry) => entry.key === value);
+    if (category && product) {
+      selectedCategory = category;
+      renderQuantityPicker(product);
+    }
+  }
+  if (pickerAction === "custom-product") {
+    selectedCategory = null;
+    renderQuantityPicker({ id: null, name: value, icon: "✏️", custom: true });
+  }
+  if (pickerAction === "save-custom-product" && currentUserIsAdmin) {
+    productSearchQuery = value;
+    renderAddProductForm(value, true);
+  }
   if (pickerAction === "quantity-decrease") {
     selectedQuantity = Math.max(1, selectedQuantity - 1);
     document.querySelector("#quantityValue").innerHTML = `${selectedQuantity} <small>szt.</small>`;
@@ -1779,6 +2001,43 @@ pickerContent.addEventListener("submit", async (event) => {
       message.textContent = error.message || "Nie udało się zmienić nazwy listy.";
       setConnectionStatus("offline", "błąd zapisu");
     } finally {
+      submitButton.disabled = false;
+    }
+    return;
+  }
+
+  const assignUsersForm = event.target.closest(".assign-users-form");
+  if (assignUsersForm) {
+    event.preventDefault();
+    const message = assignUsersForm.querySelector(".catalog-form-message");
+    const submitButton = assignUsersForm.querySelector("button[type='submit']");
+    const listId = assignUsersForm.elements.listId.value;
+    const role = assignUsersForm.elements.role.value;
+    const userIds = [...assignUsersForm.querySelectorAll("input[name='userIds']:checked")].map((input) => input.value);
+    if (!userIds.length) {
+      message.textContent = "Wybierz przynajmniej jednego użytkownika.";
+      return;
+    }
+    submitButton.disabled = true;
+    message.textContent = "";
+    try {
+      setConnectionStatus("syncing", "przypisywanie…");
+      const addedCount = await window.ShoppingDB.addExistingUsersToList(listId, userIds, role);
+      manageableMemberships = await window.ShoppingDB.loadManageableMemberships();
+      if (currentList?.id === listId) await refreshRemoteData();
+      pickerTitle.textContent = "Użytkownicy dodani";
+      pickerContent.innerHTML = `
+        <div class="user-create-success">
+          <span>✓</span>
+          <strong>Gotowe</strong>
+          <p>Liczba dodanych kont: ${Number(addedCount)}.</p>
+          <button class="catalog-form-submit" type="button" data-picker-action="close">Zamknij</button>
+        </div>`;
+      setConnectionStatus("online", "połączono");
+    } catch (error) {
+      console.error(error);
+      message.textContent = error.message || "Nie udało się przypisać użytkowników.";
+      setConnectionStatus("offline", "błąd zapisu");
       submitButton.disabled = false;
     }
     return;
@@ -1876,7 +2135,17 @@ pickerContent.addEventListener("submit", async (event) => {
   message.textContent = "";
 
   try {
-    if (pickerMode === "add-category") {
+    if (pickerMode === "promote-custom-product") {
+      if (!pendingCatalogPromotion) throw new Error("Nie znaleziono produktu do zapisania.");
+      const categoryId = form.elements.categoryId.value;
+      const icon = form.elements.icon.value.trim() || "🛒";
+      const category = productCatalog.find((entry) => entry.id === categoryId);
+      if (!category) throw new Error("Nie znaleziono wybranej kategorii.");
+      setConnectionStatus("syncing", "zapisywanie…");
+      await window.ShoppingDB.promoteCustomItem(pendingCatalogPromotion.itemId, categoryId, name, icon);
+      pendingCatalogPromotion = null;
+      await refreshRemoteData();
+    } else if (pickerMode === "add-category") {
       const icon = form.elements.icon.value.trim() || "🛒";
       if (productCatalog.some((category) => category.name.toLowerCase() === name.toLowerCase())) {
         throw new Error("Taka kategoria już istnieje.");
@@ -1888,18 +2157,30 @@ pickerContent.addEventListener("submit", async (event) => {
         await window.ShoppingDB.addCategory(name, icon);
         await refreshRemoteData();
       }
-    } else if (pickerMode === "add-product") {
+    } else if (pickerMode === "add-product" || pickerMode === "add-product-from-search") {
+      const addFromSearch = pickerMode === "add-product-from-search";
       const categoryId = form.elements.categoryId.value;
+      const icon = form.elements.icon.value.trim() || "🛒";
       const category = productCatalog.find((entry) => entry.id === categoryId);
       if (!category) throw new Error("Nie znaleziono wybranej kategorii.");
-      if (category.products.some((product) => product.toLowerCase() === name.toLowerCase())) {
+      if (category.products.some((product) => normalizedCatalogProduct(product, category).name.toLowerCase() === name.toLowerCase())) {
         throw new Error("Taki produkt już istnieje w tej kategorii.");
       }
-      if (isDemoMode) category.products.push(name);
+      if (isDemoMode) category.products.push({ id: createId(), name, icon });
       else {
         setConnectionStatus("syncing", "zapisywanie…");
-        await window.ShoppingDB.addProduct(categoryId, name);
+        await window.ShoppingDB.addProduct(categoryId, name, icon);
         await refreshRemoteData();
+      }
+      if (addFromSearch) {
+        const savedCategory = productCatalog.find((entry) => entry.id === categoryId);
+        const savedProduct = savedCategory?.products
+          .map((entry) => normalizedCatalogProduct(entry, savedCategory))
+          .find((product) => normalizeProductSearch(product.name) === normalizeProductSearch(name));
+        if (!savedCategory || !savedProduct) throw new Error("Produkt zapisano, ale nie udało się go od razu wybrać.");
+        selectedCategory = savedCategory;
+        renderQuantityPicker(savedProduct);
+        return;
       }
     } else if (pickerMode === "add-store") {
       if (storeNames.some((store) => store.toLowerCase() === name.toLowerCase())) {
@@ -1933,6 +2214,10 @@ document.querySelector(".app-content").addEventListener("click", async (event) =
   if (!button || !itemElement) return;
   const index = items.findIndex((item) => item.id === itemElement.dataset.id);
   if (index < 0) return;
+  if (button.dataset.action === "promote-custom") {
+    openPromoteCustomProductForm(items[index]);
+    return;
+  }
   const itemId = items[index].id;
   const nextDone = !items[index].done;
   if (button.dataset.action === "toggle") items[index].done = nextDone;
@@ -1980,15 +2265,15 @@ document.querySelector(".app-content").addEventListener("pointermove", (event) =
   if (!dragState && pressState) {
     const deltaX = event.clientX - pressState.startX;
     const deltaY = event.clientY - pressState.startY;
-    if (pressState.swiping || (pressState.canSwipe && deltaX < -8 && Math.abs(deltaX) > Math.abs(deltaY))) {
+    if (pressState.swiping || (pressState.canSwipe && Math.abs(deltaX) > 8 && Math.abs(deltaX) > Math.abs(deltaY))) {
       event.preventDefault();
       clearTimeout(pressState.timer);
       pressState.swiping = true;
-      pressState.currentX = Math.max(-105, Math.min(0, deltaX));
+      pressState.currentX = Math.max(-105, Math.min(105, deltaX));
       const swipeProgress = Math.min(1, Math.abs(pressState.currentX) / 90);
       pressState.item.classList.remove("is-pressing");
       pressState.item.classList.add("is-swiping");
-      pressState.item.classList.toggle("is-delete-ready", pressState.currentX <= -72);
+      pressState.item.classList.toggle("is-delete-ready", Math.abs(pressState.currentX) >= 72);
       pressState.item.style.setProperty("--swipe-strength", String(swipeProgress * .58));
       pressState.item.style.transform = `translate3d(${pressState.currentX}px, 0, 0)`;
       return;
@@ -2203,7 +2488,7 @@ adminList.addEventListener("submit", (event) => {
   try {
     validateAdminName(type, item, name);
     item.name = name;
-    if (type === "categories") item.icon = form.elements.icon.value.trim() || "🛒";
+    if (type === "categories" || type === "products") item.icon = form.elements.icon.value.trim() || "🛒";
     adminEditingItem = null;
     renderAdminList();
   } catch (error) {
@@ -2222,6 +2507,7 @@ document.querySelector("#addCategoryMenuButton").addEventListener("click", () =>
 document.querySelector("#addStoreMenuButton").addEventListener("click", () => openCatalogEditor("store"));
 createListMenuButton.addEventListener("click", () => void openCreateListForm());
 createUserMenuButton.addEventListener("click", openCreateUserForm);
+assignUsersMenuButton.addEventListener("click", () => void openAssignUsersForm());
 renameListMenuButton.addEventListener("click", openRenameListForm);
 changePasswordMenuButton.addEventListener("click", openChangePasswordForm);
 notifyListButton.addEventListener("click", () => void handleNotifyList());
