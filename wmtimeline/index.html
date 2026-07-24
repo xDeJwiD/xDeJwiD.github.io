@@ -1,0 +1,3428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://bpmziyioiszufnyxlqse.supabase.co wss://bpmziyioiszufnyxlqse.supabase.co; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+  >
+  <title>Timeline Editor</title>
+  <style>
+    @property --sync-state-color {
+      syntax: "<color>";
+      inherits: true;
+      initial-value: #8b8b8b;
+    }
+
+    :root {
+      /* ===================== THEME =====================
+         Edit this block to change the look of the whole editor.
+         Section colors can be changed independently below. */
+      --bg: #1e1e1e;
+      --panel: #2b2b2b;
+      --panel-2: #343434;
+      --text: #d4d4d4;
+      --muted: #9d9d9d;
+      --toolbar-bg: #2d2d2d;
+      --toolbar-bg-bottom: #242424;
+      --border: #1a1a1a;
+      --border-soft: #343434;
+      --control-bg: #3b3b3b;
+      --control-bg-hover: #4b4b4b;
+      --input-bg: #2a2a2a;
+      --input-focus: #6b6b6b;
+      --button-text: #d4d4d4;
+      --button-radius: 3px;
+      --section-radius: 5px;
+      --section-padding-y: 5px;
+      --section-padding-x: 8px;
+      --toolbar-gap: 10px;
+      --section-gap: 5px;
+      --control-gap: 7px;
+      --control-padding-x: 8px;
+      --section-bg: transparent;
+      --section-border: transparent;
+      --section-label-color: #9d9d9d;
+      --toolbar-section-height: 52px;
+      --control-height: 28px;
+      --control-font-size: 13px;
+      --action-button-width: 92px;
+      --accent-loop: #659df2;
+      --accent-transition: #fe9f4d;
+      --accent-story: #8f7fee;
+      --blender-orange: #e87d0d;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Tahoma, sans-serif;
+    }
+
+    body { display: flex; }
+    .app-shell { display: flex; flex-direction: column; width: 100%; height: 100%; }
+
+    .sync-status-bar {
+      --sync-state-color: #8b8b8b;
+      position: relative;
+      height: 24px;
+      min-height: 24px;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #181818;
+      background: #242424;
+      color: #b8b8b8;
+      font-size: 11px;
+      letter-spacing: .035em;
+      text-transform: uppercase;
+      transition: --sync-state-color .42s ease;
+    }
+
+    .sync-status-bar::after {
+      content: "";
+      position: absolute;
+      z-index: 2;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      pointer-events: none;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--sync-state-color) 18%,
+        var(--sync-state-color) 82%,
+        transparent 100%
+      );
+    }
+
+    .sync-status-dot {
+      width: 7px;
+      height: 7px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: #8b8b8b;
+      transition: background-color .42s ease;
+    }
+
+    .sync-status-time {
+      margin-left: auto;
+      color: #858585;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0;
+    }
+
+    .sync-status-bar[data-state="saved"] .sync-status-dot { background: #64a86f; }
+    .sync-status-bar[data-state="pending"] .sync-status-dot { background: #d79a45; }
+    .sync-status-bar[data-state="saving"] .sync-status-dot {
+      background: var(--blender-orange);
+      animation: sync-dot-pulse .8s ease-in-out infinite alternate;
+    }
+    .sync-status-bar[data-state="offline"] .sync-status-dot { background: #888; }
+    .sync-status-bar[data-state="out-of-sync"] .sync-status-dot,
+    .sync-status-bar[data-state="conflict"] .sync-status-dot { background: #d64a4a; }
+    .sync-status-bar[data-state="back-online"] .sync-status-dot { background: #68a9d8; }
+
+    .sync-status-bar[data-state="saved"] { --sync-state-color: #64a86f; }
+    .sync-status-bar[data-state="pending"] { --sync-state-color: #d79a45; }
+    .sync-status-bar[data-state="saving"] { --sync-state-color: var(--blender-orange); }
+    .sync-status-bar[data-state="offline"] { --sync-state-color: #888; }
+    .sync-status-bar[data-state="out-of-sync"],
+    .sync-status-bar[data-state="conflict"] { --sync-state-color: #d64a4a; }
+    .sync-status-bar[data-state="back-online"] { --sync-state-color: #68a9d8; }
+
+    @keyframes sync-dot-pulse {
+      from { opacity: .4; }
+      to { opacity: 1; }
+    }
+
+    body.auth-checking .app-shell,
+    body.auth-locked .app-shell {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loading-reveal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      overflow: hidden;
+      pointer-events: none;
+      background: #1b1b1b;
+    }
+
+    body.auth-checking .loading-reveal,
+    body.auth-revealing .loading-reveal {
+      display: block;
+    }
+
+    .loading-reveal::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(
+          180deg,
+          transparent 22%,
+          rgba(255, 255, 255, .025) 38%,
+          rgba(232, 125, 13, .16) 50%,
+          rgba(255, 255, 255, .025) 62%,
+          transparent 78%
+        );
+      transform: translateY(100%);
+      animation: blender-loading-sweep 1.25s ease-in-out infinite;
+    }
+
+    .loading-reveal-label {
+      position: absolute;
+      left: 50%;
+      bottom: 34px;
+      transform: translateX(-50%);
+      color: #8f8f8f;
+      font-size: 11px;
+      letter-spacing: .04em;
+    }
+
+    body.auth-revealing .loading-reveal {
+      background:
+        linear-gradient(180deg, #1b1b1b 0%, #202020 88%, rgba(232, 125, 13, .38) 100%);
+      animation: blender-reveal-out .72s cubic-bezier(.72, 0, .2, 1) forwards;
+    }
+
+    body.auth-revealing .loading-reveal::before,
+    body.auth-revealing .loading-reveal-label {
+      display: none;
+    }
+
+    body.auth-revealing .app-shell {
+      animation: blender-app-in .5s ease-out both;
+    }
+
+    @keyframes blender-loading-sweep {
+      0% { transform: translateY(100%); }
+      65%, 100% { transform: translateY(-100%); }
+    }
+
+    @keyframes blender-reveal-out {
+      from { clip-path: inset(0 0 0 0); }
+      to { clip-path: inset(0 0 100% 0); }
+    }
+
+    @keyframes blender-app-in {
+      from { filter: brightness(.72); }
+      to { filter: brightness(1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .loading-reveal::before { animation: none; }
+      body.auth-revealing .loading-reveal { animation-duration: .01ms; }
+      body.auth-revealing .app-shell { animation: none; }
+    }
+
+    .login-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      background: var(--bg);
+    }
+
+    body.auth-locked .login-gate { display: grid; }
+
+    .login-card {
+      width: min(390px, 100%);
+      padding: 28px;
+      border: 1px solid var(--border-soft);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .45);
+    }
+
+    .login-card h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .login-card p {
+      margin: 0 0 22px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .login-form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .login-password {
+      width: 100%;
+      height: 38px;
+      padding: 0 11px;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--button-radius);
+      outline: none;
+      background: var(--input-bg);
+      color: var(--text);
+      font: inherit;
+    }
+
+    .login-password:focus { border-color: var(--blender-orange); }
+
+    .login-submit {
+      height: 38px;
+      border: 1px solid #a85808;
+      border-radius: var(--button-radius);
+      background: var(--blender-orange);
+      color: #fff;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 600;
+    }
+
+    .login-submit:hover { background: #f08a1c; }
+    .login-submit:disabled { cursor: wait; opacity: .65; }
+
+    .login-status {
+      min-height: 18px;
+      color: #f28b82;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .toolbar {
+      height: 132px;
+      min-height: 140px;
+      max-height: 70vh;
+      width: 100%;
+      background: var(--toolbar-bg);
+      border-bottom: 1px solid #171717;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+      padding: 12px 20px;
+      flex: 0 0 auto;
+    }
+
+    .toolbar-resizer {
+      height: 6px;
+      background: #1a1a1a;
+      border-top: 1px solid #343434;
+      border-bottom: 1px solid #111111;
+      cursor: row-resize;
+      flex: 0 0 auto;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .toolbar-group.right { justify-content: flex-end; }
+    .topbar-row { position:relative; display:flex; align-items:center; justify-content:space-between; min-height:48px; padding:0 2px; }
+    .app-title { font-size:16px; color:#e4e4e4; letter-spacing:.02em; }
+    .top-search { position:absolute; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:var(--control-gap); }
+    .top-search .search-input { width:250px; }
+    .top-search .editor-search-status { max-width:150px; }
+    .file-actions { display:flex; align-items:center; gap:12px; }
+    .file-actions .button {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .file-stack { display:flex; flex-direction:column; align-items:flex-end; gap:5px; }
+    .file-actions .status { min-width:145px; text-align:right; }
+    .editor-toolbar { position:relative; display:grid; grid-template-columns:max-content max-content max-content max-content minmax(0, 1fr) max-content; align-items:end; column-gap:var(--toolbar-gap); width:100%; min-width:0; margin-top:auto; padding:0 2px 1px; }
+    .tool-section { display:flex; flex-direction:column; align-items:flex-start; justify-content:space-between; gap:var(--section-gap); height:var(--toolbar-section-height); background:var(--section-bg); border:1px solid var(--section-border); border-radius:var(--section-radius); padding:var(--section-padding-y) var(--section-padding-x); }
+    .section-label { font-size:11px; line-height:1; color:var(--section-label-color); text-align:left; }
+    .editor-toolbar .camera-name { width:180px; }
+    .editor-toolbar .range-info { min-width:95px; text-align:left; }
+    .editor-toolbar .block-range { display:flex; align-items:center; gap:var(--control-gap); white-space:nowrap; }
+    .editor-toolbar .block-range input { width:68px; }
+    .editor-toolbar .timeline-range { display:flex; align-items:center; gap:var(--control-gap); margin-left:auto; white-space:nowrap; }
+    .editor-toolbar .timeline-range input { width:68px; }
+    .editor-toolbar .timeline-range .button { padding:0 8px; }
+    .snapping-control { display:flex; flex-direction:column; gap:2px; }
+    .snapping-label { font-size:11px; color:var(--muted); line-height:1; text-align:left; }
+    .editor-toolbar .selection-actions { padding:0; border:0; background:transparent; }
+    .editor-toolbar .button,
+    .editor-toolbar .text-input,
+    .editor-toolbar .search-input,
+    .editor-toolbar .block-range input,
+    .editor-toolbar .timeline-range input {
+      height:var(--control-height) !important;
+      min-height:var(--control-height);
+      font-size:var(--control-font-size);
+      margin:0;
+    }
+    .editor-toolbar .button { width:auto; padding:0 var(--control-padding-x); white-space:nowrap; }
+    .editor-toolbar .segmented { height:var(--control-height); border:0; border-radius:var(--button-radius); }
+    .editor-toolbar .segment-button { min-width:0; height:var(--control-height) !important; min-height:var(--control-height); line-height:var(--control-height); padding:0 var(--control-padding-x); margin:0; font-size:var(--control-font-size); box-sizing:border-box; }
+    .editor-toolbar .block-range input,
+    .editor-toolbar .timeline-range input { width:62px; padding:0 var(--control-padding-x); }
+    .editor-toolbar .text-input,
+    .editor-toolbar .search-input { padding:0 var(--control-padding-x); }
+    .editor-toolbar .block-frame-section { min-width:145px; }
+    .editor-toolbar .camera-section { min-width:145px; --section-bg:rgba(101,157,242,.045); --section-border:rgba(101,157,242,.16); }
+    .editor-toolbar .block-frame-section { --section-bg:rgba(143,127,238,.045); --section-border:rgba(143,127,238,.16); }
+    .editor-toolbar .snapping-section { --section-bg:rgba(90,160,110,.045); --section-border:rgba(90,160,110,.16); }
+    .editor-toolbar .block-type-section { --section-bg:rgba(254,159,77,.045); --section-border:rgba(254,159,77,.16); }
+    .editor-toolbar .action-section { min-width:238px; --section-bg:rgba(254,159,77,.045); --section-border:rgba(254,159,77,.16); }
+    .editor-toolbar .view-section { --section-bg:rgba(170,170,170,.045); --section-border:rgba(170,170,170,.16); }
+    .editor-toolbar .view-section { grid-column:6; justify-self:end; margin-left:0; }
+    .editor-toolbar .selected-block-controls { position:absolute; left:50%; transform:translateX(-50%); display:flex; align-items:flex-end; gap:var(--toolbar-gap); }
+    .editor-toolbar .danger { min-width:24px; padding:0 var(--control-padding-x); }
+    .editor-toolbar .selection-actions .danger { width:var(--control-height); min-width:var(--control-height); padding:0 var(--control-padding-x); }
+    .editor-toolbar > .tool-section,
+    .editor-toolbar .selected-block-controls > .tool-section { margin:0; }
+    .editor-toolbar button,
+    .editor-toolbar .segment-button,
+    .editor-toolbar input { box-sizing:border-box; }
+
+    /* One visual baseline for every toolbar group and control. */
+    .editor-toolbar .tool-section,
+    .editor-toolbar .selected-block-controls > .tool-section {
+      height:var(--toolbar-section-height) !important;
+      min-height:var(--toolbar-section-height);
+      padding:var(--section-padding-y) var(--section-padding-x);
+      border-width:1px;
+      border-style:solid;
+      border-radius:var(--section-radius);
+      box-sizing:border-box;
+    }
+
+    .editor-toolbar .button,
+    .editor-toolbar .segment-button,
+    .editor-toolbar .text-input,
+    .editor-toolbar .search-input,
+    .editor-toolbar input[type="number"] {
+      height:var(--control-height) !important;
+      min-height:var(--control-height);
+      padding-top:0;
+      padding-bottom:0;
+      margin:0;
+      border-radius:var(--button-radius);
+      box-sizing:border-box;
+    }
+
+    .editor-toolbar .button,
+    .editor-toolbar .segment-button {
+      line-height:normal;
+    }
+    .editor-toolbar .timeline-range { gap:4px; margin-left:0; }
+    .editor-toolbar .timeline-range > span { font-size:10px; color:var(--muted); }
+    .editor-toolbar input[type="number"] {
+      background:var(--input-bg);
+      color:var(--text);
+      border:1px solid var(--border);
+      border-radius:3px;
+      text-align:center;
+      outline:none;
+      color-scheme:dark;
+    }
+    .editor-toolbar input[type="number"]:focus,
+    .editor-toolbar .text-input:focus,
+    .top-search .search-input:focus { border-color:var(--input-focus); box-shadow:inset 0 0 0 1px #454545; }
+    .legacy-comment-controls { display:none !important; }
+    .range-controls { display:flex; align-items:center; gap:7px; color:var(--muted); white-space:nowrap; }
+    .range-controls label { display:flex; align-items:center; gap:5px; }
+    .range-controls input { width:72px; height:32px; border:1px solid #1a1a1a; background:#2a2a2a; color:var(--text); border-radius:3px; padding:0 7px; }
+    .selection-actions { display:grid; grid-template-columns:var(--action-button-width) var(--action-button-width) var(--control-height); gap:var(--control-gap); padding:0; border-bottom:0; background:transparent; }
+    .selection-actions .button { width:100%; min-width:0; padding:0 8px; white-space:nowrap; }
+
+    .button, .text-input, .search-input {
+      height: var(--control-height);
+      border: 1px solid var(--border);
+      background: var(--control-bg);
+      color: var(--button-text);
+      border-radius: var(--button-radius);
+      font-size: var(--control-font-size);
+    }
+
+    .button {
+      padding: 0 14px;
+      cursor: pointer;
+    }
+
+    .button:hover { background: var(--control-bg-hover); }
+    .button:disabled { opacity: 0.45; cursor: default; }
+    .button.danger { background: #5a3d3d; }
+    .button.danger:hover { background: #704949; }
+
+    .text-input {
+      width: min(420px, 42vw);
+      background: var(--input-bg);
+      text-align: center;
+      padding: 0 12px;
+      outline: none;
+    }
+
+    .text-input:disabled { opacity: 0.45; }
+
+    .status {
+      font-size: 13px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .segmented {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: var(--button-radius);
+      overflow: hidden;
+      background: #303030;
+    }
+
+    .segmented input { display: none; }
+
+    .segment-button {
+      min-width: 94px;
+      height: 28px;
+      padding: 0 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-right: 1px solid #1a1a1a;
+      background: var(--control-bg);
+      color: var(--text);
+      font-size: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .segment-button:last-of-type { border-right: 0; }
+    .segmented input:disabled + .segment-button { opacity: 0.45; cursor: default; }
+    .segmented input:checked + .segment-button { color: #f5f7fb; }
+    .segmented input[value="loop"]:checked + .segment-button { background:#568edc; box-shadow:none; }
+    .segmented input[value="transition"]:checked + .segment-button { background:#ec8d39; box-shadow:none; }
+    .segmented input[value="story"]:checked + .segment-button { background:#7f6de0; box-shadow:none; }
+    .toolbar-snap input[value="0"]:checked + .segment-button { background: #563f3f; }
+    .toolbar-snap input[value="1"]:checked + .segment-button { background: #405a4a; }
+
+    .timeline-shell {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      background: #1f1f1f;
+    }
+
+    .sidebar { display:none; }
+
+    .sidebar-controls {
+      flex: 1;
+      align-content: start;
+    }
+
+    .sidebar-comments {
+      border-top: 2px solid #151515;
+    }
+
+    .sidebar-header {
+      padding: 10px;
+      border-bottom: 1px solid #1a1a1a;
+      background: #2b2b2b;
+    }
+
+    .search-input {
+      width: 100%;
+      background: #202020;
+      padding: 0 10px;
+      outline: none;
+    }
+
+    .search-results {
+      padding: 10px;
+      font-size: 12px;
+      color: #8f8f8f;
+      overflow: auto;
+      min-height: 0;
+    }
+
+    .sidebar-controls {
+      padding: 10px;
+      border-bottom: 1px solid #1a1a1a;
+      display: grid;
+      gap: 8px;
+    }
+
+    .sidebar-controls .field-label {
+      color: #a9a9a9;
+      font-size: 11px;
+    }
+
+    .sidebar-controls .text-input,
+    .sidebar-controls .segmented {
+      width: 100%;
+    }
+
+    .sidebar-controls .segment-button {
+      min-width: 0;
+      flex: 1;
+      padding: 0 5px;
+      font-size: 11px;
+    }
+
+    .comment-colors .segment-button {
+      min-width: 0;
+      height: 28px;
+      padding: 0;
+    }
+
+    .comment-colors .segment-button::before {
+      content: "";
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--swatch);
+      border: 1px solid rgba(255,255,255,.45);
+    }
+
+    .sidebar-resizer { display:none; }
+
+    .timeline-main {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .timeline-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: default;
+      height: calc(100% - 20px);
+    }
+
+    .timeline-scrollbar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 20px;
+      accent-color: #6d6d6d;
+      background: #292929;
+      cursor: ew-resize;
+    }
+
+    .hint {
+      position: absolute;
+      left: 18px;
+      bottom: 14px;
+      font-size: 12px;
+      color: #8f8f8f;
+      pointer-events: none;
+      background: rgba(32, 32, 32, 0.92);
+      border: 1px solid rgba(84, 84, 84, 0.55);
+      padding: 8px 10px;
+      border-radius: 4px;
+    }
+
+    .selection-box {
+      position: absolute;
+      pointer-events: none;
+      border: 1px solid #9cc8ff;
+      background: rgba(100, 157, 242, 0.16);
+      display: none;
+    }
+
+    /* ================= RESPONSIVE LAYOUT =================
+       The desktop layout stays compact. Below 1100px the toolbar wraps instead
+       of forcing horizontal overflow; below 700px the top row becomes stacked. */
+    @media (max-width: 1100px) {
+      .toolbar {
+        height: auto;
+        min-height: 190px;
+      }
+
+      .editor-toolbar {
+        display:flex;
+        flex-wrap:wrap;
+        align-items:flex-end;
+        row-gap:var(--toolbar-gap);
+      }
+
+      .editor-toolbar > .tool-section,
+      .editor-toolbar .selected-block-controls {
+        flex:0 0 auto;
+        max-width:100%;
+      }
+
+      .editor-toolbar .action-section {
+        min-width:0;
+        max-width:100%;
+      }
+
+      .editor-toolbar .selection-actions {
+        grid-template-columns:minmax(0, 1fr) minmax(0, 1fr) var(--control-height);
+        width:100%;
+      }
+
+      .editor-toolbar .selected-block-controls {
+        position:static;
+        transform:none;
+        order:5;
+      }
+
+      .editor-toolbar .view-section {
+        grid-column:auto;
+        margin-left:auto;
+        order:6;
+      }
+
+      .top-search .search-input { width:min(250px, 28vw); }
+    }
+
+    @media (max-width: 700px) {
+      .toolbar {
+        min-height:260px;
+        padding:10px 12px;
+      }
+
+      .topbar-row {
+        display:grid;
+        grid-template-columns:minmax(0, 1fr) auto;
+        grid-template-areas:
+          "title files"
+          "search search";
+        align-items:center;
+        gap:10px;
+        min-height:0;
+        padding:0;
+      }
+
+      .app-title { grid-area:title; }
+      .file-actions { grid-area:files; gap:8px; }
+      .top-search {
+        position:static;
+        grid-area:search;
+        transform:none;
+        width:100%;
+      }
+      .top-search .search-input {
+        width:100%;
+        flex:1 1 auto;
+      }
+      .top-search .editor-search-status { display:none; }
+
+      .editor-toolbar {
+        align-items:flex-end;
+        padding:0;
+      }
+
+      .editor-toolbar .selected-block-controls,
+      .editor-toolbar .view-section {
+        margin-left:0;
+        order:initial;
+      }
+
+      .editor-toolbar .selected-block-controls {
+        width:100%;
+        justify-content:center;
+        flex-wrap:wrap;
+      }
+
+      .editor-toolbar .view-section {
+        width:100%;
+      }
+
+      .editor-toolbar .timeline-range {
+        width:100%;
+        justify-content:flex-start;
+      }
+
+      .editor-toolbar .camera-name { width:clamp(140px, 42vw, 180px); }
+      .file-actions .status { min-width:0; max-width:120px; }
+    }
+
+    @media (max-width: 480px) {
+      .toolbar { min-height:315px; }
+      .topbar-row { grid-template-columns:1fr; grid-template-areas:"title" "files" "search"; }
+      .file-actions { justify-content:flex-start; }
+      .file-stack { align-items:flex-start; }
+      .file-actions .status { text-align:left; }
+      .editor-toolbar .selected-block-controls { justify-content:flex-start; }
+      .editor-toolbar .selected-block-controls { gap:var(--control-gap); }
+      .editor-toolbar .camera-section,
+      .editor-toolbar .block-frame-section { flex:1 1 140px; }
+      .editor-toolbar .block-frame-section { min-width:0; }
+      .editor-toolbar .block-range input,
+      .editor-toolbar .timeline-range input { width:58px; }
+    }
+
+    /* ================= UI QUALITY RULES =================
+       Shared control behavior and collision-proof responsive layouts. */
+    button,
+    input { font:inherit; }
+
+    button:focus-visible,
+    input:focus-visible,
+    label:focus-visible {
+      outline:2px solid #8ab4f8;
+      outline-offset:2px;
+    }
+
+    .editor-toolbar,
+    .tool-section,
+    .selected-block-controls,
+    .selection-actions,
+    .timeline-range,
+    .block-range { min-width:0; }
+
+    .tool-section > *,
+    .selected-block-controls > .tool-section > * { max-width:100%; }
+
+    .section-label { flex:0 0 auto; user-select:none; }
+    .status { min-width:0; }
+
+    @media (max-width: 1100px) {
+      .editor-toolbar {
+        display:grid;
+        grid-template-columns:repeat(4, minmax(0, 1fr));
+        grid-template-areas:
+          "snap type actions view"
+          "selected selected selected selected";
+        align-items:end;
+        column-gap:var(--toolbar-gap);
+        row-gap:var(--toolbar-gap);
+      }
+
+      .editor-toolbar .snapping-section { grid-area:snap; width:100%; }
+      .editor-toolbar .block-type-section { grid-area:type; width:100%; }
+      .editor-toolbar .action-section { grid-area:actions; width:100%; }
+      .editor-toolbar .action-section { min-width:0; }
+      .editor-toolbar .view-section { grid-area:view; width:100%; justify-self:stretch; }
+      .editor-toolbar .selected-block-controls {
+        grid-area:selected;
+        position:static;
+        transform:none;
+        display:flex;
+        justify-content:center;
+        align-items:flex-end;
+        width:100%;
+        order:initial;
+      }
+
+      .editor-toolbar .selection-actions { width:100%; }
+      .editor-toolbar .timeline-range { width:100%; justify-content:flex-end; }
+    }
+
+    @media (max-width: 760px) {
+      .toolbar { min-height:275px; }
+
+      .editor-toolbar {
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+        grid-template-areas:
+          "snap type"
+          "actions actions"
+          "selected selected"
+          "view view";
+      }
+
+      .editor-toolbar .view-section,
+      .editor-toolbar .action-section { width:100%; }
+      .editor-toolbar .timeline-range { justify-content:flex-start; }
+      .editor-toolbar .selected-block-controls { flex-wrap:wrap; }
+      .editor-toolbar .camera-section,
+      .editor-toolbar .block-frame-section { flex:1 1 145px; }
+    }
+
+    @media (max-width: 480px) {
+      .toolbar { min-height:345px; padding-left:10px; padding-right:10px; }
+      .editor-toolbar {
+        grid-template-columns:1fr;
+        grid-template-areas:
+          "snap"
+          "type"
+          "actions"
+          "selected"
+          "view";
+      }
+
+      .editor-toolbar .snapping-section,
+      .editor-toolbar .block-type-section,
+      .editor-toolbar .action-section,
+      .editor-toolbar .view-section { width:100%; }
+      .editor-toolbar .segmented { width:max-content; max-width:100%; }
+      .editor-toolbar .selected-block-controls { justify-content:flex-start; }
+      .editor-toolbar .camera-section,
+      .editor-toolbar .block-frame-section { min-width:0; }
+      .editor-toolbar .camera-name { width:100%; }
+      .editor-toolbar .block-range { width:100%; }
+      .editor-toolbar .timeline-range { flex-wrap:wrap; }
+    }
+
+    /* ================= REDESIGN VISUAL LAYER =================
+       Presentation only. The editor structure and JavaScript stay unchanged. */
+    :root {
+      --bg:#1b1b1b;
+      --panel:#292929;
+      --panel-2:#333333;
+      --text:#d6d6d6;
+      --muted:#9d9d9d;
+      --toolbar-bg:#323232;
+      --toolbar-bg-bottom:#292929;
+      --border:#1b1b1b;
+      --border-soft:#444444;
+      --control-bg:#454545;
+      --control-bg-hover:#565656;
+      --input-bg:#202020;
+      --input-focus:#e87d0d;
+      --button-text:#d6d6d6;
+      --button-radius:3px;
+      --section-radius:3px;
+      --section-padding-y:5px;
+      --section-padding-x:8px;
+      --toolbar-gap:8px;
+      --section-gap:5px;
+      --control-gap:6px;
+      --control-padding-x:10px;
+      --section-bg:rgba(255,255,255,.022);
+      --section-border:#1b1b1b;
+      --section-label-color:#a0a0a0;
+      --toolbar-section-height:58px;
+      --control-height:30px;
+      --control-font-size:13px;
+      --action-button-width:auto;
+    }
+
+    html,
+    body {
+      background:var(--bg);
+      color:var(--text);
+      font:13px "Segoe UI", Tahoma, sans-serif;
+    }
+
+    .toolbar {
+      height:140px;
+      min-height:140px;
+      padding:12px 16px 10px;
+      gap:12px;
+      overflow-x:auto;
+      overflow-y:hidden;
+      background:var(--toolbar-bg);
+      border-bottom-color:#181818;
+    }
+
+    .topbar-row {
+      position:static;
+      min-height:38px;
+      padding:0;
+      display:grid;
+      grid-template-columns:minmax(140px, 1fr) minmax(240px, 420px) minmax(280px, 1fr);
+      align-items:center;
+      gap:16px;
+    }
+
+    .app-title {
+      color:#dedede;
+      font-size:18px;
+      letter-spacing:.02em;
+      white-space:nowrap;
+    }
+
+    .top-search {
+      position:static;
+      width:100%;
+      min-width:0;
+      transform:none;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .top-search .search-input {
+      width:100%;
+      min-width:0;
+      text-align:left;
+    }
+
+    .top-search .editor-search-status {
+      min-width:0;
+      max-width:180px;
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    .file-actions {
+      min-width:0;
+      justify-content:flex-end;
+      gap:8px;
+    }
+
+    .file-stack {
+      min-width:120px;
+      gap:3px;
+    }
+
+    .file-actions .status {
+      min-width:0;
+      max-width:180px;
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    .editor-toolbar {
+      position:static;
+      width:100%;
+      min-width:max-content;
+      margin:0;
+      padding:0 0 2px;
+      display:flex;
+      flex-wrap:nowrap;
+      align-items:stretch;
+      gap:8px;
+    }
+
+    .editor-toolbar .tool-section,
+    .editor-toolbar .selected-block-controls > .tool-section {
+      width:auto;
+      min-width:0;
+      height:58px !important;
+      min-height:58px;
+      margin:0;
+      padding:5px 8px;
+      flex:0 0 auto;
+      justify-content:space-between;
+      gap:5px;
+      border:1px solid var(--border);
+      border-radius:3px;
+      background:rgba(255,255,255,.022);
+    }
+
+    .editor-toolbar .snapping-section,
+    .editor-toolbar .block-type-section,
+    .editor-toolbar .action-section,
+    .editor-toolbar .camera-section,
+    .editor-toolbar .block-frame-section,
+    .editor-toolbar .view-section {
+      --section-bg:rgba(255,255,255,.022);
+      --section-border:var(--border);
+    }
+
+    .section-label {
+      color:var(--muted);
+      font-size:11px;
+      font-weight:400;
+      line-height:1;
+    }
+
+    .editor-toolbar .selected-block-controls {
+      position:static;
+      width:auto;
+      transform:none;
+      display:contents;
+    }
+
+    .editor-toolbar .camera-section,
+    .editor-toolbar .block-frame-section {
+      min-width:0;
+    }
+
+    .editor-toolbar .camera-name {
+      width:190px;
+    }
+
+    .editor-toolbar .view-section {
+      grid-column:auto;
+      justify-self:auto;
+      margin-left:auto;
+    }
+
+    .button,
+    .text-input,
+    .search-input,
+    .editor-toolbar input[type="number"] {
+      height:30px !important;
+      min-height:30px;
+      margin:0;
+      border:1px solid var(--border);
+      border-radius:3px;
+      color:var(--text);
+      font-size:13px;
+      box-sizing:border-box;
+    }
+
+    .button {
+      width:auto;
+      padding:0 10px;
+      border-color:#191919;
+      background:#454545;
+      box-shadow:none;
+      white-space:nowrap;
+    }
+
+    .button:hover {
+      background:#555555;
+    }
+
+    .button.danger {
+      background:#5a3939;
+    }
+
+    .button.danger:hover {
+      background:#704848;
+    }
+
+    .text-input,
+    .search-input,
+    .editor-toolbar input[type="number"] {
+      padding:0 9px;
+      background:var(--input-bg);
+      outline:0;
+    }
+
+    .editor-toolbar input[type="number"]:focus,
+    .editor-toolbar .text-input:focus,
+    .top-search .search-input:focus {
+      border-color:var(--input-focus);
+      box-shadow:none;
+    }
+
+    .editor-toolbar .segmented {
+      width:auto;
+      height:30px;
+      max-width:none;
+      border:0;
+      border-radius:4px;
+      background:transparent;
+    }
+
+    .editor-toolbar .segment-button {
+      width:auto;
+      min-width:0;
+      height:30px !important;
+      min-height:30px;
+      margin:0;
+      padding:0 11px;
+      border-right:1px solid #202020;
+      background:#454545;
+      color:var(--text);
+      font-size:13px;
+      line-height:normal;
+      white-space:nowrap;
+    }
+
+    .segmented input:checked + .segment-button {
+      color:#fff;
+      box-shadow:inset 0 -2px var(--blender-orange);
+    }
+
+    .segmented input[value="loop"]:checked + .segment-button {
+      background:#568edc;
+      box-shadow:none;
+    }
+
+    .segmented input[value="transition"]:checked + .segment-button {
+      background:#ec8d39;
+      box-shadow:none;
+    }
+
+    .segmented input[value="story"]:checked + .segment-button {
+      background:#7f6de0;
+      box-shadow:none;
+    }
+
+    .toolbar-snap input[value="0"]:checked + .segment-button {
+      background:#4d4d4d;
+    }
+
+    .toolbar-snap input[value="1"]:checked + .segment-button {
+      background:#4d4d4d;
+      box-shadow:inset 0 -2px var(--blender-orange);
+    }
+
+    .selection-actions,
+    .editor-toolbar .selection-actions {
+      width:auto;
+      padding:0;
+      display:flex;
+      grid-template-columns:none;
+      gap:6px;
+      border:0;
+      background:transparent;
+    }
+
+    .selection-actions .button,
+    .editor-toolbar .selection-actions .button {
+      width:auto;
+      min-width:0;
+      flex:0 0 auto;
+      padding:0 8px;
+    }
+
+    .editor-toolbar .selection-actions .danger {
+      width:30px;
+      min-width:30px;
+      padding:0;
+    }
+
+    .editor-toolbar .block-range,
+    .editor-toolbar .timeline-range {
+      width:auto;
+      margin:0;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:6px;
+      white-space:nowrap;
+    }
+
+    .editor-toolbar .block-range label,
+    .editor-toolbar .timeline-range label {
+      display:flex;
+      align-items:center;
+      gap:4px;
+      color:var(--muted);
+    }
+
+    .editor-toolbar .block-range input,
+    .editor-toolbar .timeline-range input {
+      width:92px;
+      min-width:92px;
+    }
+
+    .editor-toolbar .timeline-range .button {
+      width:30px;
+      min-width:30px;
+      padding:0;
+    }
+
+    .editor-toolbar .range-info {
+      display:none;
+    }
+
+    .editor-toolbar .tool-section.is-disabled {
+      opacity:.45;
+    }
+
+    .editor-toolbar .tool-section.is-disabled .button:disabled,
+    .editor-toolbar .tool-section.is-disabled .text-input:disabled,
+    .editor-toolbar .tool-section.is-disabled input:disabled,
+    .editor-toolbar .tool-section.is-disabled .segmented input:disabled + .segment-button {
+      opacity:1;
+    }
+
+    .toolbar-resizer {
+      height:5px;
+      background:#202020;
+      border-top:1px solid #3a3a3a;
+      border-bottom:1px solid #151515;
+    }
+
+    .timeline-shell,
+    .timeline-main {
+      background:#1d1d1d;
+    }
+
+    .timeline-scrollbar {
+      left:10px;
+      right:10px;
+      bottom:2px;
+      width:calc(100% - 20px);
+      height:16px;
+      background:transparent;
+    }
+
+    .timeline-canvas {
+      height:calc(100% - 22px);
+    }
+
+    .hint {
+      left:10px;
+      bottom:25px;
+      padding:0;
+      border:0;
+      background:transparent;
+      color:#777d85;
+      font-size:11px;
+    }
+
+    @media (max-width:1100px) {
+      .toolbar {
+        height:140px;
+        min-height:140px;
+      }
+
+      .editor-toolbar {
+        display:flex;
+        flex-wrap:nowrap;
+        min-width:max-content;
+      }
+
+      .editor-toolbar .snapping-section,
+      .editor-toolbar .block-type-section,
+      .editor-toolbar .action-section,
+      .editor-toolbar .view-section {
+        width:auto;
+      }
+
+      .editor-toolbar .selected-block-controls {
+        display:contents;
+        width:auto;
+      }
+
+      .editor-toolbar .view-section {
+        margin-left:auto;
+      }
+    }
+
+    @media (max-width:760px) {
+      .toolbar {
+        height:208px;
+        min-height:208px;
+        padding:10px;
+      }
+
+      .topbar-row {
+        grid-template-columns:1fr minmax(220px, 1.5fr);
+        gap:8px;
+      }
+
+      .file-actions {
+        grid-column:1 / -1;
+        justify-content:flex-start;
+      }
+
+      .file-stack {
+        flex-direction:row;
+        align-items:center;
+      }
+
+      .file-actions .status {
+        text-align:left;
+      }
+    }
+
+    @media (max-width:480px) {
+      .toolbar {
+        height:250px;
+        min-height:250px;
+      }
+
+      .topbar-row {
+        grid-template-columns:1fr;
+        grid-template-areas:none;
+      }
+
+      .app-title,
+      .top-search,
+      .file-actions {
+        grid-area:auto;
+      }
+
+      .top-search .editor-search-status {
+        display:none;
+      }
+    }
+  </style>
+</head>
+<body class="auth-checking">
+  <div id="loadingReveal" class="loading-reveal" aria-hidden="true">
+    <div class="loading-reveal-label">Ładowanie timeline…</div>
+  </div>
+  <div id="loginGate" class="login-gate" aria-hidden="true">
+    <div class="login-card">
+      <h1>Timeline Editor</h1>
+      <p>Wpisz hasło dostępu, aby otworzyć i edytować timeline.</p>
+      <form id="loginForm" class="login-form">
+        <input
+          id="loginPassword"
+          class="login-password"
+          type="password"
+          placeholder="Hasło dostępu"
+          autocomplete="current-password"
+          required
+          autofocus
+        >
+        <button id="loginSubmit" class="login-submit" type="submit">Zaloguj</button>
+        <div id="loginStatus" class="login-status" role="status"></div>
+      </form>
+    </div>
+  </div>
+  <div class="app-shell">
+    <div id="syncStatusBar" class="sync-status-bar" data-state="loading" role="status">
+      <span class="sync-status-dot" aria-hidden="true"></span>
+      <span id="syncStatusText">Loading timeline…</span>
+      <span id="syncStatusTime" class="sync-status-time"></span>
+    </div>
+    <div id="toolbar" class="toolbar">
+      <div class="topbar-row">
+        <div class="app-title">Timeline Editor</div>
+        <div class="top-search">
+          <input id="searchInput" class="search-input" type="text" placeholder="Search camera…">
+          <span id="searchResults" class="status editor-search-status"></span>
+        </div>
+        <div class="file-actions">
+          <input id="fileInput" type="file" accept=".json,application/json" hidden>
+          <button id="saveJsonButton" class="button" type="button">Zapisz teraz</button>
+          <a id="downloadAddonButton" class="button" href="./WeidmullerUtils.zip" download="WeidmullerUtils.zip">Pobierz addon</a>
+          <button id="logoutButton" class="button" type="button">Wyloguj</button>
+        </div>
+      </div>
+      <div class="editor-toolbar">
+        <div class="tool-section snapping-section">
+          <div class="section-label">Snapping</div>
+          <div class="segmented toolbar-snap">
+            <input id="snapOff" name="snapMode" type="radio" value="0">
+            <label class="segment-button" for="snapOff">OFF</label>
+            <input id="snapOn" name="snapMode" type="radio" value="1" checked>
+            <label class="segment-button" for="snapOn">ON</label>
+          </div>
+        </div>
+        <div class="tool-section block-type-section">
+          <div class="section-label">Block type</div>
+          <div class="segmented">
+            <input id="typeLoop" name="stripType" type="radio" value="loop" disabled>
+            <label class="segment-button" for="typeLoop">Loop</label>
+            <input id="typeTransition" name="stripType" type="radio" value="transition" disabled>
+            <label class="segment-button" for="typeTransition">Trans</label>
+            <input id="typeStory" name="stripType" type="radio" value="story" disabled>
+            <label class="segment-button" for="typeStory">Story</label>
+          </div>
+        </div>
+        <div class="tool-section action-section">
+          <div class="section-label">Actions</div>
+          <div class="selection-actions">
+            <button id="makeTransitionButton" class="button" type="button" disabled>Make Trans</button>
+            <button id="swapTransitionButton" class="button" type="button" disabled>Swap</button>
+            <button id="deleteButton" class="button danger" type="button" disabled title="Delete selected block">X</button>
+          </div>
+        </div>
+        <div class="selected-block-controls">
+          <div class="tool-section camera-section">
+            <div class="section-label">Camera name</div>
+            <input id="nameInput" class="text-input camera-name" type="text" placeholder="Selected camera" disabled>
+          </div>
+          <div class="tool-section block-frame-section">
+            <div class="section-label">Block frames</div>
+            <div class="block-range">
+              <label>Start <input id="selectedStartFrame" type="number" min="1" step="1" disabled></label>
+              <label>End <input id="selectedEndFrame" type="number" min="1" step="1" disabled></label>
+            </div>
+            <span id="rangeInfo" class="status range-info"></span>
+          </div>
+        </div>
+        <div class="tool-section view-section">
+          <div class="section-label">Timeline view</div>
+          <div class="timeline-range">
+            <label>Start <input id="timelineStartFrame" type="number" min="1" step="1" value="1"></label>
+            <label>End <input id="timelineEndFrame" type="number" min="1" step="1" value="1000"></label>
+            <button id="zoomOutButton" class="button" type="button">−</button>
+            <button id="zoomInButton" class="button" type="button">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="toolbarResizer" class="toolbar-resizer"></div>
+
+    <div class="timeline-shell">
+      <aside id="sidebar" class="sidebar"></aside>
+      <div id="sidebarResizer" class="sidebar-resizer"></div>
+      <div class="timeline-main">
+        <canvas id="timelineCanvas" class="timeline-canvas"></canvas>
+        <input id="timelineScrollbar" class="timeline-scrollbar" type="range" min="1" max="2000" value="1" step="1" aria-label="Timeline horizontal scroll">
+        <div class="hint">Double click to add strip. Drag strip edges to resize. Pan with middle mouse or Shift + left mouse. Zoom with mouse wheel or -/+.</div>
+        <div id="selectionBox" class="selection-box"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./supabase.min.js"></script>
+  <script>
+    const SUPABASE_URL = "https://bpmziyioiszufnyxlqse.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_8vSjd-U5aeXXspEcCNf8LA_RzeMnz-j";
+    const supabaseClient = window.supabase
+      ? window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: false,
+            storageKey: "weidmuller-timeline-auth",
+          },
+        },
+      )
+      : null;
+
+    const loginGate = document.getElementById("loginGate");
+    const loginForm = document.getElementById("loginForm");
+    const loginPassword = document.getElementById("loginPassword");
+    const loginSubmit = document.getElementById("loginSubmit");
+    const loginStatus = document.getElementById("loginStatus");
+    const logoutButton = document.getElementById("logoutButton");
+    const syncStatusBar = document.getElementById("syncStatusBar");
+    const syncStatusText = document.getElementById("syncStatusText");
+    const syncStatusTime = document.getElementById("syncStatusTime");
+    let authenticationRevealTimer = null;
+    const fileInput = document.getElementById("fileInput");
+    const openJsonButton = document.getElementById("openJsonButton");
+    const saveJsonButton = document.getElementById("saveJsonButton");
+    const deleteButton = document.getElementById("deleteButton");
+    const makeTransitionButton = document.getElementById("makeTransitionButton");
+    const swapTransitionButton = document.getElementById("swapTransitionButton");
+    const nameInput = document.getElementById("nameInput");
+    const rangeInfo = document.getElementById("rangeInfo");
+    const timelineStartFrame = document.getElementById("timelineStartFrame");
+    const timelineEndFrame = document.getElementById("timelineEndFrame");
+    const selectedStartFrame = document.getElementById("selectedStartFrame");
+    const selectedEndFrame = document.getElementById("selectedEndFrame");
+    const actionSection = document.querySelector(".action-section");
+    const cameraSection = document.querySelector(".camera-section");
+    const blockFrameSection = document.querySelector(".block-frame-section");
+    const zoomOutButton = document.getElementById("zoomOutButton");
+    const zoomInButton = document.getElementById("zoomInButton");
+    const typeInputs = Array.from(document.querySelectorAll('input[name="stripType"]'));
+    const toolbar = document.getElementById("toolbar");
+    const toolbarResizer = document.getElementById("toolbarResizer");
+    const sidebar = document.getElementById("sidebar");
+    const sidebarResizer = document.getElementById("sidebarResizer");
+    const searchInput = document.getElementById("searchInput");
+    const searchResults = document.getElementById("searchResults");
+    const canvas = document.getElementById("timelineCanvas");
+    const selectionBox = document.getElementById("selectionBox");
+    const timelineScrollbar = document.getElementById("timelineScrollbar");
+    const ctx = canvas.getContext("2d");
+
+    const TYPE_COLORS = {
+      loop: "#659DF2",
+      transition: "#FE9F4D",
+      story: "#8F7FEE",
+      comment: "#C5A85A",
+    };
+
+    const state = {
+      strips: [],
+      selectedStripId: null,
+      selectedStripIds: new Set(),
+      nextStripId: 1,
+      frameWidth: 14,
+      offsetX: -14,
+      laneHeight: 36,
+      laneGap: 8,
+      topPadding: 34,
+      leftPadding: 14,
+      dragMode: null,
+      dragStripId: null,
+      dragOriginFrame: 0,
+      dragOriginY: 0,
+      dragStartMouseX: 0,
+      dragInitialStart: 0,
+      dragInitialEnd: 0,
+      dragLastStart: 0,
+      dragLastEnd: 0,
+      snapTrim: null,
+      altClonePending: false,
+      selectionStartX: 0,
+      selectionStartY: 0,
+      dragGroup: null,
+      panStartX: 0,
+      panInitialOffsetX: 0,
+      resizeMode: null,
+      resizeInitialValue: 0,
+      resizeInitialMouse: 0,
+      fileHandle: null,
+      fileName: null,
+      timelineId: null,
+      timelineRevision: null,
+      databaseReady: false,
+      syncInProgress: false,
+      syncInterval: null,
+      dirtyStatusInterval: null,
+      realtimeChannel: null,
+      remotePullTimer: null,
+      lastSyncedTimeline: null,
+      lastSyncedBlocks: new Map(),
+      minFrame: 1,
+      rangeStart: 1,
+      rangeEnd: 1000,
+      allowLocalRangePersistence: false,
+      pendingLocalViewport: null,
+    };
+
+    function resizeCanvas() {
+      const ratio = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.floor(rect.width * ratio);
+      canvas.height = Math.floor(rect.height * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      draw();
+    }
+
+    function getSelectedStrip() {
+      return state.strips.find((strip) => strip.id === state.selectedStripId) || null;
+    }
+
+    function getSelectedStrips() {
+      return state.strips.filter((strip) => state.selectedStripIds.has(strip.id));
+    }
+
+    function setSelection(ids) {
+      state.selectedStripIds = new Set(ids);
+      state.selectedStripId = ids[0] ?? null;
+      updateSelectionUI();
+      draw();
+    }
+
+    function getStripColor(type) {
+      return TYPE_COLORS[type] || TYPE_COLORS.story;
+    }
+
+    function isCommentStrip(strip) {
+      return strip.type === "comment";
+    }
+
+    function getSectionStart(type) {
+      return state.topPadding + state.laneGap;
+    }
+
+    function getSectionEnd(type) {
+      return canvas.clientHeight - 8;
+    }
+
+    function getStripY(strip) {
+      return getSectionStart(isCommentStrip(strip) ? "comment" : "camera") +
+        strip.lane * (state.laneHeight + state.laneGap);
+    }
+
+    function setSyncStatus(status, text, showTime = false) {
+      syncStatusBar.dataset.state = status;
+      syncStatusText.textContent = text;
+      syncStatusTime.textContent = showTime
+        ? `Last sync ${new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        })}`
+        : "";
+    }
+
+    function setStatus(text) {
+      // Legacy editor actions no longer occupy the global synchronization bar.
+      console.debug(text);
+    }
+
+    const DATABASE_BLOCK_COLUMNS =
+      "id, camera, transition_from, transition_to, type, start_frame, end_frame, lane, lane_locked, revision";
+    const LOCAL_TIMELINE_VIEW_KEY = "weidmuller-timeline-view-range";
+
+    function getLocalTimelineViewRange(fallbackStart, fallbackEnd) {
+      try {
+        const saved = JSON.parse(window.localStorage.getItem(LOCAL_TIMELINE_VIEW_KEY));
+        const start = Math.max(1, Math.round(Number(saved?.start)));
+        const end = Math.max(start, Math.round(Number(saved?.end)));
+        if (Number.isFinite(start) && Number.isFinite(end)) {
+          const frameWidth = Number(saved?.frameWidth);
+          const centerFrame = Number(saved?.centerFrame);
+          return {
+            start,
+            end,
+            frameWidth: Number.isFinite(frameWidth) ? frameWidth : null,
+            centerFrame: Number.isFinite(centerFrame) ? centerFrame : null,
+          };
+        }
+      } catch (error) {
+        console.warn("Could not read the local timeline view", error);
+      }
+      return {
+        start: Math.max(1, Math.round(Number(fallbackStart) || 1)),
+        end: Math.max(1, Math.round(Number(fallbackEnd) || 1000)),
+      };
+    }
+
+    function saveLocalTimelineViewState() {
+      if (!state.allowLocalRangePersistence) return;
+      try {
+        const centerFrame = xToFrame(canvas.clientWidth * 0.5);
+        window.localStorage.setItem(
+          LOCAL_TIMELINE_VIEW_KEY,
+          JSON.stringify({
+            start: state.rangeStart,
+            end: state.rangeEnd,
+            frameWidth: state.frameWidth,
+            centerFrame,
+          }),
+        );
+      } catch (error) {
+        console.warn("Could not save the local timeline view", error);
+      }
+    }
+
+    function restoreLocalTimelineViewport() {
+      const viewport = state.pendingLocalViewport;
+      state.pendingLocalViewport = null;
+      if (
+        !viewport ||
+        !Number.isFinite(viewport.frameWidth) ||
+        !Number.isFinite(viewport.centerFrame)
+      ) return false;
+
+      state.frameWidth = Math.min(64, Math.max(0.1, viewport.frameWidth));
+      state.offsetX = clampOffset(
+        canvas.clientWidth * 0.5 -
+        state.leftPadding -
+        (viewport.centerFrame - 1) * state.frameWidth,
+      );
+      updateScrollbar();
+      draw();
+      saveLocalTimelineViewState();
+      return true;
+    }
+
+    function serializeDatabaseBlock(block) {
+      return JSON.stringify({
+        camera: String(block.camera || ""),
+        transition_from: block.type === "transition"
+          ? (block.transition_from || null)
+          : null,
+        transition_to: block.type === "transition"
+          ? (block.transition_to || null)
+          : null,
+        type: String(block.type || "story"),
+        start_frame: Number(block.start_frame),
+        end_frame: Number(block.end_frame),
+        lane: Math.max(0, Math.round(Number(block.lane) || 0)),
+        lane_locked: Boolean(block.lane_locked ?? block.laneLocked),
+      });
+    }
+
+    function createDatabaseUuid() {
+      if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+      const bytes = new Uint8Array(16);
+      window.crypto.getRandomValues(bytes);
+      bytes[6] = (bytes[6] & 0x0f) | 0x40;
+      bytes[8] = (bytes[8] & 0x3f) | 0x80;
+      const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0"));
+      return [
+        hex.slice(0, 4).join(""),
+        hex.slice(4, 6).join(""),
+        hex.slice(6, 8).join(""),
+        hex.slice(8, 10).join(""),
+        hex.slice(10).join(""),
+      ].join("-");
+    }
+
+    function getDatabaseBlockPayload(strip, includeIdentity = false) {
+      const payload = {
+        camera: String(strip.camera || ""),
+        transition_from: strip.type === "transition"
+          ? (strip.transition_from || null)
+          : null,
+        transition_to: strip.type === "transition"
+          ? (strip.transition_to || null)
+          : null,
+        type: strip.type,
+        start_frame: strip.start_frame,
+        end_frame: strip.end_frame,
+        lane: Math.max(0, Math.round(Number(strip.lane) || 0)),
+        lane_locked: Boolean(strip.laneLocked),
+      };
+      if (includeIdentity) {
+        if (!strip.databaseId) strip.databaseId = createDatabaseUuid();
+        payload.id = strip.databaseId;
+        payload.timeline_id = state.timelineId;
+      }
+      return payload;
+    }
+
+    function applyDatabaseRowToStrip(strip, row) {
+      strip.camera = row.camera;
+      strip.transition_from = row.transition_from;
+      strip.transition_to = row.transition_to;
+      strip.type = row.type;
+      strip.start_frame = Number(row.start_frame);
+      strip.end_frame = Number(row.end_frame);
+      strip.lane = Math.max(0, Math.round(Number(row.lane) || 0));
+      strip.laneLocked = Boolean(row.lane_locked);
+      strip.databaseId = row.id;
+      strip.databaseRevision = Number(row.revision);
+      normalizeStrip(strip);
+      return strip;
+    }
+
+    function rememberDatabaseSnapshot(timeline, blocks) {
+      state.timelineRevision = Number(timeline.revision);
+      state.lastSyncedTimeline = {
+        rangeStart: Number(timeline.range_start),
+        rangeEnd: Number(timeline.range_end),
+        revision: Number(timeline.revision),
+      };
+      state.lastSyncedBlocks = new Map(
+        blocks.map((block) => [
+          block.id,
+          {
+            revision: Number(block.revision),
+            content: serializeDatabaseBlock(block),
+          },
+        ]),
+      );
+    }
+
+    function hasUnsavedDatabaseChanges() {
+      if (!state.databaseReady || !state.lastSyncedTimeline) return false;
+
+      const currentIds = new Set();
+      for (const strip of state.strips) {
+        if (!strip.databaseId) return true;
+        currentIds.add(strip.databaseId);
+        const previous = state.lastSyncedBlocks.get(strip.databaseId);
+        if (!previous || previous.content !== serializeDatabaseBlock(strip)) return true;
+      }
+      return [...state.lastSyncedBlocks.keys()].some((id) => !currentIds.has(id));
+    }
+
+    async function fetchTimelineDatabaseRows() {
+      const { data: timeline, error: timelineError } = await supabaseClient
+        .from("timelines")
+        .select("id, slug, name, range_start, range_end, revision")
+        .eq("slug", "main")
+        .single();
+      if (timelineError) throw timelineError;
+
+      const { data: blocks, error: blocksError } = await supabaseClient
+        .from("timeline_blocks")
+        .select(DATABASE_BLOCK_COLUMNS)
+        .eq("timeline_id", timeline.id)
+        .order("start_frame", { ascending: true })
+        .order("end_frame", { ascending: true });
+      if (blocksError) throw blocksError;
+      return { timeline, blocks: blocks || [] };
+    }
+
+    async function loadTimelineFromDatabase() {
+      if (!supabaseClient) throw new Error("Biblioteka danych jest niedostępna.");
+      setSyncStatus("loading", "Loading timeline…");
+      const { timeline, blocks } = await fetchTimelineDatabaseRows();
+      state.allowLocalRangePersistence = false;
+      const localView = getLocalTimelineViewRange(
+        timeline.range_start,
+        timeline.range_end,
+      );
+      state.pendingLocalViewport = localView;
+
+      state.timelineId = timeline.id;
+      importTimelineData({
+        version: 1,
+        timeline_range: {
+          start: localView.start,
+          end: localView.end,
+        },
+        timeline_blocks: blocks.map((block) => ({
+          camera: block.camera,
+          transition_from: block.transition_from,
+          transition_to: block.transition_to,
+          type: block.type,
+          start_frame: block.start_frame,
+          end_frame: block.end_frame,
+          _database_lane: block.lane,
+          _database_lane_locked: block.lane_locked,
+          _database_id: block.id,
+          _database_revision: block.revision,
+        })),
+      });
+      rememberDatabaseSnapshot(timeline, blocks);
+      state.allowLocalRangePersistence = true;
+      state.databaseReady = true;
+      startDatabaseSynchronization();
+      setSyncStatus("saved", "Saved", true);
+    }
+
+    async function resolveChangedBlockConflict(strip, previous) {
+      const { data: remote, error } = await supabaseClient
+        .from("timeline_blocks")
+        .select(DATABASE_BLOCK_COLUMNS)
+        .eq("id", strip.databaseId)
+        .maybeSingle();
+      if (error) throw error;
+
+      if (!remote) {
+        state.lastSyncedBlocks.delete(strip.databaseId);
+        strip.databaseId = null;
+        strip.databaseRevision = null;
+        return true;
+      }
+
+      const localCopy = normalizeStrip({
+        camera: `${strip.camera} (konflikt)`,
+        transition_from: strip.transition_from,
+        transition_to: strip.transition_to,
+        type: strip.type,
+        start_frame: strip.start_frame,
+        end_frame: strip.end_frame,
+        lane: strip.lane,
+        laneLocked: strip.laneLocked,
+        databaseId: null,
+        databaseRevision: null,
+      });
+      state.strips.push(localCopy);
+      applyDatabaseRowToStrip(strip, remote);
+      state.lastSyncedBlocks.set(remote.id, {
+        revision: Number(remote.revision),
+        content: serializeDatabaseBlock(remote),
+      });
+      return previous.content !== serializeDatabaseBlock(remote);
+    }
+
+    async function pushLocalDatabaseChanges() {
+      let conflictCreated = false;
+
+      const syncedIds = new Set(state.strips.map((strip) => strip.databaseId).filter(Boolean));
+      for (const [databaseId, previous] of state.lastSyncedBlocks) {
+        if (syncedIds.has(databaseId)) continue;
+        const { error } = await supabaseClient
+          .from("timeline_blocks")
+          .delete()
+          .eq("id", databaseId)
+          .eq("revision", previous.revision);
+        if (error) throw error;
+        state.lastSyncedBlocks.delete(databaseId);
+      }
+
+      const stripsToSave = state.strips.slice();
+      for (const strip of stripsToSave) {
+        const previous = strip.databaseId
+          ? state.lastSyncedBlocks.get(strip.databaseId)
+          : null;
+        const content = serializeDatabaseBlock(strip);
+
+        if (!previous) {
+          const { data, error } = await supabaseClient
+            .from("timeline_blocks")
+            .insert(getDatabaseBlockPayload(strip, true))
+            .select(DATABASE_BLOCK_COLUMNS)
+            .single();
+          if (error) throw error;
+          strip.databaseRevision = Number(data.revision);
+          state.lastSyncedBlocks.set(data.id, {
+            revision: Number(data.revision),
+            content: serializeDatabaseBlock(data),
+          });
+          continue;
+        }
+
+        if (previous.content === content) continue;
+        const { data, error } = await supabaseClient
+          .from("timeline_blocks")
+          .update(getDatabaseBlockPayload(strip))
+          .eq("id", strip.databaseId)
+          .eq("revision", previous.revision)
+          .select(DATABASE_BLOCK_COLUMNS)
+          .maybeSingle();
+        if (error) throw error;
+
+        if (!data) {
+          conflictCreated = (await resolveChangedBlockConflict(strip, previous)) ||
+            conflictCreated;
+          continue;
+        }
+
+        strip.databaseRevision = Number(data.revision);
+        state.lastSyncedBlocks.set(data.id, {
+          revision: Number(data.revision),
+          content: serializeDatabaseBlock(data),
+        });
+      }
+      return conflictCreated;
+    }
+
+    async function pullRemoteDatabaseChanges() {
+      if (hasUnsavedDatabaseChanges()) return;
+      const { timeline, blocks } = await fetchTimelineDatabaseRows();
+      const existingByDatabaseId = new Map(
+        state.strips
+          .filter((strip) => strip.databaseId)
+          .map((strip) => [strip.databaseId, strip]),
+      );
+      const merged = blocks.map((row) => {
+        const existing = existingByDatabaseId.get(row.id);
+        if (existing) return applyDatabaseRowToStrip(existing, row);
+        return normalizeStrip({
+          camera: row.camera,
+          transition_from: row.transition_from,
+          transition_to: row.transition_to,
+          type: row.type,
+          start_frame: row.start_frame,
+          end_frame: row.end_frame,
+          lane: row.lane,
+          laneLocked: row.lane_locked,
+          databaseId: row.id,
+          databaseRevision: Number(row.revision),
+        });
+      });
+
+      state.strips = merged;
+      state.selectedStripIds = new Set(
+        [...state.selectedStripIds].filter((id) => state.strips.some((strip) => strip.id === id)),
+      );
+      state.selectedStripId = state.selectedStripIds.values().next().value ?? null;
+      rememberDatabaseSnapshot(timeline, blocks);
+      updateSelectionUI();
+      draw();
+    }
+
+    async function synchronizeTimelineDatabase(forceStatus = false) {
+      if (!window.navigator.onLine) {
+        setSyncStatus("offline", "Offline · changes will sync after reconnect");
+        return;
+      }
+      if (
+        !state.databaseReady ||
+        state.syncInProgress ||
+        state.dragMode ||
+        !supabaseClient
+      ) return;
+
+      state.syncInProgress = true;
+      saveJsonButton.disabled = true;
+      const hadChanges = hasUnsavedDatabaseChanges();
+      if (hadChanges || forceStatus) setSyncStatus("saving", "Saving…");
+
+      try {
+        const conflictCreated = await pushLocalDatabaseChanges();
+        if (!hasUnsavedDatabaseChanges()) await pullRemoteDatabaseChanges();
+        setSyncStatus(
+          conflictCreated ? "conflict" : "saved",
+          conflictCreated ? "Conflict · local copy created" : "Saved",
+          !conflictCreated,
+        );
+      } catch (error) {
+        console.error("Timeline synchronization failed", error);
+        setSyncStatus(
+          window.navigator.onLine ? "out-of-sync" : "offline",
+          window.navigator.onLine
+            ? "Out of sync · retrying automatically"
+            : "Offline · changes will sync after reconnect",
+        );
+      } finally {
+        state.syncInProgress = false;
+        saveJsonButton.disabled = false;
+      }
+    }
+
+    function stopDatabaseSynchronization() {
+      if (state.syncInterval) window.clearInterval(state.syncInterval);
+      if (state.dirtyStatusInterval) window.clearInterval(state.dirtyStatusInterval);
+      if (state.remotePullTimer) window.clearTimeout(state.remotePullTimer);
+      state.syncInterval = null;
+      state.dirtyStatusInterval = null;
+      state.remotePullTimer = null;
+      if (state.realtimeChannel && supabaseClient) {
+        supabaseClient.removeChannel(state.realtimeChannel);
+      }
+      state.realtimeChannel = null;
+      state.databaseReady = false;
+    }
+
+    function startDatabaseSynchronization() {
+      stopDatabaseSynchronization();
+      state.databaseReady = true;
+      state.syncInterval = window.setInterval(
+        () => synchronizeTimelineDatabase(),
+        10000,
+      );
+      state.dirtyStatusInterval = window.setInterval(() => {
+        if (!window.navigator.onLine) {
+          setSyncStatus("offline", "Offline · changes will sync after reconnect");
+          return;
+        }
+        if (
+          !state.syncInProgress &&
+          hasUnsavedDatabaseChanges() &&
+          ["saved", "back-online"].includes(syncStatusBar.dataset.state)
+        ) {
+          setSyncStatus("pending", "Unsaved changes");
+        }
+      }, 400);
+
+      const scheduleRemotePull = () => {
+        if (state.remotePullTimer) window.clearTimeout(state.remotePullTimer);
+        state.remotePullTimer = window.setTimeout(
+          () => synchronizeTimelineDatabase(),
+          350,
+        );
+      };
+      state.realtimeChannel = supabaseClient
+        .channel(`camera-timeline-${state.timelineId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "timelines",
+            filter: `id=eq.${state.timelineId}`,
+          },
+          scheduleRemotePull,
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "timeline_blocks",
+          },
+          scheduleRemotePull,
+        )
+        .subscribe((channelStatus) => {
+          if (["CHANNEL_ERROR", "TIMED_OUT", "CLOSED"].includes(channelStatus)) {
+            setSyncStatus(
+              window.navigator.onLine ? "out-of-sync" : "offline",
+              window.navigator.onLine
+                ? "Out of sync · realtime disconnected"
+                : "Offline · changes will sync after reconnect",
+            );
+          }
+        });
+    }
+
+    function setAuthenticationLocked(locked) {
+      const shouldReveal = !locked && (
+        document.body.classList.contains("auth-checking") ||
+        document.body.classList.contains("auth-locked")
+      );
+      if (authenticationRevealTimer) {
+        window.clearTimeout(authenticationRevealTimer);
+        authenticationRevealTimer = null;
+      }
+      document.body.classList.remove("auth-checking");
+      document.body.classList.remove("auth-revealing");
+      document.body.classList.toggle("auth-locked", locked);
+      if (shouldReveal) {
+        document.body.classList.add("auth-revealing");
+        authenticationRevealTimer = window.setTimeout(() => {
+          document.body.classList.remove("auth-revealing");
+          authenticationRevealTimer = null;
+        }, 760);
+      }
+      loginGate.setAttribute("aria-hidden", String(!locked));
+      if (locked) {
+        window.setTimeout(() => loginPassword.focus(), 0);
+        return;
+      }
+
+      loginPassword.value = "";
+      loginStatus.textContent = "";
+      window.requestAnimationFrame(() => {
+        resizeCanvas();
+        if (!restoreLocalTimelineViewport()) applyTimelineRange();
+      });
+    }
+
+    async function initializeAuthentication() {
+      if (!supabaseClient) {
+        loginStatus.textContent = "Nie udało się załadować modułu logowania.";
+        return;
+      }
+
+      const { data, error } = await supabaseClient.auth.getSession();
+      if (error) {
+        loginStatus.textContent = "Nie udało się sprawdzić sesji.";
+        return;
+      }
+
+      if (data.session) {
+        try {
+          await loadTimelineFromDatabase();
+          setAuthenticationLocked(false);
+        } catch (loadError) {
+          console.error("Timeline loading failed", loadError);
+          loginStatus.textContent = "Sesja jest aktywna, ale nie udało się wczytać timeline.";
+        }
+      } else {
+        setAuthenticationLocked(true);
+      }
+    }
+
+    async function getLoginFailureMessage(error) {
+      try {
+        const response = error?.context;
+        const details = response?.clone
+          ? await response.clone().json()
+          : null;
+        if (Number(details?.retry_after_seconds) > 0) {
+          const minutes = Math.max(
+            1,
+            Math.ceil(Number(details.retry_after_seconds) / 60),
+          );
+          return `Za dużo prób logowania. Spróbuj ponownie za ${minutes} min.`;
+        }
+        if (Number.isFinite(Number(details?.remaining_attempts))) {
+          const remaining = Math.max(0, Number(details.remaining_attempts));
+          const suffix = remaining === 1 ? "próba" : "próby";
+          return `Nieprawidłowe hasło. Pozostały ${remaining} ${suffix}.`;
+        }
+      } catch (parseError) {
+        console.debug("Could not read login error details", parseError);
+      }
+      return "Nieprawidłowe hasło lub błąd połączenia.";
+    }
+
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const password = loginPassword.value;
+      if (!password) return;
+
+      loginSubmit.disabled = true;
+      loginStatus.textContent = "Logowanie…";
+
+      try {
+        if (!supabaseClient) throw new Error("Moduł logowania jest niedostępny.");
+        const { data, error } = await supabaseClient.functions.invoke("timeline-login", {
+          body: { password },
+        });
+        if (error) {
+          throw new Error(await getLoginFailureMessage(error));
+        }
+        if (!data?.access_token || !data?.refresh_token) {
+          throw new Error("Nieprawidłowa odpowiedź usługi logowania.");
+        }
+
+        const { error: sessionError } = await supabaseClient.auth.setSession({
+          access_token: data.access_token,
+          refresh_token: data.refresh_token,
+        });
+        if (sessionError) throw sessionError;
+
+        await loadTimelineFromDatabase();
+        setAuthenticationLocked(false);
+      } catch (error) {
+        console.error("Timeline login failed", error);
+        loginPassword.select();
+        loginStatus.textContent =
+          error instanceof Error
+            ? error.message
+            : "Nieprawidłowe hasło lub błąd połączenia.";
+      } finally {
+        loginSubmit.disabled = false;
+      }
+    });
+
+    logoutButton.addEventListener("click", async () => {
+      logoutButton.disabled = true;
+      try {
+        stopDatabaseSynchronization();
+        if (supabaseClient) await supabaseClient.auth.signOut();
+      } finally {
+        logoutButton.disabled = false;
+        setAuthenticationLocked(true);
+        setStatus("Wylogowano");
+      }
+    });
+
+    function clampFrame(frame) {
+      return Math.max(1, Math.round(frame));
+    }
+
+    function clampOffset(offset) {
+      return Math.min(-state.leftPadding, offset);
+    }
+
+    function snapFrame(frame, forceSnap = false) {
+      const enabled = document.querySelector('input[name="snapMode"]:checked')?.value === "1" || forceSnap;
+      if (!enabled) return Math.max(1, Math.round(frame));
+      // Match the currently visible numbered timeline division.
+      const step = getAdaptiveStep(10);
+      return Math.max(1, Math.round(frame / step) * step);
+    }
+
+    function frameToX(frame) {
+      return state.leftPadding + state.offsetX + (frame - 1) * state.frameWidth;
+    }
+
+    function xToFrame(x) {
+      return ((x - state.leftPadding - state.offsetX) / state.frameWidth) + 1;
+    }
+
+    function ensureUniqueId(strip) {
+      if (typeof strip.id !== "number") {
+        strip.id = state.nextStripId++;
+      } else {
+        state.nextStripId = Math.max(state.nextStripId, strip.id + 1);
+      }
+    }
+
+    function getAdaptiveStep(minPixels) {
+      const rawFrames = minPixels / state.frameWidth;
+      const magnitude = 10 ** Math.floor(Math.log10(Math.max(rawFrames, 1)));
+      const normalized = rawFrames / magnitude;
+      if (normalized <= 1) return 1 * magnitude;
+      if (normalized <= 2) return 2 * magnitude;
+      if (normalized <= 5) return 5 * magnitude;
+      return 10 * magnitude;
+    }
+
+    function updateSelectionUI() {
+      const strip = getSelectedStrip();
+      const selected = getSelectedStrips();
+      const enabled = Boolean(strip);
+      const singleSelection = enabled && selected.length === 1;
+      nameInput.disabled = !singleSelection;
+      deleteButton.disabled = !enabled;
+      selectedStartFrame.disabled = !singleSelection;
+      selectedEndFrame.disabled = !singleSelection;
+      actionSection.classList.toggle("is-disabled", !enabled);
+      cameraSection.classList.toggle("is-disabled", !singleSelection);
+      blockFrameSection.classList.toggle("is-disabled", !singleSelection);
+      const cameraSelection = selected.length === 2 && selected.every((item) => item.type !== "comment");
+      makeTransitionButton.disabled = !cameraSelection;
+      swapTransitionButton.disabled = !(selected.length === 1 && strip?.type === "transition");
+      typeInputs.forEach((input) => { input.disabled = false; });
+
+      if (!strip) {
+        nameInput.value = "";
+        selectedStartFrame.value = "";
+        selectedEndFrame.value = "";
+        rangeInfo.textContent = "";
+        return;
+      }
+
+      if (selected.length > 1) {
+        nameInput.value = "";
+        rangeInfo.textContent = `${selected.length} strips selected`;
+        nameInput.disabled = true;
+        selectedStartFrame.value = "";
+        selectedEndFrame.value = "";
+        return;
+      }
+
+      nameInput.value = strip.type === "comment" ? "" : strip.camera;
+      rangeInfo.textContent = "";
+      selectedStartFrame.value = strip.start_frame;
+      selectedEndFrame.value = strip.end_frame;
+      typeInputs.forEach((input) => { input.checked = input.value === strip.type; });
+    }
+
+    function normalizeStrip(strip) {
+      ensureUniqueId(strip);
+      strip.camera = String(strip.camera || "New Camera");
+      strip.type = String(strip.type || "story");
+      strip.comment = String(strip.comment || strip.camera || "Comment");
+      strip.color = strip.color || TYPE_COLORS.comment;
+      strip.start_frame = clampFrame(strip.start_frame || 1);
+      strip.end_frame = clampFrame(strip.end_frame || strip.start_frame + 9);
+      if (strip.end_frame < strip.start_frame) {
+        [strip.start_frame, strip.end_frame] = [strip.end_frame, strip.start_frame];
+      }
+      strip.lane = Math.max(0, Math.round(Number(strip.lane) || 0));
+      strip.laneLocked = Boolean(strip.laneLocked);
+      strip.rect = null;
+      return strip;
+    }
+
+    function layoutStrips() {
+      const strips = [...state.strips].sort((a, b) => {
+        if (a.start_frame !== b.start_frame) return a.start_frame - b.start_frame;
+        if (a.end_frame !== b.end_frame) return a.end_frame - b.end_frame;
+        return a.id - b.id;
+      });
+
+      const laneIntervals = { camera: [], comment: [] };
+      const sectionKey = (strip) => isCommentStrip(strip) ? "comment" : "camera";
+      const canPlace = (strip, lane) => {
+        const intervals = laneIntervals[sectionKey(strip)][lane] || [];
+        return intervals.every((interval) => (
+          strip.end_frame < interval.start || strip.start_frame > interval.end
+        ));
+      };
+      const occupy = (strip, lane) => {
+        const lanes = laneIntervals[sectionKey(strip)];
+        if (!lanes[lane]) lanes[lane] = [];
+        lanes[lane].push({ start: strip.start_frame, end: strip.end_frame });
+        strip.lane = lane;
+      };
+
+      // Manually positioned strips reserve their chosen lane first.
+      for (const strip of strips) {
+        if (strip.laneLocked) {
+          let lane = Math.max(0, strip.lane);
+          while (!canPlace(strip, lane)) lane += 1;
+          occupy(strip, lane);
+        }
+      }
+
+      for (const strip of strips) {
+        if (strip.laneLocked) continue;
+        let lane = 0;
+        while (!canPlace(strip, lane)) lane += 1;
+        occupy(strip, lane);
+      }
+      return Math.max(1, laneIntervals.camera.length, laneIntervals.comment.length);
+    }
+
+    function laneHasCollision(strip, lane) {
+      return state.strips.some((other) => {
+        if (other.id === strip.id || other.lane !== lane) return false;
+        return !(strip.end_frame < other.start_frame || strip.start_frame > other.end_frame);
+      });
+    }
+
+    function restoreSnapTrim() {
+      if (!state.snapTrim) return;
+      state.snapTrim.strip.end_frame = state.snapTrim.originalEnd;
+      if (state.snapTrim.originalRightBoundary === undefined) {
+        delete state.snapTrim.strip.snapRightBoundary;
+      } else {
+        state.snapTrim.strip.snapRightBoundary = state.snapTrim.originalRightBoundary;
+      }
+      state.snapTrim = null;
+    }
+
+    function getStartAfterStrip(other) {
+      const canTrim = other.end_frame > other.start_frame;
+      const naturalStart = other.end_frame + 1;
+      // Keep destructive boundary correction stable when zooming in:
+      // frame 39 already owns the clean boundary at 40, while 60/60 overlaps.
+      const snapStep = Math.max(10, getAdaptiveStep(10));
+      const isOnSnapGrid = (frame) => Math.round(frame / snapStep) * snapStep === frame;
+      const alreadyTrimmedForBoundary = other.snapRightBoundary === naturalStart;
+      const shouldTrim = (
+        canTrim &&
+        !alreadyTrimmedForBoundary &&
+        !isOnSnapGrid(naturalStart) &&
+        isOnSnapGrid(other.end_frame)
+      );
+      return {
+        start: shouldTrim ? other.end_frame : naturalStart,
+        trimStrip: shouldTrim ? other : null,
+      };
+    }
+
+    function applySnapTrim(candidate) {
+      if (!candidate.trimStrip) return;
+      const originalEnd = candidate.trimStrip.end_frame;
+      const originalRightBoundary = candidate.trimStrip.snapRightBoundary;
+      candidate.trimStrip.end_frame = candidate.start - 1;
+      candidate.trimStrip.snapRightBoundary = candidate.start;
+      state.snapTrim = {
+        strip: candidate.trimStrip,
+        originalEnd,
+        originalRightBoundary,
+      };
+    }
+
+    function snapBodyStart(strip, proposedStart, width, forceSnap) {
+      restoreSnapTrim();
+      const snappedStart = snapFrame(proposedStart, forceSnap);
+      strip.start_frame = snappedStart;
+      strip.end_frame = snappedStart + width;
+      if (!laneHasCollision(strip, strip.lane)) return snappedStart;
+
+      const candidates = [];
+      for (const other of state.strips) {
+        if (other.id === strip.id || other.lane !== strip.lane) continue;
+        if (strip.end_frame < other.start_frame || strip.start_frame > other.end_frame) continue;
+
+        const startedOnLeft = state.dragInitialEnd <= other.start_frame;
+        const startedOnRight = state.dragInitialStart >= other.end_frame;
+        const movingCenter = (strip.start_frame + strip.end_frame) * 0.5;
+        const otherCenter = (other.start_frame + other.end_frame) * 0.5;
+        const approachesFromLeft = startedOnLeft || (!startedOnRight && movingCenter <= otherCenter);
+
+        if (approachesFromLeft) {
+          const end = other.start_frame - 1;
+          if (end >= 1) {
+            candidates.push({
+              start: Math.max(1, end - width),
+              end,
+              trimStrip: null,
+            });
+          }
+          continue;
+        }
+
+        const placement = getStartAfterStrip(other);
+        candidates.push({
+          start: placement.start,
+          end: placement.start + width,
+          trimStrip: placement.trimStrip,
+        });
+      }
+
+      candidates.sort((a, b) => (
+        Math.abs(a.start - snappedStart) - Math.abs(b.start - snappedStart)
+      ));
+      for (const candidate of candidates) {
+        strip.start_frame = candidate.start;
+        strip.end_frame = candidate.end;
+        applySnapTrim(candidate);
+        if (!laneHasCollision(strip, strip.lane)) return candidate.start;
+        restoreSnapTrim();
+      }
+
+      strip.start_frame = snappedStart;
+      strip.end_frame = snappedStart + width;
+      return snappedStart;
+    }
+
+    function snapResizedLeftEdge(strip, proposedStart, forceSnap) {
+      restoreSnapTrim();
+      const snappedStart = snapFrame(proposedStart, forceSnap);
+      strip.start_frame = Math.min(snappedStart, strip.end_frame - 1);
+      if (!laneHasCollision(strip, strip.lane)) return strip.start_frame;
+
+      const candidates = [];
+      for (const other of state.strips) {
+        if (other.id === strip.id || other.lane !== strip.lane) continue;
+        if (strip.end_frame < other.start_frame || strip.start_frame > other.end_frame) continue;
+        const placement = getStartAfterStrip(other);
+        if (placement.start >= strip.end_frame) continue;
+        candidates.push(placement);
+      }
+
+      candidates.sort((a, b) => (
+        Math.abs(a.start - snappedStart) - Math.abs(b.start - snappedStart)
+      ));
+      for (const candidate of candidates) {
+        strip.start_frame = candidate.start;
+        applySnapTrim(candidate);
+        if (!laneHasCollision(strip, strip.lane)) return candidate.start;
+        restoreSnapTrim();
+      }
+
+      strip.start_frame = Math.min(snappedStart, strip.end_frame - 1);
+      return strip.start_frame;
+    }
+
+    function snapResizedRightEdge(strip, proposedEnd, forceSnap) {
+      restoreSnapTrim();
+      const snappedEnd = snapFrame(proposedEnd, forceSnap);
+      strip.end_frame = Math.max(snappedEnd, strip.start_frame + 1);
+      if (!laneHasCollision(strip, strip.lane)) return strip.end_frame;
+
+      const candidates = [];
+      for (const other of state.strips) {
+        if (other.id === strip.id || other.lane !== strip.lane) continue;
+        if (strip.end_frame < other.start_frame || strip.start_frame > other.end_frame) continue;
+        const end = other.start_frame - 1;
+        if (end <= strip.start_frame) continue;
+        candidates.push(end);
+      }
+
+      candidates.sort((a, b) => Math.abs(a - snappedEnd) - Math.abs(b - snappedEnd));
+      for (const candidate of candidates) {
+        strip.end_frame = candidate;
+        if (!laneHasCollision(strip, strip.lane)) return candidate;
+      }
+
+      strip.end_frame = Math.max(snappedEnd, strip.start_frame + 1);
+      return strip.end_frame;
+    }
+
+    function swapLanes(strip, targetLane) {
+      const previousLane = strip.lane;
+      if (previousLane === targetLane) return;
+
+      const collidingStrips = state.strips.filter((other) => (
+        other.id !== strip.id &&
+        other.lane === targetLane &&
+        !(strip.end_frame < other.start_frame || strip.start_frame > other.end_frame)
+      ));
+
+      strip.lane = targetLane;
+      strip.laneLocked = true;
+
+      for (const other of collidingStrips) {
+        other.lane = previousLane;
+        if (laneHasCollision(other, previousLane)) {
+          let fallbackLane = 0;
+          while (laneHasCollision(other, fallbackLane) || fallbackLane === targetLane) {
+            fallbackLane += 1;
+          }
+          other.lane = fallbackLane;
+        }
+        other.laneLocked = true;
+      }
+    }
+
+    function drawGrid(width, height, laneCount) {
+      const headerHeight = state.topPadding;
+      const minorStep = getAdaptiveStep(10);
+      const majorStep = getAdaptiveStep(42);
+      const labelStep = getAdaptiveStep(84);
+      const visibleStart = Math.floor(xToFrame(0));
+      const visibleEnd = Math.ceil(xToFrame(width));
+      const startFrame = Math.floor(visibleStart / minorStep) * minorStep - minorStep * 2;
+      const endFrame = Math.ceil(visibleEnd / minorStep) * minorStep + minorStep * 2;
+      const labelCandidates = [];
+
+      ctx.fillStyle = "#1d1d1d";
+      ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = "#2a2a2a";
+      ctx.fillRect(0, 0, width, headerHeight);
+
+      const segmentStart = Math.floor(visibleStart / 600) * 600;
+      for (let frame = segmentStart; frame <= visibleEnd; frame += 600) {
+        if (Math.abs(Math.floor(frame / 600)) % 2 !== 1) continue;
+        const x1 = Math.max(0, frameToX(frame));
+        const x2 = Math.min(width, frameToX(frame + 600));
+        ctx.fillStyle = "#202020";
+        ctx.fillRect(
+          x1,
+          headerHeight,
+          Math.max(0, x2 - x1),
+          Math.max(0, height - headerHeight),
+        );
+      }
+
+      for (let frame = startFrame; frame <= endFrame; frame += minorStep) {
+        const x = frameToX(frame);
+        if (x < -state.frameWidth * 2 || x > width + state.frameWidth * 2) continue;
+
+        const isSuperMajor = frame % 600 === 0;
+        const isMajor = frame % labelStep === 0;
+        ctx.strokeStyle = isMajor ? "#303030" : "#252525";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(Math.round(x) + 0.5, headerHeight);
+        ctx.lineTo(Math.round(x) + 0.5, height);
+        ctx.stroke();
+
+        if (isSuperMajor || isMajor) {
+          labelCandidates.push({ frame, x, important: isSuperMajor });
+        }
+      }
+
+      ctx.font = "12px Segoe UI";
+      ctx.textBaseline = "middle";
+      const chosenLabels = [];
+      const orderedLabels = [
+        ...labelCandidates.filter((label) => label.important),
+        ...labelCandidates.filter((label) => !label.important),
+      ];
+      for (const label of orderedLabels) {
+        const text = String(label.frame);
+        const textWidth = ctx.measureText(text).width;
+        const left = label.x + 3;
+        const right = left + textWidth;
+        const overlaps = chosenLabels.some((chosen) => (
+          left < chosen.right + 8 && right + 8 > chosen.left
+        ));
+        if (overlaps) continue;
+        chosenLabels.push({ ...label, left, right });
+      }
+      chosenLabels.sort((a, b) => a.x - b.x);
+      for (const label of chosenLabels) {
+        ctx.fillStyle = label.important ? "#d4d4d4" : "#a0a0a0";
+        ctx.font = label.important ? "bold 12px Segoe UI" : "12px Segoe UI";
+        ctx.fillText(String(label.frame), label.x + 3, headerHeight / 2);
+      }
+
+      ctx.fillStyle = "#929292";
+      ctx.font = "11px Segoe UI";
+      ctx.fillText("CAMERAS", 8, state.topPadding - 12);
+    }
+
+    function drawStrips() {
+      for (const strip of state.strips) {
+        const x = frameToX(strip.start_frame);
+        const width = Math.max(8, (strip.end_frame - strip.start_frame + 1) * state.frameWidth);
+        const y = getStripY(strip);
+        const isSelected = state.selectedStripIds.has(strip.id);
+
+        strip.rect = { x, y, width, height: state.laneHeight };
+
+        ctx.fillStyle = getStripColor(strip.type);
+        ctx.fillRect(x, y, width, state.laneHeight);
+        ctx.strokeStyle = isSelected ? "#f08a1c" : "rgba(0, 0, 0, 0.62)";
+        ctx.lineWidth = isSelected ? 2 : 1;
+        ctx.strokeRect(x + 0.5, y + 0.5, width - 1, state.laneHeight - 1);
+
+        const handleWidth = 7;
+        ctx.fillStyle = isSelected ? "rgba(255, 171, 64, 0.22)" : "rgba(0, 0, 0, 0.18)";
+        ctx.fillRect(x, y, handleWidth, state.laneHeight);
+        ctx.fillRect(x + width - handleWidth, y, handleWidth, state.laneHeight);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(x + 8, y + 2, Math.max(0, width - 16), state.laneHeight - 4);
+        ctx.clip();
+        ctx.fillStyle = "#efefef";
+        ctx.font = "13px Segoe UI";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(strip.camera, x + width / 2, y + state.laneHeight / 2);
+        ctx.restore();
+      }
+    }
+
+    function drawDatabaseRangeMarkers(width, height) {
+      if (!state.lastSyncedTimeline) return;
+      const frames = new Set([
+        Number(state.lastSyncedTimeline.rangeStart),
+        Number(state.lastSyncedTimeline.rangeEnd),
+      ]);
+
+      ctx.save();
+      ctx.fillStyle = "#d64a4a";
+      for (const frame of frames) {
+        if (!Number.isFinite(frame)) continue;
+        const x = Math.round(frameToX(frame));
+        if (x < -2 || x > width + 2) continue;
+        ctx.fillRect(x - 1, 0, 2, height);
+      }
+      ctx.restore();
+    }
+
+    function draw() {
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      const laneCount = layoutStrips();
+      drawGrid(width, height, laneCount);
+      drawStrips();
+      drawDatabaseRangeMarkers(width, height);
+      updateScrollbar();
+    }
+
+    function hitTest(mouseX, mouseY) {
+      for (let i = state.strips.length - 1; i >= 0; i -= 1) {
+        const strip = state.strips[i];
+        if (isCommentStrip(strip)) continue;
+        const rect = strip.rect;
+        if (!rect) continue;
+        const inside = mouseX >= rect.x && mouseX <= rect.x + rect.width && mouseY >= rect.y && mouseY <= rect.y + rect.height;
+        if (!inside) continue;
+        const edgeThreshold = 8;
+        if (mouseX <= rect.x + edgeThreshold) return { strip, zone: "left" };
+        if (mouseX >= rect.x + rect.width - edgeThreshold) return { strip, zone: "right" };
+        return { strip, zone: "body" };
+      }
+      return null;
+    }
+
+    function selectStrip(stripId) {
+      setSelection(stripId == null ? [] : [stripId]);
+    }
+
+    function focusStrip(strip) {
+      if (!strip) return;
+      state.selectedStripIds = new Set([strip.id]);
+      state.selectedStripId = strip.id;
+      const stripCenter = frameToX(strip.start_frame + (strip.end_frame - strip.start_frame) * 0.5);
+      const canvasCenter = canvas.clientWidth * 0.5;
+      state.offsetX = clampOffset(state.offsetX + canvasCenter - stripCenter);
+      updateScrollbar();
+      updateSelectionUI();
+      draw();
+      saveLocalTimelineViewState();
+    }
+
+    function addStripAtFrame(frame, sectionType = "camera") {
+      const start = clampFrame(frame);
+      const selectedType = document.querySelector('input[name="stripType"]:checked')?.value || "story";
+      const blockType = selectedType;
+      const strip = normalizeStrip({
+        camera: `Camera_${state.nextStripId}`,
+        type: blockType,
+        start_frame: start,
+        end_frame: start + 99,
+      });
+      state.strips.push(strip);
+      selectStrip(strip.id);
+    }
+
+    function makeTransitionFromSelection() {
+      const cameras = getSelectedStrips()
+        .filter((strip) => strip.type !== "comment")
+        .sort((a, b) => a.start_frame - b.start_frame || a.end_frame - b.end_frame);
+      if (cameras.length !== 2) return;
+
+      const first = cameras[0];
+      const second = cameras[1];
+      const duration = 200;
+      const gapStart = first.end_frame + 1;
+      const gapEnd = second.start_frame - 1;
+      const gapLength = Math.max(0, gapEnd - gapStart + 1);
+      let start;
+
+      if (gapLength >= duration) {
+        start = gapStart + Math.floor((gapLength - duration) * 0.5);
+      } else {
+        const boundaryCenter = (first.end_frame + second.start_frame) * 0.5;
+        start = Math.max(1, Math.round(boundaryCenter - (duration - 1) * 0.5));
+      }
+      const end = start + duration - 1;
+
+      const sectionStart = getSectionStart("camera");
+      const sectionEnd = getSectionEnd("camera") - state.laneHeight;
+      const maxVisibleLane = Math.max(
+        0,
+        Math.floor((sectionEnd - sectionStart) / (state.laneHeight + state.laneGap)),
+      );
+      const selectedLanes = new Set([first.lane, second.lane]);
+      const laneIsFree = (lane) => state.strips.every((strip) => (
+        strip.lane !== lane || end < strip.start_frame || start > strip.end_frame
+      ));
+      let transitionLane = null;
+
+      for (let lane = 0; lane <= maxVisibleLane; lane += 1) {
+        if (!selectedLanes.has(lane) && laneIsFree(lane)) {
+          transitionLane = lane;
+          break;
+        }
+      }
+
+      const transition = normalizeStrip({
+        camera: `${first.camera}-${second.camera}`,
+        transition_from: first.camera,
+        transition_to: second.camera,
+        type: "transition",
+        start_frame: start,
+        end_frame: end,
+        laneLocked: transitionLane !== null,
+      });
+      if (transitionLane !== null) transition.lane = transitionLane;
+      state.strips.push(transition);
+      selectStrip(transition.id);
+      setStatus(`Created 200-frame transition ${transition.camera}`);
+    }
+
+    function swapSelectedTransition() {
+      const transition = getSelectedStrip();
+      if (!transition || transition.type !== "transition") return;
+      const from = transition.transition_from;
+      const to = transition.transition_to;
+      if (!from || !to) {
+        const separator = transition.camera.indexOf("-");
+        if (separator < 1) return;
+        transition.transition_from = transition.camera.slice(0, separator);
+        transition.transition_to = transition.camera.slice(separator + 1);
+      }
+      [transition.transition_from, transition.transition_to] = [
+        transition.transition_to,
+        transition.transition_from,
+      ];
+      transition.camera = `${transition.transition_from}-${transition.transition_to}`;
+      updateSelectionUI();
+      draw();
+    }
+
+    function importTimelineData(data) {
+      const blocks = Array.isArray(data.timeline_blocks) ? data.timeline_blocks : [];
+      state.strips = blocks.filter((block) => block.type !== "comment").map((block) => normalizeStrip({
+        camera: block.camera,
+        transition_from: block.transition_from,
+        transition_to: block.transition_to,
+        type: block.type,
+        start_frame: block.start_frame,
+        end_frame: block.end_frame,
+        lane: block._database_lane ?? block.lane ?? 0,
+        laneLocked: block._database_lane_locked ?? block.lane_locked ?? block.laneLocked ?? false,
+        databaseId: block._database_id || null,
+        databaseRevision: Number.isFinite(Number(block._database_revision))
+          ? Number(block._database_revision)
+          : null,
+      }));
+      state.selectedStripId = state.strips[0]?.id ?? null;
+      state.selectedStripIds = new Set(state.selectedStripId == null ? [] : [state.selectedStripId]);
+      const savedRange = data.timeline_range || data.settings?.timeline_range;
+      if (savedRange && Number.isFinite(Number(savedRange.start)) && Number.isFinite(Number(savedRange.end))) {
+        state.rangeStart = Math.max(1, Math.round(Number(savedRange.start)));
+        state.rangeEnd = Math.max(state.rangeStart, Math.round(Number(savedRange.end)));
+      }
+      timelineStartFrame.value = String(state.rangeStart);
+      timelineEndFrame.value = String(state.rangeEnd);
+      updateSelectionUI();
+      if (canvas.clientWidth > 0) applyTimelineRange();
+      else draw();
+    }
+
+    function exportTimelineData() {
+      return {
+        version: 1,
+        timeline_range: { start: state.rangeStart, end: state.rangeEnd },
+        timeline_blocks: state.strips
+          .slice()
+          .sort((a, b) => a.start_frame - b.start_frame || a.end_frame - b.end_frame)
+          .map((strip) => ({
+            camera: strip.camera,
+            transition_from: strip.type === "transition" ? strip.transition_from : undefined,
+            transition_to: strip.type === "transition" ? strip.transition_to : undefined,
+            type: strip.type,
+            start_frame: strip.start_frame,
+            end_frame: strip.end_frame,
+          })),
+      };
+    }
+
+    function zoomTimeline(factor, anchorX = canvas.clientWidth * 0.5) {
+      const frameBeforeZoom = xToFrame(anchorX);
+      const nextFrameWidth = Math.min(64, Math.max(0.1, state.frameWidth * factor));
+      if (Math.abs(nextFrameWidth - state.frameWidth) < 0.000001) return;
+      state.frameWidth = nextFrameWidth;
+      state.offsetX = clampOffset(anchorX - (frameBeforeZoom - 1) * state.frameWidth);
+      updateScrollbar();
+      draw();
+      saveLocalTimelineViewState();
+    }
+
+    function updateScrollbar() {
+      const centerFrame = Math.round(xToFrame(canvas.clientWidth * 0.5));
+      timelineScrollbar.min = String(state.rangeStart);
+      timelineScrollbar.max = String(state.rangeEnd);
+      timelineScrollbar.value = String(Math.max(
+        state.rangeStart,
+        Math.min(state.rangeEnd, centerFrame),
+      ));
+    }
+
+    function applyTimelineRange() {
+      let start = Math.max(1, Math.round(Number(timelineStartFrame.value) || 1));
+      let end = Math.max(start, Math.round(Number(timelineEndFrame.value) || start));
+      state.rangeStart = start;
+      state.rangeEnd = end;
+      timelineStartFrame.value = String(start);
+      timelineEndFrame.value = String(end);
+      const span = Math.max(1, end - start + 1);
+      state.frameWidth = Math.min(64, Math.max(0.1, canvas.clientWidth / span));
+      state.offsetX = state.leftPadding - (start - 1) * state.frameWidth;
+      timelineScrollbar.min = String(start);
+      timelineScrollbar.max = String(end);
+      timelineScrollbar.value = String(Math.round((start + end) / 2));
+      saveLocalTimelineViewState();
+      draw();
+    }
+
+    function updateSelectedFrameRange() {
+      const strip = getSelectedStrip();
+      if (!strip || getSelectedStrips().length !== 1) return;
+      const start = Math.max(1, Math.round(Number(selectedStartFrame.value) || strip.start_frame));
+      const end = Math.max(start, Math.round(Number(selectedEndFrame.value) || start));
+      strip.start_frame = start;
+      strip.end_frame = end;
+      selectedStartFrame.value = String(start);
+      selectedEndFrame.value = String(end);
+      draw();
+    }
+
+    async function openJsonWithPicker() {
+      if (!window.showOpenFilePicker) {
+        fileInput.click();
+        return;
+      }
+      const [handle] = await window.showOpenFilePicker({
+        multiple: false,
+        types: [{ description: "JSON Files", accept: { "application/json": [".json"] } }],
+      });
+      const file = await handle.getFile();
+      const data = JSON.parse(await file.text());
+      state.fileHandle = handle;
+      state.fileName = file.name;
+      await rememberFileHandle(handle);
+      importTimelineData(data);
+      setStatus(`Zaimportowano ${file.name} — oczekuje na zapis`);
+    }
+
+    function openHandleDatabase() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open("timeline-editor-settings", 1);
+        request.onupgradeneeded = () => {
+          request.result.createObjectStore("files");
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function rememberFileHandle(handle) {
+      if (!window.indexedDB || !handle) return;
+      try {
+        const database = await openHandleDatabase();
+        await new Promise((resolve, reject) => {
+          const transaction = database.transaction("files", "readwrite");
+          transaction.objectStore("files").put(handle, "last-json");
+          transaction.oncomplete = resolve;
+          transaction.onerror = () => reject(transaction.error);
+        });
+        database.close();
+      } catch (error) {
+        console.warn("Could not remember JSON file handle", error);
+      }
+    }
+
+    async function restoreRememberedFile() {
+      if (!window.indexedDB || !window.showOpenFilePicker) return;
+      try {
+        const database = await openHandleDatabase();
+        const handle = await new Promise((resolve, reject) => {
+          const request = database.transaction("files").objectStore("files").get("last-json");
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+        database.close();
+        if (!handle) return;
+
+        const permission = await handle.queryPermission({ mode: "readwrite" });
+        if (permission !== "granted") return;
+        const file = await handle.getFile();
+        const data = JSON.parse(await file.text());
+        state.fileHandle = handle;
+        state.fileName = file.name;
+        importTimelineData(data);
+        setStatus(`Loaded ${file.name}`);
+      } catch (error) {
+        console.warn("Could not restore remembered JSON file", error);
+      }
+    }
+
+    async function saveJsonWithPicker() {
+      const payload = JSON.stringify(exportTimelineData(), null, 2);
+      if (state.fileHandle && state.fileHandle.createWritable) {
+        const writable = await state.fileHandle.createWritable();
+        await writable.write(payload);
+        await writable.close();
+        setStatus(`Saved ${state.fileName || "timeline.json"}`);
+        return;
+      }
+      if (window.showSaveFilePicker) {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: state.fileName || "timeline.json",
+          types: [{ description: "JSON Files", accept: { "application/json": [".json"] } }],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(payload);
+        await writable.close();
+        state.fileHandle = handle;
+        state.fileName = handle.name || "timeline.json";
+        setStatus(`Saved ${state.fileName}`);
+        return;
+      }
+      const blob = new Blob([payload], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = state.fileName || "timeline.json";
+      link.click();
+      URL.revokeObjectURL(url);
+      setStatus(`Downloaded ${link.download}`);
+    }
+
+    openJsonButton?.addEventListener("click", async () => {
+      try { await openJsonWithPicker(); }
+      catch (error) { if (error?.name !== "AbortError") setStatus(`Open failed: ${error.message}`); }
+    });
+
+    fileInput.addEventListener("change", async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      try {
+        const data = JSON.parse(await file.text());
+        state.fileHandle = null;
+        state.fileName = file.name;
+        importTimelineData(data);
+        setStatus(`Zaimportowano ${file.name} — oczekuje na zapis`);
+      } catch (error) {
+        setStatus(`Open failed: ${error.message}`);
+      } finally {
+        event.target.value = "";
+      }
+    });
+
+    saveJsonButton.addEventListener("click", async () => {
+      await synchronizeTimelineDatabase(true);
+    });
+
+    deleteButton.addEventListener("click", () => {
+      if (!state.selectedStripIds.size) return;
+      state.strips = state.strips.filter((strip) => !state.selectedStripIds.has(strip.id));
+      setSelection([]);
+    });
+
+    makeTransitionButton.addEventListener("click", makeTransitionFromSelection);
+    swapTransitionButton.addEventListener("click", swapSelectedTransition);
+
+    nameInput.addEventListener("input", () => {
+      const strip = getSelectedStrip();
+      if (!strip) return;
+      const selected = getSelectedStrips();
+      if (selected.length > 1) {
+        selected.forEach((item) => { if (item.type !== "comment") item.camera = nameInput.value; });
+        draw();
+        return;
+      }
+      if (strip.type !== "comment") strip.camera = nameInput.value;
+      draw();
+    });
+
+    typeInputs.forEach((input) => {
+      input.addEventListener("change", () => {
+        const strip = getSelectedStrip();
+        if (!strip || !input.checked) return;
+        if (strip.type === "comment") {
+          updateSelectionUI();
+          return;
+        }
+        getSelectedStrips().forEach((item) => {
+          if (item.type !== "comment") item.type = input.value;
+        });
+        draw();
+      });
+    });
+
+    zoomOutButton.addEventListener("click", () => zoomTimeline(0.75));
+    zoomInButton.addEventListener("click", () => zoomTimeline(1.25));
+    [selectedStartFrame, selectedEndFrame].forEach((input) => {
+      input.addEventListener("change", updateSelectedFrameRange);
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") updateSelectedFrameRange();
+      });
+    });
+    [timelineStartFrame, timelineEndFrame].forEach((input) => {
+      input.addEventListener("change", applyTimelineRange);
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") applyTimelineRange();
+      });
+    });
+
+    timelineScrollbar.addEventListener("input", () => {
+      const targetFrame = Math.max(
+        state.rangeStart,
+        Math.min(state.rangeEnd, Number(timelineScrollbar.value)),
+      );
+      state.offsetX = canvas.clientWidth * 0.5 - (targetFrame - 1) * state.frameWidth - state.leftPadding;
+      draw();
+      saveLocalTimelineViewState();
+    });
+
+    searchInput.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      const query = searchInput.value.trim().toLowerCase();
+      if (!query) {
+        searchResults.textContent = "Type a camera name and press Enter to jump to its strip.";
+        return;
+      }
+      const matches = state.strips.filter((strip) => (
+        (strip.type === "comment" ? strip.comment : strip.camera).toLowerCase().includes(query)
+      ));
+      if (!matches.length) {
+        searchResults.textContent = `No strips found for "${searchInput.value}".`;
+        return;
+      }
+      const target = matches[0];
+      searchResults.textContent = `Jumped to ${target.camera} (${target.start_frame}-${target.end_frame}).`;
+      focusStrip(target);
+    });
+
+    canvas.addEventListener("dblclick", (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+      if (hitTest(mouseX, mouseY)) return;
+      addStripAtFrame(xToFrame(mouseX), "camera");
+    });
+
+    canvas.addEventListener("mousedown", (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+      const initialHit = hitTest(mouseX, mouseY);
+
+      if (event.button === 1 || (event.button === 0 && event.shiftKey && !initialHit)) {
+        state.dragMode = "pan";
+        state.panStartX = event.clientX;
+        state.panInitialOffsetX = state.offsetX;
+        return;
+      }
+
+      if (event.button !== 0) return;
+      let hit = initialHit;
+      if (!hit) {
+        setSelection([]);
+        state.dragMode = "selectBox";
+        state.selectionStartX = mouseX;
+        state.selectionStartY = mouseY;
+        selectionBox.style.display = "block";
+        selectionBox.style.left = `${mouseX}px`;
+        selectionBox.style.top = `${mouseY}px`;
+        selectionBox.style.width = "0px";
+        selectionBox.style.height = "0px";
+        return;
+      }
+
+      if (event.ctrlKey || event.metaKey || event.shiftKey) {
+        const ids = new Set(state.selectedStripIds);
+        if (ids.has(hit.strip.id)) ids.delete(hit.strip.id);
+        else ids.add(hit.strip.id);
+        setSelection([...ids]);
+        return;
+      }
+
+      if (!state.selectedStripIds.has(hit.strip.id)) {
+        selectStrip(hit.strip.id);
+      }
+      state.altClonePending = event.altKey && hit.zone === "body";
+      state.dragMode = hit.zone;
+      state.dragStripId = hit.strip.id;
+      state.dragOriginFrame = xToFrame(mouseX);
+      state.dragOriginY = mouseY;
+      state.dragStartMouseX = event.clientX;
+      state.dragInitialStart = hit.strip.start_frame;
+      state.dragInitialEnd = hit.strip.end_frame;
+      state.dragLastStart = hit.strip.start_frame;
+      state.dragLastEnd = hit.strip.end_frame;
+      if (hit.zone === "body" && state.selectedStripIds.has(hit.strip.id)) {
+        state.dragGroup = getSelectedStrips().map((item) => ({
+          strip: item,
+          start: item.start_frame,
+          end: item.end_frame,
+          lane: item.lane,
+        }));
+      }
+    });
+
+    canvas.addEventListener("mousemove", (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+      const hit = hitTest(mouseX, mouseY);
+      canvas.style.cursor = hit ? (hit.zone === "body" ? "grab" : "ew-resize") : "default";
+    });
+
+    canvas.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      zoomTimeline(event.deltaY < 0 ? 1.1 : 0.9, mouseX);
+    }, { passive: false });
+
+    toolbarResizer.addEventListener("mousedown", (event) => {
+      state.resizeMode = "toolbar";
+      state.resizeInitialMouse = event.clientY;
+      state.resizeInitialValue = toolbar.getBoundingClientRect().height;
+    });
+
+    sidebarResizer.addEventListener("mousedown", (event) => {
+      state.resizeMode = "sidebar";
+      state.resizeInitialMouse = event.clientX;
+      state.resizeInitialValue = sidebar.getBoundingClientRect().width;
+    });
+
+    window.addEventListener("mousemove", (event) => {
+      if (state.resizeMode === "toolbar") {
+        const nextHeight = Math.max(140, Math.min(window.innerHeight * 0.7, state.resizeInitialValue + (event.clientY - state.resizeInitialMouse)));
+        toolbar.style.height = `${nextHeight}px`;
+        resizeCanvas();
+        return;
+      }
+      if (state.resizeMode === "sidebar") {
+        const nextWidth = Math.max(180, Math.min(window.innerWidth * 0.45, state.resizeInitialValue + (event.clientX - state.resizeInitialMouse)));
+        sidebar.style.width = `${nextWidth}px`;
+        resizeCanvas();
+        return;
+      }
+      if (!state.dragMode) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+
+      if (state.dragMode === "pan") {
+        state.offsetX = clampOffset(state.panInitialOffsetX + (event.clientX - state.panStartX));
+        updateScrollbar();
+        draw();
+        return;
+      }
+
+      if (state.dragMode === "selectBox") {
+        const x = Math.min(state.selectionStartX, mouseX);
+        const y = Math.min(state.selectionStartY, mouseY);
+        const width = Math.abs(mouseX - state.selectionStartX);
+        const height = Math.abs(mouseY - state.selectionStartY);
+        selectionBox.style.left = `${x}px`;
+        selectionBox.style.top = `${y}px`;
+        selectionBox.style.width = `${width}px`;
+        selectionBox.style.height = `${height}px`;
+        return;
+      }
+
+      let strip = state.strips.find((item) => item.id === state.dragStripId);
+      if (!strip) return;
+
+      if (state.dragMode === "body" && state.dragGroup && state.dragGroup.length > 1) {
+        const rawGroupDelta = Math.round(xToFrame(mouseX) - state.dragOriginFrame);
+        const forceGroupSnap = event.shiftKey || event.ctrlKey;
+        const anchor = state.dragGroup[0];
+        const snappedAnchor = snapFrame(anchor.start + rawGroupDelta, forceGroupSnap);
+        const groupDelta = snappedAnchor - anchor.start;
+        const laneDelta = Math.round((mouseY - state.dragOriginY) / (state.laneHeight + state.laneGap));
+        for (const entry of state.dragGroup) {
+          const width = entry.end - entry.start;
+          entry.strip.start_frame = Math.max(1, entry.start + groupDelta);
+          entry.strip.end_frame = entry.strip.start_frame + width;
+          const sectionType = isCommentStrip(entry.strip) ? "comment" : "camera";
+          const sectionStart = getSectionStart(sectionType);
+          const sectionEnd = getSectionEnd(sectionType) - state.laneHeight;
+          const maxLane = Math.max(
+            0,
+            Math.floor((sectionEnd - sectionStart) / (state.laneHeight + state.laneGap)),
+          );
+          entry.strip.lane = Math.min(maxLane, Math.max(0, entry.lane + laneDelta));
+          entry.strip.laneLocked = true;
+        }
+        updateSelectionUI();
+        draw();
+        return;
+      }
+
+      if (
+        state.dragMode === "body" &&
+        state.altClonePending &&
+        Math.hypot(
+          event.clientX - state.dragStartMouseX,
+          event.clientY - (canvas.getBoundingClientRect().top + state.dragOriginY),
+        ) > 4
+      ) {
+        const copy = normalizeStrip({
+          ...strip,
+          id: state.nextStripId++,
+          laneLocked: true,
+        });
+        copy.lane = strip.lane;
+        state.strips.push(copy);
+        state.dragStripId = copy.id;
+        strip = copy;
+        state.altClonePending = false;
+        selectStrip(copy.id);
+      }
+      let deltaFrames = Math.round(xToFrame(mouseX) - state.dragOriginFrame);
+      const forceSnap = event.shiftKey || event.ctrlKey;
+      if (state.dragMode === "body") {
+        const width = state.dragInitialEnd - state.dragInitialStart;
+        const sectionType = isCommentStrip(strip) ? "comment" : "camera";
+        const sectionStart = getSectionStart(sectionType);
+        const sectionEnd = getSectionEnd(sectionType) - state.laneHeight;
+        const constrainedMouseY = Math.max(sectionStart, Math.min(sectionEnd, mouseY));
+        const requestedLane = Math.max(
+          0,
+          Math.round((constrainedMouseY - sectionStart) / (state.laneHeight + state.laneGap)),
+        );
+        const movingToAnotherLane = Math.abs(mouseY - state.dragOriginY) > 4 && requestedLane !== strip.lane;
+        if (movingToAnotherLane) {
+          restoreSnapTrim();
+          strip.start_frame = snapFrame(state.dragInitialStart + deltaFrames, forceSnap);
+          strip.end_frame = strip.start_frame + width;
+        } else {
+          snapBodyStart(strip, state.dragInitialStart + deltaFrames, width, forceSnap);
+        }
+        if (Math.abs(mouseY - state.dragOriginY) > 4) {
+          strip.laneLocked = true;
+          if (requestedLane !== strip.lane) {
+            swapLanes(strip, requestedLane);
+          }
+        }
+        if (laneHasCollision(strip, strip.lane)) {
+          strip.start_frame = state.dragLastStart;
+          strip.end_frame = state.dragLastEnd;
+        } else {
+          state.dragLastStart = strip.start_frame;
+          state.dragLastEnd = strip.end_frame;
+        }
+      } else if (state.dragMode === "left") {
+        snapResizedLeftEdge(strip, state.dragInitialStart + deltaFrames, forceSnap);
+      } else if (state.dragMode === "right") {
+        snapResizedRightEdge(strip, state.dragInitialEnd + deltaFrames, forceSnap);
+      }
+      if (state.dragMode === "left" || state.dragMode === "right") {
+        if (laneHasCollision(strip, strip.lane)) {
+          strip.start_frame = state.dragLastStart;
+          strip.end_frame = state.dragLastEnd;
+        } else {
+          state.dragLastStart = strip.start_frame;
+          state.dragLastEnd = strip.end_frame;
+        }
+      }
+      updateSelectionUI();
+      draw();
+    });
+
+    window.addEventListener("mouseup", () => {
+      const completedDragMode = state.dragMode;
+      if (state.dragMode === "selectBox") {
+        const box = selectionBox.getBoundingClientRect();
+        const canvasRect = canvas.getBoundingClientRect();
+        const x1 = Math.min(state.selectionStartX, box.left - canvasRect.left);
+        const x2 = Math.max(state.selectionStartX, box.right - canvasRect.left);
+        const y1 = Math.min(state.selectionStartY, box.top - canvasRect.top);
+        const y2 = Math.max(state.selectionStartY, box.bottom - canvasRect.top);
+        const ids = state.strips.filter((strip) => {
+          if (!strip.rect) return false;
+          return strip.rect.x < x2 && strip.rect.x + strip.rect.width > x1 &&
+            strip.rect.y < y2 && strip.rect.y + strip.rect.height > y1;
+        }).map((strip) => strip.id);
+        selectionBox.style.display = "none";
+        setSelection(ids);
+      }
+      state.dragMode = null;
+      state.dragStripId = null;
+      state.dragGroup = null;
+      state.altClonePending = false;
+      state.snapTrim = null;
+      state.resizeMode = null;
+      if (completedDragMode === "pan") saveLocalTimelineViewState();
+    });
+
+    window.addEventListener("keydown", (event) => {
+      const deleteKeys = new Set(["x", "backspace", "delete"]);
+      if (!deleteKeys.has(event.key.toLowerCase())) return;
+      if (!state.selectedStripIds.size) return;
+      const activeElement = document.activeElement;
+      if (
+        activeElement?.matches("input, textarea, select") ||
+        activeElement?.isContentEditable
+      ) return;
+      event.preventDefault();
+      state.strips = state.strips.filter((strip) => !state.selectedStripIds.has(strip.id));
+      setSelection([]);
+    });
+
+    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("offline", () => {
+      if (!state.databaseReady) return;
+      setSyncStatus("offline", "Offline · changes will sync after reconnect");
+    });
+    window.addEventListener("online", () => {
+      if (!state.databaseReady) return;
+      setSyncStatus("back-online", "Back online · preparing sync");
+      window.setTimeout(() => synchronizeTimelineDatabase(true), 350);
+    });
+    window.addEventListener("beforeunload", (event) => {
+      if (!hasUnsavedDatabaseChanges()) return;
+      event.preventDefault();
+      event.returnValue = "";
+    });
+
+    importTimelineData({
+      version: 1,
+      timeline_blocks: [
+        { camera: "DC10", type: "story", start_frame: 1, end_frame: 99 },
+        { camera: "DC110", type: "transition", start_frame: 100, end_frame: 105 },
+        { camera: "DC120", type: "loop", start_frame: 106, end_frame: 180 }
+      ]
+    });
+    setStatus("Loaded demo timeline");
+    resizeCanvas();
+    applyTimelineRange();
+    initializeAuthentication();
+  </script>
+</body>
+</html>
