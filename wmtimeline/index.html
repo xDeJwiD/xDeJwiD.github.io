@@ -1553,6 +1553,7 @@
       dirtyStatusInterval: null,
       realtimeChannel: null,
       remotePullTimer: null,
+      suppressRealtimeUntil: 0,
       lastSyncedTimeline: null,
       lastSyncedBlocks: new Map(),
       minFrame: 1,
@@ -1691,7 +1692,18 @@
       return true;
     }
 
+    function getDatabaseLaneState(block) {
+      const laneLocked = Boolean(block.lane_locked ?? block.laneLocked);
+      return {
+        lane: laneLocked
+          ? Math.max(0, Math.round(Number(block.lane) || 0))
+          : 0,
+        laneLocked,
+      };
+    }
+
     function serializeDatabaseBlock(block) {
+      const laneState = getDatabaseLaneState(block);
       return JSON.stringify({
         camera: String(block.camera || ""),
         transition_from: block.type === "transition"
@@ -1703,8 +1715,8 @@
         type: String(block.type || "story"),
         start_frame: Number(block.start_frame),
         end_frame: Number(block.end_frame),
-        lane: Math.max(0, Math.round(Number(block.lane) || 0)),
-        lane_locked: Boolean(block.lane_locked ?? block.laneLocked),
+        lane: laneState.lane,
+        lane_locked: laneState.laneLocked,
       });
     }
 
@@ -1725,6 +1737,7 @@
     }
 
     function getDatabaseBlockPayload(strip, includeIdentity = false) {
+      const laneState = getDatabaseLaneState(strip);
       const payload = {
         camera: String(strip.camera || ""),
         transition_from: strip.type === "transition"
@@ -1736,8 +1749,8 @@
         type: strip.type,
         start_frame: strip.start_frame,
         end_frame: strip.end_frame,
-        lane: Math.max(0, Math.round(Number(strip.lane) || 0)),
-        lane_locked: Boolean(strip.laneLocked),
+        lane: laneState.lane,
+        lane_locked: laneState.laneLocked,
       };
       if (includeIdentity) {
         if (!strip.databaseId) strip.databaseId = createDatabaseUuid();
@@ -1791,6 +1804,23 @@
         if (!previous || previous.content !== serializeDatabaseBlock(strip)) return true;
       }
       return [...state.lastSyncedBlocks.keys()].some((id) => !currentIds.has(id));
+    }
+
+    function databaseRowsMatchSnapshot(timeline, blocks) {
+      if (
+        !state.lastSyncedTimeline ||
+        Number(timeline.revision) !== Number(state.timelineRevision) ||
+        blocks.length !== state.lastSyncedBlocks.size
+      ) return false;
+
+      return blocks.every((block) => {
+        const previous = state.lastSyncedBlocks.get(block.id);
+        return Boolean(
+          previous &&
+          Number(previous.revision) === Number(block.revision) &&
+          previous.content === serializeDatabaseBlock(block)
+        );
+      });
     }
 
     async function fetchTimelineDatabaseRows() {
@@ -1891,6 +1921,7 @@
       const syncedIds = new Set(state.strips.map((strip) => strip.databaseId).filter(Boolean));
       for (const [databaseId, previous] of state.lastSyncedBlocks) {
         if (syncedIds.has(databaseId)) continue;
+        state.suppressRealtimeUntil = Date.now() + 2000;
         const { error } = await supabaseClient
           .from("timeline_blocks")
           .delete()
@@ -1908,6 +1939,7 @@
         const content = serializeDatabaseBlock(strip);
 
         if (!previous) {
+          state.suppressRealtimeUntil = Date.now() + 2000;
           const { data, error } = await supabaseClient
             .from("timeline_blocks")
             .insert(getDatabaseBlockPayload(strip, true))
@@ -1923,6 +1955,7 @@
         }
 
         if (previous.content === content) continue;
+        state.suppressRealtimeUntil = Date.now() + 2000;
         const { data, error } = await supabaseClient
           .from("timeline_blocks")
           .update(getDatabaseBlockPayload(strip))
@@ -1950,6 +1983,7 @@
     async function pullRemoteDatabaseChanges() {
       if (hasUnsavedDatabaseChanges()) return;
       const { timeline, blocks } = await fetchTimelineDatabaseRows();
+      if (databaseRowsMatchSnapshot(timeline, blocks)) return;
       const existingByDatabaseId = new Map(
         state.strips
           .filter((strip) => strip.databaseId)
@@ -2001,7 +2035,9 @@
 
       try {
         const conflictCreated = await pushLocalDatabaseChanges();
-        if (!hasUnsavedDatabaseChanges()) await pullRemoteDatabaseChanges();
+        if (!hadChanges && !hasUnsavedDatabaseChanges()) {
+          await pullRemoteDatabaseChanges();
+        }
         setSyncStatus(
           conflictCreated ? "conflict" : "saved",
           conflictCreated ? "Conflict · local copy created" : "Saved",
@@ -2057,6 +2093,7 @@
       }, 400);
 
       const scheduleRemotePull = () => {
+        if (Date.now() < state.suppressRealtimeUntil) return;
         if (state.remotePullTimer) window.clearTimeout(state.remotePullTimer);
         state.remotePullTimer = window.setTimeout(
           () => synchronizeTimelineDatabase(),
