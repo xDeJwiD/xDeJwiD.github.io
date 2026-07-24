@@ -1799,11 +1799,25 @@
       const currentIds = new Set();
       for (const strip of state.strips) {
         if (!strip.databaseId) return true;
+        if (currentIds.has(strip.databaseId)) return true;
         currentIds.add(strip.databaseId);
         const previous = state.lastSyncedBlocks.get(strip.databaseId);
         if (!previous || previous.content !== serializeDatabaseBlock(strip)) return true;
       }
       return [...state.lastSyncedBlocks.keys()].some((id) => !currentIds.has(id));
+    }
+
+    function detachDuplicateDatabaseIdentities() {
+      const seenDatabaseIds = new Set();
+      for (const strip of state.strips) {
+        if (!strip.databaseId) continue;
+        if (seenDatabaseIds.has(strip.databaseId)) {
+          strip.databaseId = null;
+          strip.databaseRevision = null;
+          continue;
+        }
+        seenDatabaseIds.add(strip.databaseId);
+      }
     }
 
     function databaseRowsMatchSnapshot(timeline, blocks) {
@@ -1917,6 +1931,7 @@
 
     async function pushLocalDatabaseChanges() {
       let conflictCreated = false;
+      detachDuplicateDatabaseIdentities();
 
       const syncedIds = new Set(state.strips.map((strip) => strip.databaseId).filter(Boolean));
       for (const [databaseId, previous] of state.lastSyncedBlocks) {
@@ -3333,6 +3348,8 @@
           ...strip,
           id: state.nextStripId++,
           laneLocked: true,
+          databaseId: null,
+          databaseRevision: null,
         });
         copy.lane = strip.lane;
         state.strips.push(copy);
