@@ -72,7 +72,7 @@ const eventLogList = document.querySelector("#eventLogList");
 const listSelectionView = document.querySelector("#listSelectionView");
 const listCards = document.querySelector("#listCards");
 const listSelectionMessage = document.querySelector("#listSelectionMessage");
-const listMembersManageButton = document.querySelector("#listMembersManageButton");
+const listMembersManageMenuButton = document.querySelector("#listMembersManageMenuButton");
 const listBackButton = document.querySelector("#listBackButton");
 const createListMenuButton = document.querySelector("#createListMenuButton");
 const createUserMenuButton = document.querySelector("#createUserMenuButton");
@@ -369,6 +369,7 @@ function closeApp() {
   createListMenuButton.classList.add("is-hidden");
   createUserMenuButton.classList.add("is-hidden");
   assignUsersMenuButton.classList.add("is-hidden");
+  listMembersManageMenuButton.classList.add("is-hidden");
   eventLogMenuButton.classList.add("is-hidden");
   renameListMenuButton.classList.add("is-hidden");
   changePasswordMenuButton.classList.add("is-hidden");
@@ -394,7 +395,7 @@ function renderListSelection() {
       <svg class="list-card-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>`).join("");
   listSelectionMessage.classList.toggle("is-hidden", availableLists.length > 0);
-  listMembersManageButton.classList.toggle("is-hidden", !currentUserIsDev || !availableLists.length);
+  listMembersManageMenuButton.classList.toggle("is-hidden", !currentUserIsDev || !availableLists.length);
 }
 
 function renderListMembersManager(listId) {
@@ -425,6 +426,7 @@ function renderListMembersManager(listId) {
 
 async function openListMembersManager(listId = availableLists[0]?.id) {
   if (!currentUserIsDev || isDemoMode || !listId) return;
+  profilePopover.classList.add("is-hidden");
   pickerMode = "manage-list-members-loading";
   pickerTitle.textContent = "Użytkownicy list";
   pickerBack.classList.add("is-hidden");
@@ -827,6 +829,7 @@ async function enterDatabaseMode(session) {
   createListMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
   createUserMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
   assignUsersMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
+  listMembersManageMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
   eventLogMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
   renameListMenuButton.classList.add("is-hidden");
   changePasswordMenuButton.classList.remove("is-hidden");
@@ -881,6 +884,7 @@ function showDatabaseRecovery(session) {
   createListMenuButton.classList.add("is-hidden");
   createUserMenuButton.classList.add("is-hidden");
   assignUsersMenuButton.classList.add("is-hidden");
+  listMembersManageMenuButton.classList.add("is-hidden");
   eventLogMenuButton.classList.add("is-hidden");
   renameListMenuButton.classList.add("is-hidden");
   changePasswordMenuButton.classList.remove("is-hidden");
@@ -940,6 +944,7 @@ function enterDemoMode() {
   createListMenuButton.classList.add("is-hidden");
   createUserMenuButton.classList.add("is-hidden");
   assignUsersMenuButton.classList.add("is-hidden");
+  listMembersManageMenuButton.classList.add("is-hidden");
   eventLogMenuButton.classList.add("is-hidden");
   renameListMenuButton.classList.add("is-hidden");
   changePasswordMenuButton.classList.add("is-hidden");
@@ -3204,7 +3209,7 @@ document.querySelector("#profileButton").addEventListener("click", () => profile
 document.querySelector("#addProductMenuButton").addEventListener("click", () => openCatalogEditor("product"));
 document.querySelector("#addCategoryMenuButton").addEventListener("click", () => openCatalogEditor("category"));
 document.querySelector("#addStoreMenuButton").addEventListener("click", () => openCatalogEditor("store"));
-listMembersManageButton.addEventListener("click", () => void openListMembersManager());
+listMembersManageMenuButton.addEventListener("click", () => void openListMembersManager());
 createListMenuButton.addEventListener("click", () => void openCreateListForm());
 createUserMenuButton.addEventListener("click", openCreateUserForm);
 assignUsersMenuButton.addEventListener("click", () => void openAssignUsersForm());
