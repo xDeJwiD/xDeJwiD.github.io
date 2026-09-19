@@ -438,6 +438,22 @@
     return data;
   }
 
+  async function resetUserPassword(userId, password) {
+    const { data, error } = await client.functions.invoke("create-shopping-user", {
+      body: { action: "reset_password", userId, password }
+    });
+    if (error) {
+      let message = error.message || "Nie udało się zmienić hasła.";
+      try {
+        const details = await error.context?.json?.();
+        if (details?.error) message = details.error;
+      } catch { /* odpowiedź bez JSON */ }
+      throw new Error(message);
+    }
+    if (data?.error) throw new Error(data.error);
+    return data;
+  }
+
   async function saveAdminCatalog(managementCatalog) {
     const listId = requireActiveList();
     assertNoError(await client.rpc("save_catalog_admin_changes", {
@@ -529,6 +545,7 @@
     createShoppingList,
     renameShoppingList,
     createUser,
+    resetUserPassword,
     saveAdminCatalog,
     updateOrder,
     subscribe

@@ -414,7 +414,10 @@ function renderListMembersManager(listId) {
         ${managedListMembers.map((member) => `
           <div class="list-member-row">
             <div><strong>${escapeHtml(member.display_name || member.username)}</strong><small>@${escapeHtml(member.username)} · ${member.role === "admin" ? "administrator" : "użytkownik"}</small></div>
-            <button class="list-member-remove" type="button" data-picker-action="remove-list-member" data-list-id="${escapeAttribute(selectedListId)}" data-user-id="${escapeAttribute(member.user_id)}">${member.user_id === ownUserId ? "Wypisz się" : "Usuń"}</button>
+            <div class="list-member-actions">
+              <button class="list-member-password" type="button" data-picker-action="reset-member-password" data-user-id="${escapeAttribute(member.user_id)}">Hasło</button>
+              <button class="list-member-remove" type="button" data-picker-action="remove-list-member" data-list-id="${escapeAttribute(selectedListId)}" data-user-id="${escapeAttribute(member.user_id)}">${member.user_id === ownUserId ? "Wypisz się" : "Usuń"}</button>
+            </div>
           </div>`).join("") || '<div class="list-members-empty">Ta lista nie ma członków.</div>'}
       </div>
     </div>`;
@@ -455,6 +458,25 @@ async function removeManagedListMember(listId, userId) {
     showPushFeedback(error.message || "Nie udało się zapisać zmian użytkowników.");
     setConnectionStatus("offline", "błąd zapisu");
   }
+}
+
+function openManagedPasswordReset(userId) {
+  const member = managedListMembers.find((entry) => entry.user_id === userId);
+  if (!member) return;
+  pickerMode = "reset-member-password";
+  pickerTitle.textContent = "Zmień hasło";
+  pickerBack.classList.add("is-hidden");
+  pickerContent.innerHTML = `
+    <form class="list-create-form managed-password-form">
+      <p class="list-form-note">Ustawiasz nowe hasło dla: <b>${escapeHtml(member.display_name || member.username)}</b>.</p>
+      <input name="userId" type="hidden" value="${escapeAttribute(userId)}">
+      <label for="managedNewPassword">Nowe hasło</label>
+      <input id="managedNewPassword" name="password" type="password" minlength="8" maxlength="72" autocomplete="new-password" required>
+      <label for="managedRepeatPassword">Powtórz nowe hasło</label>
+      <input id="managedRepeatPassword" name="repeatPassword" type="password" minlength="8" maxlength="72" autocomplete="new-password" required>
+      <p class="catalog-form-message" role="alert"></p>
+      <button class="catalog-form-submit" type="submit">Zapisz nowe hasło</button>
+    </form>`;
 }
 
 function updateListActivityTime(timestamp) {
@@ -2498,6 +2520,7 @@ pickerContent.addEventListener("click", (event) => {
   }
   if (pickerAction === "accent-color") void saveAccentColor(value);
   if (pickerAction === "remove-list-member") void removeManagedListMember(option.dataset.listId, option.dataset.userId);
+  if (pickerAction === "reset-member-password") openManagedPasswordReset(option.dataset.userId);
   if (pickerAction === "quantity-confirm") confirmProductDraft();
   if (pickerAction === "store") {
     selectedStore = value;
@@ -2556,6 +2579,35 @@ pickerContent.addEventListener("submit", async (event) => {
       if (current) Object.assign(current, previous);
       renderItemsPreservingScroll();
       setConnectionStatus("offline", "błąd zapisu");
+    }
+    return;
+  }
+
+  const managedPasswordForm = event.target.closest(".managed-password-form");
+  if (managedPasswordForm) {
+    event.preventDefault();
+    if (!managedPasswordForm.checkValidity()) {
+      managedPasswordForm.reportValidity();
+      return;
+    }
+    const message = managedPasswordForm.querySelector(".catalog-form-message");
+    const submitButton = managedPasswordForm.querySelector("button[type='submit']");
+    const password = managedPasswordForm.elements.password.value;
+    if (password !== managedPasswordForm.elements.repeatPassword.value) {
+      message.textContent = "Hasła nie są takie same.";
+      return;
+    }
+    submitButton.disabled = true;
+    try {
+      setConnectionStatus("syncing", "zmiana hasła…");
+      await window.ShoppingDB.resetUserPassword(managedPasswordForm.elements.userId.value, password);
+      pickerTitle.textContent = "Hasło zmienione";
+      pickerContent.innerHTML = '<div class="user-create-success"><span>✓</span><strong>Gotowe</strong><p>Nowe hasło użytkownika zostało zapisane.</p><button class="catalog-form-submit" type="button" data-picker-action="close">Zamknij</button></div>';
+      setConnectionStatus("online", "połączono");
+    } catch (error) {
+      message.textContent = error.message || "Nie udało się zmienić hasła.";
+      setConnectionStatus("offline", "błąd zapisu");
+      submitButton.disabled = false;
     }
     return;
   }

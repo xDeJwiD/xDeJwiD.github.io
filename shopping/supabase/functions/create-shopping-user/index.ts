@@ -38,11 +38,28 @@ Deno.serve(async (request) => {
   if (profileError) return response(500, { error: "Nie udało się sprawdzić uprawnień." });
   if (callerProfile?.role !== "dev") return response(403, { error: "Tylko dev może tworzyć użytkowników." });
 
-  let body: { login?: string; displayName?: string; password?: string; listIds?: string[]; listRole?: string };
+  let body: { action?: string; userId?: string; login?: string; displayName?: string; password?: string; listIds?: string[]; listRole?: string };
   try {
     body = await request.json();
   } catch {
     return response(400, { error: "Nieprawidłowe dane formularza." });
+  }
+
+  if (body.action === "reset_password") {
+    const userId = String(body.userId || "");
+    const newPassword = String(body.password || "");
+    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidPattern.test(userId)) return response(400, { error: "Nieprawidłowy użytkownik." });
+    if (newPassword.length < 8 || newPassword.length > 72) return response(400, { error: "Hasło musi mieć od 8 do 72 znaków." });
+    const { data: targetProfile, error: targetError } = await service
+      .from("profiles")
+      .select("user_id")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (targetError || !targetProfile) return response(404, { error: "Nie znaleziono użytkownika." });
+    const { error: passwordError } = await service.auth.admin.updateUserById(userId, { password: newPassword });
+    if (passwordError) return response(400, { error: "Nie udało się zmienić hasła." });
+    return response(200, { userId });
   }
 
   const login = String(body.login || "").trim().toLowerCase();

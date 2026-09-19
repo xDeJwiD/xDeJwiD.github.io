@@ -206,6 +206,8 @@ html[data-theme="dark"] .moon-icon { display: block; }
 .list-member-row strong { font-size: 12px; }
 .list-member-row small { margin-top: 3px; color: var(--muted); font-size: 9px; }
 .list-member-remove { min-height: 33px; padding: 0 9px; border: 1px solid color-mix(in srgb, var(--danger) 45%, var(--line)); border-radius: 9px; color: var(--danger); background: var(--card); font-size: 9px; font-weight: 800; cursor: pointer; }
+.list-member-actions { display: flex; gap: 5px; }
+.list-member-password { min-height: 33px; padding: 0 9px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 9px; color: var(--accent-dark); background: var(--card); font-size: 9px; font-weight: 800; cursor: pointer; }
 .list-card { width: 100%; min-height: 76px; display: grid; grid-template-columns: 42px minmax(0, 1fr) 24px; align-items: center; gap: 12px; padding: 13px 15px; border: 1px solid var(--line); border-radius: 17px; color: var(--ink); background: var(--card); text-align: left; cursor: pointer; transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease; }
 .list-card:hover { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); box-shadow: 0 12px 30px rgba(14, 35, 29, .08); transform: translateY(-1px); }
 .list-card-icon { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 12px; color: var(--accent-dark); background: var(--accent-soft); }
