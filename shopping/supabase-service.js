@@ -43,11 +43,15 @@
     const { data: userData, error: userError } = await client.auth.getUser();
     if (userError || !userData.user) throw userError || new Error("Brak sesji użytkownika.");
     const userId = userData.user.id;
-    const [profileResult, initialListsResult, membershipsResult] = await Promise.all([
-      client.from("profiles").select("user_id,username,display_name,theme,role").eq("user_id", userId).maybeSingle(),
+    const [initialProfileResult, initialListsResult, membershipsResult] = await Promise.all([
+      client.from("profiles").select("user_id,username,display_name,theme,accent_color,role").eq("user_id", userId).maybeSingle(),
       client.from("shopping_lists").select("id,name,position,created_at,updated_at").order("position").order("created_at"),
       client.from("members").select("list_id,role").eq("user_id", userId)
     ]);
+    let profileResult = initialProfileResult;
+    if (profileResult.error?.code === "42703" || /accent_color/i.test(profileResult.error?.message || "")) {
+      profileResult = await client.from("profiles").select("user_id,username,display_name,theme,role").eq("user_id", userId).maybeSingle();
+    }
     let listsResult = initialListsResult;
     if (listsResult.error?.code === "42703" || /updated_at/i.test(listsResult.error?.message || "")) {
       listsResult = await client.from("shopping_lists").select("id,name,position,created_at").order("position").order("created_at");
@@ -66,7 +70,7 @@
     const [storesResult, categoriesResult, productsResult, membershipsResult] = await Promise.all([
       client.from("stores").select("id,name,position,is_active").eq("list_id", listId).order("position"),
       client.from("categories").select("id,name,icon,position,is_active").eq("list_id", listId).order("position"),
-      client.from("products").select("id,category_id,name,icon,position,is_active").eq("list_id", listId).order("position"),
+      client.from("products").select("id,category_id,name,icon,default_store_id,position,is_active").eq("list_id", listId).order("position"),
       client.from("members").select("user_id,role").eq("list_id", listId)
     ]);
 
@@ -100,7 +104,13 @@
         .filter((product) => product.is_active && product.category_id === category.id)
         .map((product) => {
           productIdByKey.set(`${category.name}|${product.name}`, product.id);
-          return { id: product.id, name: product.name, icon: product.icon || category.icon || "🛒" };
+          return {
+            id: product.id,
+            name: product.name,
+            icon: product.icon || category.icon || "🛒",
+            defaultStoreId: product.default_store_id || null,
+            defaultStoreName: storeById.get(product.default_store_id)?.name || null
+          };
         });
       return { id: category.id, name: category.name, icon: category.icon, products: categoryProducts };
     });
@@ -295,7 +305,7 @@
     assertNoError(await client.from("shopping_items").delete().eq("list_id", listId).eq("is_purchased", true));
   }
 
-  async function addProduct(categoryId, name, icon) {
+  async function addProduct(categoryId, name, icon, defaultStoreId) {
     const listId = requireActiveList();
     const positions = [...productById.values()]
       .filter((product) => product.category_id === categoryId)
@@ -306,6 +316,7 @@
       category_id: categoryId,
       name: name.trim(),
       icon: icon.trim() || "🛒",
+      default_store_id: defaultStoreId || null,
       position,
       is_active: true
     }));
@@ -355,12 +366,38 @@
       .eq("user_id", userData.user.id));
   }
 
+  async function updateAccentColor(accentColor) {
+    if (!/^#[0-9a-f]{6}$/i.test(accentColor)) throw new Error("Nieprawidłowy kolor.");
+    const { data: userData, error: userError } = await client.auth.getUser();
+    if (userError || !userData.user) throw userError || new Error("Brak sesji użytkownika.");
+    assertNoError(await client
+      .from("profiles")
+      .update({ accent_color: accentColor.toLowerCase() })
+      .eq("user_id", userData.user.id));
+  }
+
   async function loadManageableUsers() {
     return assertNoError(await client.rpc("get_manageable_users"));
   }
 
   async function loadManageableMemberships() {
     return assertNoError(await client.rpc("get_manageable_memberships"));
+  }
+
+  async function loadListMembersForManagement(listId) {
+    return assertNoError(await client.rpc("get_list_members_for_management", { p_list_id: listId }));
+  }
+
+  async function loadManageableShoppingLists() {
+    return assertNoError(await client.rpc("get_manageable_shopping_lists"));
+  }
+
+  async function removeListMember(listId, userId) {
+    assertNoError(await client.rpc("remove_list_member", { p_list_id: listId, p_user_id: userId }));
+  }
+
+  async function loadEventLog() {
+    return assertNoError(await client.rpc("get_event_log", { p_list_id: requireActiveList() }));
   }
 
   async function addExistingUsersToList(listId, userIds, role) {
@@ -413,9 +450,10 @@
         is_active: category.is_active
       })),
       p_products: managementCatalog.products.map((product) => ({
-        id: product.id,
-        name: product.name.trim(),
-        icon: (product.icon || "🛒").trim() || "🛒",
+          id: product.id,
+          name: product.name.trim(),
+          icon: (product.icon || "🛒").trim() || "🛒",
+          default_store_id: product.default_store_id || null,
         position: product.position,
         is_active: product.is_active
       })),
@@ -480,8 +518,13 @@
     addProduct,
     addStore,
     updateTheme,
+    updateAccentColor,
     loadManageableUsers,
     loadManageableMemberships,
+    loadListMembersForManagement,
+    loadManageableShoppingLists,
+    removeListMember,
+    loadEventLog,
     addExistingUsersToList,
     createShoppingList,
     renameShoppingList,
