@@ -2,6 +2,10 @@ const STORAGE_KEY = "razem-shopping-items-v3";
 const PREVIOUS_STORAGE_KEY = "razem-shopping-items-v2";
 const THEME_KEY = "razem-theme";
 const ACCENT_COLOR_KEY = "razem-accent-color";
+const ACCENT_COLOR_PENDING_KEY = "razem-accent-color-pending";
+const OFFLINE_DATABASE_NAME = "razem-shopping-offline";
+const OFFLINE_DATABASE_VERSION = 1;
+const OFFLINE_STORE_NAME = "records";
 const STORE_KEY = "razem-selected-store";
 const APP_VERSION_KEY = "razem-app-version";
 const INSTALL_PROMPT_DISMISSED_KEY = "razem-install-prompt-dismissed";
@@ -49,6 +53,8 @@ const pickerBackdrop = document.querySelector("#pickerBackdrop");
 const pickerSheet = document.querySelector("#pickerSheet");
 const pickerTitle = document.querySelector("#pickerTitle");
 const pickerContent = document.querySelector("#pickerContent");
+const pickerScrollFadeTop = document.querySelector("#pickerScrollFadeTop");
+const pickerScrollFadeBottom = document.querySelector("#pickerScrollFadeBottom");
 const pickerBack = document.querySelector("#pickerBack");
 const selectedProductLabel = document.querySelector("#selectedProductLabel");
 const addSelectedButton = document.querySelector("#addSelectedButton");
@@ -156,6 +162,240 @@ let installPromptMode = null;
 let installPromptPreview = false;
 let pushFeedbackTimer = null;
 let pushActionRunning = false;
+let offlineUserId = null;
+let offlineQueue = [];
+let offlineSyncRunning = false;
+let offlineSnapshotWriteQueue = Promise.resolve();
+let offlineQueueWriteQueue = Promise.resolve();
+
+function openOfflineDatabase() {
+  if (!("indexedDB" in window)) return Promise.reject(new Error("To urządzenie nie obsługuje pamięci offline."));
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(OFFLINE_DATABASE_NAME, OFFLINE_DATABASE_VERSION);
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains(OFFLINE_STORE_NAME)) {
+        request.result.createObjectStore(OFFLINE_STORE_NAME, { keyPath: "key" });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error("Nie udało się otworzyć pamięci offline."));
+  });
+}
+
+async function offlineRead(key) {
+  try {
+    const database = await openOfflineDatabase();
+    return await new Promise((resolve, reject) => {
+      const request = database.transaction(OFFLINE_STORE_NAME, "readonly").objectStore(OFFLINE_STORE_NAME).get(key);
+      request.onsuccess = () => resolve(request.result?.value ?? null);
+      request.onerror = () => reject(request.error);
+    });
+  } catch (error) {
+    console.warn("Pamięć offline jest chwilowo niedostępna.", error);
+    return null;
+  }
+}
+
+async function offlineWrite(key, value) {
+  try {
+    const database = await openOfflineDatabase();
+    await new Promise((resolve, reject) => {
+      const request = database.transaction(OFFLINE_STORE_NAME, "readwrite").objectStore(OFFLINE_STORE_NAME).put({ key, value, savedAt: Date.now() });
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  } catch (error) {
+    console.warn("Nie udało się zapisać kopii offline.", error);
+  }
+}
+
+function offlineContextKey(userId) {
+  return `context:${userId}`;
+}
+
+function offlineListKey(userId, listId) {
+  return `list:${userId}:${listId}`;
+}
+
+function offlineQueueKey(userId) {
+  return `queue:${userId}`;
+}
+
+function serializeListData(data) {
+  return {
+    ...data,
+    productIdByKey: [...(data.productIdByKey || new Map()).entries()],
+    storeIdByName: [...(data.storeIdByName || new Map()).entries()]
+  };
+}
+
+function deserializeListData(data) {
+  if (!data?.items || !data?.catalog) return null;
+  return {
+    ...data,
+    productIdByKey: new Map(data.productIdByKey || []),
+    storeIdByName: new Map(data.storeIdByName || [])
+  };
+}
+
+function persistCurrentListSnapshot() {
+  if (isDemoMode || !offlineUserId || !currentList) return;
+  const key = offlineListKey(offlineUserId, currentList.id);
+  const snapshot = JSON.parse(JSON.stringify(serializeListData({
+    items,
+    catalog: productCatalog,
+    stores: storeNames,
+    productIdByKey,
+    storeIdByName,
+    managementCatalog
+  })));
+  offlineSnapshotWriteQueue = offlineSnapshotWriteQueue
+    .catch(() => {})
+    .then(() => offlineWrite(key, snapshot));
+  return offlineSnapshotWriteQueue;
+}
+
+async function loadOfflineListSnapshot(listId) {
+  if (!offlineUserId || !listId) return null;
+  return deserializeListData(await offlineRead(offlineListKey(offlineUserId, listId)));
+}
+
+function saveOfflineQueue() {
+  if (!offlineUserId) return Promise.resolve();
+  const key = offlineQueueKey(offlineUserId);
+  const queueCopy = JSON.parse(JSON.stringify(offlineQueue));
+  offlineQueueWriteQueue = offlineQueueWriteQueue
+    .catch(() => {})
+    .then(() => offlineWrite(key, queueCopy));
+  return offlineQueueWriteQueue;
+}
+
+function pendingOfflineOperationCount() {
+  return offlineQueue.length;
+}
+
+function updateOfflineStatus() {
+  const count = pendingOfflineOperationCount();
+  const label = count === 1 ? "zmiana oczekuje" : (count >= 2 && count <= 4 ? "zmiany oczekują" : "zmian oczekuje");
+  setConnectionStatus("offline", count ? `offline · ${count} ${label}` : "offline");
+}
+
+function markItemWaitingForSync(item, state = "change") {
+  item.offlinePending = state;
+  void persistCurrentListSnapshot();
+}
+
+async function enqueueOfflineOperation(operation) {
+  offlineQueue.push({ id: createId(), createdAt: Date.now(), ...operation });
+  await saveOfflineQueue();
+  updateOfflineStatus();
+}
+
+async function initializeOfflineState(session) {
+  offlineUserId = session?.user?.id || null;
+  offlineQueue = offlineUserId ? (await offlineRead(offlineQueueKey(offlineUserId)) || []) : [];
+}
+
+function isTemporaryOfflineId(id) {
+  return String(id || "").startsWith("offline:");
+}
+
+async function queueOfflineItemUpdate(listId, itemId, changes) {
+  if (isTemporaryOfflineId(itemId)) {
+    const addOperation = offlineQueue.find((operation) => operation.type === "add" && operation.tempId === itemId);
+    if (addOperation) {
+      if (Object.hasOwn(changes, "quantity")) addOperation.item.quantity = changes.quantity;
+      if (Object.hasOwn(changes, "store_id")) addOperation.item.storeId = changes.store_id;
+      if (Object.hasOwn(changes, "is_purchased")) addOperation.item.isPurchased = changes.is_purchased;
+      await saveOfflineQueue();
+      updateOfflineStatus();
+      return;
+    }
+  }
+  const queued = offlineQueue.find((operation) => operation.type === "update" && operation.listId === listId && operation.itemId === itemId);
+  if (queued) Object.assign(queued.changes, changes);
+  else await enqueueOfflineOperation({ type: "update", listId, itemId, changes: { ...changes } });
+  if (queued) {
+    await saveOfflineQueue();
+    updateOfflineStatus();
+  }
+}
+
+async function queueOfflineItemDeletion(listId, itemId) {
+  if (isTemporaryOfflineId(itemId)) {
+    offlineQueue = offlineQueue.filter((operation) => !(operation.type === "add" && operation.tempId === itemId));
+  } else {
+    offlineQueue = offlineQueue.filter((operation) => !(operation.type === "update" && operation.listId === listId && operation.itemId === itemId));
+    offlineQueue.push({ id: createId(), createdAt: Date.now(), type: "delete", listId, itemId });
+  }
+  await saveOfflineQueue();
+  updateOfflineStatus();
+}
+
+function replaceQueuedTemporaryId(temporaryId, persistedId) {
+  offlineQueue.forEach((operation) => {
+    if (operation.itemId === temporaryId) operation.itemId = persistedId;
+    if (operation.type === "order") {
+      operation.changes.forEach((change) => {
+        if (change.id === temporaryId) change.id = persistedId;
+      });
+    }
+  });
+}
+
+async function flushOfflineQueue() {
+  if (offlineSyncRunning || !navigator.onLine || isDemoMode || !window.ShoppingDB || !offlineQueue.length) return;
+  offlineSyncRunning = true;
+  const originalListId = currentList?.id || null;
+  try {
+    while (offlineQueue.length && navigator.onLine) {
+      const operation = offlineQueue[0];
+      window.ShoppingDB.setActiveList(operation.listId);
+      if (operation.type === "add") {
+        let persistedId = operation.item.id || null;
+        try {
+          const inserted = await window.ShoppingDB.addItem(operation.item);
+          persistedId = inserted?.id || persistedId;
+        } catch (error) {
+          // Ten sam identyfikator oznacza, że poprzednia próba dotarła do serwera,
+          // ale aplikacja nie zdążyła skreślić operacji z lokalnej kolejki.
+          if (error?.code !== "23505" || !persistedId) throw error;
+        }
+        if (persistedId && currentList?.id === operation.listId) {
+          const localItem = items.find((item) => item.id === operation.tempId);
+          if (localItem) {
+            localItem.id = persistedId;
+            delete localItem.offlinePending;
+          }
+          replaceQueuedTemporaryId(operation.tempId, persistedId);
+        }
+      } else if (operation.type === "update") {
+        await window.ShoppingDB.updateItem(operation.itemId, operation.changes);
+      } else if (operation.type === "delete") {
+        await window.ShoppingDB.deleteItem(operation.itemId);
+      } else if (operation.type === "order") {
+        await window.ShoppingDB.updateOrder(operation.changes.filter((change) => !isTemporaryOfflineId(change.id)));
+      } else if (operation.type === "clear-purchased") {
+        await window.ShoppingDB.clearPurchased();
+      }
+      offlineQueue.shift();
+      await saveOfflineQueue();
+    }
+    if (originalListId) window.ShoppingDB.setActiveList(originalListId);
+    if (!offlineQueue.length && currentList) {
+      await refreshRemoteItems({ force: true });
+      setConnectionStatus("online", "połączono");
+    } else if (offlineQueue.length) {
+      updateOfflineStatus();
+    }
+  } catch (error) {
+    console.warn("Synchronizacja zmian offline zostanie ponowiona później.", error);
+    if (originalListId) window.ShoppingDB.setActiveList(originalListId);
+    updateOfflineStatus();
+  } finally {
+    offlineSyncRunning = false;
+  }
+}
 
 function isAppInstalled() {
   return window.matchMedia("(display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui)").matches
@@ -300,6 +540,7 @@ function loadItems() {
 
 function saveItems() {
   if (isDemoMode) localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  else void persistCurrentListSnapshot();
 }
 
 function setTheme(theme) {
@@ -654,6 +895,7 @@ function applyRemoteData(data, { preserveScroll = false } = {}) {
     else renderItems();
   }
   updateProductDraft();
+  void persistCurrentListSnapshot();
 }
 
 async function refreshRemoteItems({ force = false } = {}) {
@@ -668,6 +910,7 @@ async function refreshRemoteItems({ force = false } = {}) {
     const changed = itemCollectionSignature(items) !== itemCollectionSignature(nextItems);
     items = nextItems;
     if (changed) renderItemsPreservingScroll();
+    void persistCurrentListSnapshot();
     remoteItemsRefreshDeferred = false;
     lastDatabaseRefreshAt = Date.now();
     if (pendingDeletionIds.size) setConnectionStatus("syncing", "usuwanie…");
@@ -676,6 +919,27 @@ async function refreshRemoteItems({ force = false } = {}) {
     console.error(error);
     setConnectionStatus("offline", "błąd synchronizacji");
   }
+}
+
+function activateShoppingListView(list, data, { preserveViewport = false, offline = false } = {}) {
+  currentList = list;
+  currentUserIsAdmin = currentUserIsDev || list.role === "admin";
+  renameListMenuButton.classList.toggle("is-hidden", !currentUserIsAdmin);
+  adminModeButton.classList.toggle("is-hidden", !currentUserIsAdmin);
+  eventLogMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
+  document.querySelector("#listTitle").textContent = list.name;
+  updateListActivityTime(list.updated_at);
+  listBackButton.classList.toggle("is-hidden", availableLists.length < 2);
+  document.body.classList.remove("choosing-list");
+  listSelectionView.classList.add("is-hidden");
+  applyRemoteData(data, { preserveScroll: preserveViewport });
+  const displayName = currentProfile?.display_name || currentProfile?.username || "Użytkownik";
+  document.querySelector("#profileMode").textContent = `${displayName}${currentUserIsDev ? " · Dev" : (currentUserIsAdmin ? " · Admin" : "")}`;
+  document.querySelector("#profileDescription").textContent = offline
+    ? `Lista „${list.name}” jest dostępna z zapisanej kopii.`
+    : `Aktualna lista: „${list.name}”.`;
+  showApp({ render: false });
+  document.title = `${list.name} · Lista zakupów`;
 }
 
 function queueItemDeletion(itemId) {
@@ -701,6 +965,31 @@ function queueItemDeletion(itemId) {
       await refreshRemoteItems();
       if (hadFailure) setConnectionStatus("offline", "błąd zapisu");
     });
+}
+
+async function removeOrQueueItemDeletion(itemId, { preserveScroll = true } = {}) {
+  const item = items.find((entry) => entry.id === itemId);
+  if (!item) return;
+  if (!isDemoMode && !navigator.onLine) {
+    if (isTemporaryOfflineId(itemId)) {
+      items = items.filter((entry) => entry.id !== itemId);
+      saveItems();
+      if (preserveScroll) renderItemsPreservingScroll();
+      else renderItems();
+      await queueOfflineItemDeletion(currentList.id, itemId);
+      return;
+    }
+    markItemWaitingForSync(item, "delete");
+    if (preserveScroll) renderItemsPreservingScroll();
+    else renderItems();
+    await queueOfflineItemDeletion(currentList.id, itemId);
+    return;
+  }
+  items = items.filter((entry) => entry.id !== itemId);
+  saveItems();
+  if (preserveScroll) renderItemsPreservingScroll();
+  else renderItems();
+  if (!isDemoMode) queueItemDeletion(itemId);
 }
 
 async function refreshRemoteData() {
@@ -770,6 +1059,10 @@ async function openShoppingList(list) {
   setConnectionStatus("syncing", "ładowanie…");
   try {
     window.ShoppingDB.setActiveList(list.id);
+    if (navigator.onLine && offlineQueue.length) {
+      await flushOfflineQueue();
+      window.ShoppingDB.setActiveList(list.id);
+    }
     const savedStore = localStorage.getItem(`${STORE_KEY}:${list.id}`) || localStorage.getItem(STORE_KEY);
     selectedStore = savedStore || "";
     hasDefaultStore = Boolean(savedStore);
@@ -779,27 +1072,19 @@ async function openShoppingList(list) {
     selectedQuantity = 1;
     pendingProduct = null;
     const data = await window.ShoppingDB.loadInitialData();
-    currentList = list;
-    currentUserIsAdmin = currentUserIsDev || list.role === "admin";
-    renameListMenuButton.classList.toggle("is-hidden", !currentUserIsAdmin);
-    adminModeButton.classList.toggle("is-hidden", !currentUserIsAdmin);
-    eventLogMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
-    document.querySelector("#listTitle").textContent = list.name;
-    updateListActivityTime(list.updated_at);
-    listBackButton.classList.toggle("is-hidden", availableLists.length < 2);
-    document.body.classList.remove("choosing-list");
-    listSelectionView.classList.add("is-hidden");
-    applyRemoteData(data, { preserveScroll: preserveViewport });
-    const displayName = currentProfile?.display_name || currentProfile?.username || "Użytkownik";
-    document.querySelector("#profileMode").textContent = `${displayName}${currentUserIsDev ? " · Dev" : (currentUserIsAdmin ? " · Admin" : "")}`;
-    document.querySelector("#profileDescription").textContent = `Aktualna lista: „${list.name}”.`;
+    activateShoppingListView(list, data, { preserveViewport });
     setConnectionStatus("online", "połączono");
-    showApp({ render: false });
-    document.title = `${list.name} · Lista zakupów`;
     await startRealtimeForCurrentList();
     await refreshPushButton();
   } catch (error) {
     console.error(error);
+    const cachedData = await loadOfflineListSnapshot(list.id);
+    if (cachedData) {
+      activateShoppingListView(list, cachedData, { preserveViewport, offline: true });
+      notifyListButton.classList.add("is-hidden");
+      updateOfflineStatus();
+      return;
+    }
     currentList = null;
     renameListMenuButton.classList.add("is-hidden");
     eventLogMenuButton.classList.add("is-hidden");
@@ -821,8 +1106,18 @@ async function enterDatabaseMode(session) {
   const previousListId = currentList?.id;
   isDemoMode = false;
   currentSession = session;
+  await initializeOfflineState(session);
   setConnectionStatus("syncing", "łączenie…");
-  const context = await window.ShoppingDB.loadUserContext();
+  let context;
+  let usingOfflineContext = false;
+  try {
+    context = await window.ShoppingDB.loadUserContext();
+    await offlineWrite(offlineContextKey(offlineUserId), context);
+  } catch (error) {
+    context = await offlineRead(offlineContextKey(offlineUserId));
+    if (!context) throw error;
+    usingOfflineContext = true;
+  }
   if (!context.profile) throw new Error("Użytkownik nie ma profilu aplikacji.");
   currentProfile = context.profile;
   currentUserIsDev = currentProfile.role === "dev";
@@ -836,13 +1131,14 @@ async function enterDatabaseMode(session) {
   availableLists = context.lists;
   if (!availableLists.length) throw new Error("Użytkownik nie jest przypisany do żadnej listy.");
   setTheme(currentProfile.theme || "light");
-  setAccentColor(currentProfile.accent_color || localStorage.getItem(ACCENT_COLOR_KEY) || DEFAULT_ACCENT_COLOR);
+  const pendingAccentColor = localStorage.getItem(ACCENT_COLOR_PENDING_KEY);
+  setAccentColor(pendingAccentColor || currentProfile.accent_color || localStorage.getItem(ACCENT_COLOR_KEY) || DEFAULT_ACCENT_COLOR);
   const username = session.user.email?.split("@")[0] || "U";
   const displayName = currentProfile.display_name || username.slice(0, 1).toUpperCase() + username.slice(1);
   document.querySelector("#profileButton").textContent = username.slice(0, 1).toUpperCase();
   document.querySelector("#profileMode").textContent = `${displayName}${currentUserIsDev ? " · Dev" : ""}`;
   document.querySelector("#profileDescription").textContent = "Wybierz listę zakupów.";
-  lastDatabaseRefreshAt = Date.now();
+  if (!usingOfflineContext) lastDatabaseRefreshAt = Date.now();
   realtimeReconnectAttempts = 0;
   const requestedListId = new URLSearchParams(window.location.search).get("list");
   const requestedList = requestedListId && availableLists.find((list) => list.id === requestedListId);
@@ -853,7 +1149,10 @@ async function enterDatabaseMode(session) {
   else {
     showApp();
     await showListSelection();
+    if (usingOfflineContext) updateOfflineStatus();
   }
+  if (pendingAccentColor) void syncPendingAccentColor();
+  if (!usingOfflineContext) void flushOfflineQueue();
 }
 
 function scheduleRealtimeReconnect() {
@@ -1402,7 +1701,7 @@ async function saveAndCloseAdminMode() {
 
 function itemMarkup(item) {
   return `
-    <article class="item ${item.done ? "is-done" : ""}" data-id="${item.id}">
+    <article class="item ${item.done ? "is-done" : ""} ${item.offlinePending ? "is-offline-pending" : ""}" data-id="${item.id}">
       <button class="drag-handle" type="button" aria-label="Przeciągnij, aby zmienić kolejność">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="7" r="1.3"/><circle cx="15" cy="7" r="1.3"/><circle cx="9" cy="12" r="1.3"/><circle cx="15" cy="12" r="1.3"/><circle cx="9" cy="17" r="1.3"/><circle cx="15" cy="17" r="1.3"/></svg>
       </button>
@@ -1415,7 +1714,7 @@ function itemMarkup(item) {
           <span class="item-name"><span>${escapeHtml(item.name)}</span></span>
           <span class="item-quantity">${item.quantity} szt.</span>
         </div>
-        <span class="item-meta">${escapeHtml(item.category)} · dodał(a): ${escapeHtml(item.addedBy)}</span>
+        <span class="item-meta">${item.offlinePending ? "Oczekuje na synchronizację" : `${escapeHtml(item.category)} · dodał(a): ${escapeHtml(item.addedBy)}`}</span>
       </div>
       ${currentUserIsAdmin && item.custom ? `
         <button class="promote-product-button" type="button" aria-label="Dodaj ${escapeAttribute(item.name)} na stałe do katalogu" title="Dodaj do katalogu" data-action="promote-custom">
@@ -1715,19 +2014,36 @@ async function saveAccentColor(color) {
   currentProfile = currentProfile ? { ...currentProfile, accent_color: color } : currentProfile;
   closePicker();
   if (isDemoMode || !window.ShoppingDB || !currentSession) return;
+  localStorage.setItem(ACCENT_COLOR_PENDING_KEY, color.toLowerCase());
   try {
     setConnectionStatus("syncing", "zapisywanie…");
     await window.ShoppingDB.updateAccentColor(color);
     currentProfile = { ...currentProfile, accent_color: color };
+    localStorage.removeItem(ACCENT_COLOR_PENDING_KEY);
     setConnectionStatus("online", "połączono");
   } catch (error) {
     console.error(error);
-    setConnectionStatus("online", "połączono");
-    showPushFeedback("Kolor zapisano lokalnie. Aby zsynchronizować go z kontem, uruchom ponownie SQL ustawień koloru w Supabase.");
+    setConnectionStatus(navigator.onLine ? "online" : "offline", navigator.onLine ? "połączono" : "offline");
+    showPushFeedback("Kolor zachowano. Synchronizacja z kontem zostanie ponowiona automatycznie.");
   }
 }
 
-function renderAddProductForm(prefilledName = "", fromSearch = false) {
+async function syncPendingAccentColor({ notify = false } = {}) {
+  const color = localStorage.getItem(ACCENT_COLOR_PENDING_KEY);
+  if (!isAccentColor(color) || isDemoMode || !window.ShoppingDB || !currentSession || !navigator.onLine) return false;
+  try {
+    await window.ShoppingDB.updateAccentColor(color);
+    currentProfile = currentProfile ? { ...currentProfile, accent_color: color } : currentProfile;
+    localStorage.removeItem(ACCENT_COLOR_PENDING_KEY);
+    if (notify) showPushFeedback("Kolor aplikacji został zsynchronizowany z kontem.");
+    return true;
+  } catch (error) {
+    console.error("Nie udało się zsynchronizować koloru aplikacji:", error);
+    return false;
+  }
+}
+
+function renderAddProductForm(prefilledName = "", fromSearch = false, preferredStoreId = "") {
   pickerMode = fromSearch ? "add-product-from-search" : "add-product";
   pickerTitle.textContent = fromSearch ? "Dodaj do katalogu" : "Dodaj produkt";
   pickerBack.classList.toggle("is-hidden", !fromSearch);
@@ -1744,7 +2060,10 @@ function renderAddProductForm(prefilledName = "", fromSearch = false) {
       <label for="newProductStore">Domyślny sklep</label>
       <select id="newProductStore" name="defaultStoreId" required ${storeNames.length ? "" : "disabled"}>
         ${storeNames.length
-          ? storeNames.map((store) => `<option value="${escapeAttribute(isDemoMode ? store : (storeIdByName.get(store) || ""))}">${escapeHtml(store)}</option>`).join("")
+          ? storeNames.map((store) => {
+              const storeId = isDemoMode ? store : (storeIdByName.get(store) || "");
+              return `<option value="${escapeAttribute(storeId)}" ${storeId === preferredStoreId ? "selected" : ""}>${escapeHtml(store)}</option>`;
+            }).join("")
           : '<option>Najpierw dodaj sklep</option>'}
       </select>
       <p class="catalog-form-message" role="alert"></p>
@@ -1998,7 +2317,7 @@ function openCatalogEditor(type) {
 function openPromoteCustomProductForm(item) {
   if (!currentUserIsAdmin || !item?.custom || isDemoMode) return;
   pendingCatalogPromotion = { itemId: item.id, name: item.name };
-  renderAddProductForm(item.name, true);
+  renderAddProductForm(item.name, true, item.storeId || "");
   pickerMode = "promote-custom-product";
   pickerTitle.textContent = "Dodaj do katalogu";
   pickerBack.classList.add("is-hidden");
@@ -2027,6 +2346,21 @@ function updatePickerViewport() {
   pickerSheet.style.setProperty("--picker-visible-height", `${Math.max(260, visibleHeight)}px`);
   pickerSheet.style.setProperty("--picker-keyboard-inset", `${keyboardInset}px`);
   pickerSheet.classList.toggle("is-keyboard-active", keyboardActive);
+  requestAnimationFrame(updatePickerScrollFades);
+}
+
+function updatePickerScrollFades() {
+  if (pickerSheet.classList.contains("is-hidden")) return;
+  const maxScroll = Math.max(0, pickerContent.scrollHeight - pickerContent.clientHeight);
+  pickerSheet.classList.toggle("can-scroll-up", maxScroll > 2 && pickerContent.scrollTop > 4);
+  pickerSheet.classList.toggle("can-scroll-down", maxScroll > 2 && pickerContent.scrollTop < maxScroll - 4);
+
+  const sheetRect = pickerSheet.getBoundingClientRect();
+  const search = pickerContent.querySelector(".product-search");
+  const contentRect = pickerContent.getBoundingClientRect();
+  const topEdge = search ? search.getBoundingClientRect().bottom : contentRect.top;
+  pickerScrollFadeTop.style.setProperty("--picker-fade-top", `${Math.max(0, Math.floor(topEdge - sheetRect.top - 4))}px`);
+  pickerScrollFadeBottom.style.setProperty("--picker-fade-bottom", `${Math.max(8, Math.round(sheetRect.bottom - contentRect.bottom))}px`);
 }
 
 function closePicker() {
@@ -2035,6 +2369,7 @@ function closePicker() {
   pickerBackdrop.classList.add("is-hidden");
   pickerSheet.classList.add("is-hidden");
   pickerSheet.classList.remove("is-keyboard-active");
+  pickerSheet.classList.remove("can-scroll-up", "can-scroll-down");
   document.body.classList.remove("picker-open");
 }
 
@@ -2083,9 +2418,46 @@ async function addSelectedProduct() {
   } else {
     const storeId = selectedProduct.storeId;
     if ((!selectedProduct.productId && !selectedProduct.custom) || !storeId) return;
+    const nextPosition = items.reduce((max, item) => Math.max(max, item.position || 0), 0) + 10;
+    if (!navigator.onLine) {
+      const persistedId = crypto.randomUUID?.() || null;
+      const temporaryId = `offline:${persistedId || createId()}`;
+      const localItem = {
+        id: temporaryId,
+        productId: selectedProduct.productId,
+        name: selectedProduct.name,
+        icon: selectedProduct.icon,
+        custom: selectedProduct.custom,
+        quantity: selectedProduct.quantity,
+        done: false,
+        addedBy: currentProfile?.display_name || currentProfile?.username || "Ty",
+        category: selectedProduct.category,
+        store: selectedProduct.store,
+        storeId,
+        position: nextPosition,
+        offlinePending: "add"
+      };
+      items.push(localItem);
+      saveItems();
+      renderItemsPreservingScroll();
+      await enqueueOfflineOperation({
+        type: "add",
+        listId: currentList.id,
+        tempId: temporaryId,
+        item: {
+          id: persistedId,
+          productId: selectedProduct.productId,
+          customName: selectedProduct.custom ? selectedProduct.name : null,
+          customIcon: selectedProduct.custom ? selectedProduct.icon : null,
+          storeId,
+          quantity: selectedProduct.quantity,
+          position: nextPosition,
+          isPurchased: false
+        }
+      });
+    } else {
     try {
       setConnectionStatus("syncing", "zapisywanie…");
-      const nextPosition = items.reduce((max, item) => Math.max(max, item.position || 0), 0) + 10;
       await window.ShoppingDB.addItem({
         productId: selectedProduct.productId,
         customName: selectedProduct.custom ? selectedProduct.name : null,
@@ -2099,6 +2471,7 @@ async function addSelectedProduct() {
       console.error(error);
       setConnectionStatus("offline", "błąd zapisu");
       return;
+    }
     }
   }
   selectedProduct = null;
@@ -2146,12 +2519,19 @@ function updateStoredOrder() {
   }).filter(Boolean);
   saveItems();
   if (!isDemoMode) {
-    setConnectionStatus("syncing", "zapisywanie…");
-    window.ShoppingDB.updateOrder(items.map((item) => ({
+    const changes = items.filter((item) => item.offlinePending !== "delete").map((item) => ({
       id: item.id,
       storeId: item.storeId,
       position: item.position
-    }))).then(
+    }));
+    if (!navigator.onLine) {
+      items.forEach((item) => markItemWaitingForSync(item, "order"));
+      void enqueueOfflineOperation({ type: "order", listId: currentList.id, changes });
+      renderItemsPreservingScroll();
+      return;
+    }
+    setConnectionStatus("syncing", "zapisywanie…");
+    window.ShoppingDB.updateOrder(changes).then(
       () => setConnectionStatus("online", "połączono"),
       (error) => {
         console.error(error);
@@ -2300,10 +2680,7 @@ function finishSwipe() {
     const removalDirection = currentX < 0 ? -110 : 110;
     item.style.transform = `translate3d(${removalDirection}vw, 0, 0)`;
     window.setTimeout(async () => {
-      items = items.filter((entry) => entry.id !== itemId);
-      saveItems();
-      renderItems();
-      if (!isDemoMode) queueItemDeletion(itemId);
+      await removeOrQueueItemDeletion(itemId, { preserveScroll: false });
     }, 220);
     return;
   }
@@ -2448,7 +2825,11 @@ pickerContent.addEventListener("input", (event) => {
   if (event.target.id !== "productSearchInput") return;
   productSearchQuery = event.target.value;
   const results = document.querySelector("#productSearchResults");
-  if (results) results.innerHTML = productSearchResultsMarkup(productSearchQuery);
+  if (results) {
+    results.innerHTML = productSearchResultsMarkup(productSearchQuery);
+    pickerContent.scrollTop = 0;
+    requestAnimationFrame(updatePickerScrollFades);
+  }
 });
 
 pickerContent.addEventListener("change", (event) => {
@@ -2462,7 +2843,8 @@ pickerContent.addEventListener("change", (event) => {
 pickerContent.addEventListener("focusin", (event) => {
   const keepFocusedFieldVisible = () => {
     updatePickerViewport();
-    event.target.scrollIntoView({ block: "nearest" });
+    if (event.target.id === "productSearchInput") pickerContent.scrollTop = 0;
+    else event.target.scrollIntoView({ block: "nearest" });
   };
   window.setTimeout(keepFocusedFieldVisible, 80);
   window.setTimeout(keepFocusedFieldVisible, 260);
@@ -2471,6 +2853,30 @@ pickerContent.addEventListener("focusout", () => window.setTimeout(updatePickerV
 window.visualViewport?.addEventListener("resize", updatePickerViewport);
 window.visualViewport?.addEventListener("scroll", updatePickerViewport);
 window.addEventListener("resize", updatePickerViewport);
+pickerContent.addEventListener("scroll", updatePickerScrollFades, { passive: true });
+new MutationObserver(() => requestAnimationFrame(updatePickerScrollFades))
+  .observe(pickerContent, { childList: true, subtree: true });
+new ResizeObserver(() => requestAnimationFrame(updatePickerScrollFades)).observe(pickerContent);
+
+let pickerTouchY = 0;
+pickerSheet.addEventListener("touchstart", (event) => {
+  pickerTouchY = event.touches[0]?.clientY || 0;
+}, { passive: true });
+pickerSheet.addEventListener("touchmove", (event) => {
+  const currentY = event.touches[0]?.clientY ?? pickerTouchY;
+  const deltaY = currentY - pickerTouchY;
+  pickerTouchY = currentY;
+  const scroller = event.target.closest(".picker-content");
+  if (!scroller) {
+    event.preventDefault();
+    return;
+  }
+  const cannotScroll = scroller.scrollHeight <= scroller.clientHeight + 1;
+  const atTop = scroller.scrollTop <= 0;
+  const atBottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1;
+  if (cannotScroll || (atTop && deltaY > 0) || (atBottom && deltaY < 0)) event.preventDefault();
+}, { passive: false });
+pickerBackdrop.addEventListener("touchmove", (event) => event.preventDefault(), { passive: false });
 
 pickerContent.addEventListener("click", (event) => {
   const option = event.target.closest("[data-picker-action]");
@@ -2573,6 +2979,12 @@ pickerContent.addEventListener("submit", async (event) => {
     renderItemsPreservingScroll();
     closePicker();
     if (isDemoMode) return;
+    if (!navigator.onLine) {
+      markItemWaitingForSync(item, "update");
+      await queueOfflineItemUpdate(currentList.id, item.id, { quantity, store_id: storeId });
+      renderItemsPreservingScroll();
+      return;
+    }
     submitButton.disabled = true;
     try {
       setConnectionStatus("syncing", "zapisywanie…");
@@ -2824,11 +3236,13 @@ pickerContent.addEventListener("submit", async (event) => {
     if (pickerMode === "promote-custom-product") {
       if (!pendingCatalogPromotion) throw new Error("Nie znaleziono produktu do zapisania.");
       const categoryId = form.elements.categoryId.value;
+      const defaultStoreId = form.elements.defaultStoreId.value;
       const icon = form.elements.icon.value.trim() || "🛒";
       const category = productCatalog.find((entry) => entry.id === categoryId);
       if (!category) throw new Error("Nie znaleziono wybranej kategorii.");
+      if (!defaultStoreId) throw new Error("Najpierw wybierz domyślny sklep produktu.");
       setConnectionStatus("syncing", "zapisywanie…");
-      await window.ShoppingDB.promoteCustomItem(pendingCatalogPromotion.itemId, categoryId, name, icon);
+      await window.ShoppingDB.promoteCustomItem(pendingCatalogPromotion.itemId, categoryId, name, icon, defaultStoreId);
       pendingCatalogPromotion = null;
       await refreshRemoteData();
     } else if (pickerMode === "add-category") {
@@ -2901,6 +3315,7 @@ document.querySelector(".app-content").addEventListener("click", async (event) =
   if (!itemElement) return;
   const index = items.findIndex((item) => item.id === itemElement.dataset.id);
   if (index < 0) return;
+  if (items[index].offlinePending === "delete") return;
   const button = event.target.closest("button[data-action]");
   if (!button) {
     if (!event.target.closest("button, a, input, select, textarea")) openItemEditor(items[index]);
@@ -2912,10 +3327,7 @@ document.querySelector(".app-content").addEventListener("click", async (event) =
   }
   const itemId = items[index].id;
   if (button.dataset.action === "delete") {
-    items.splice(index, 1);
-    saveItems();
-    renderItemsPreservingScroll();
-    if (!isDemoMode) queueItemDeletion(itemId);
+    await removeOrQueueItemDeletion(itemId);
     return;
   }
   if (button.dataset.action !== "toggle" || pendingItemUpdateIds.has(itemId)) return;
@@ -2927,6 +3339,12 @@ document.querySelector(".app-content").addEventListener("click", async (event) =
   saveItems();
   moveToggledItemWithoutRerender(item, itemElement);
   if (isDemoMode) return;
+  if (!navigator.onLine) {
+    markItemWaitingForSync(item, "toggle");
+    await queueOfflineItemUpdate(currentList.id, itemId, { is_purchased: nextDone });
+    renderItemsPreservingScroll();
+    return;
+  }
 
   pendingItemUpdateIds.add(itemId);
   rememberLocalItemMutation(itemId, nextDone);
@@ -2965,6 +3383,7 @@ document.querySelector(".app-content").addEventListener("click", async (event) =
 document.querySelector(".app-content").addEventListener("pointerdown", (event) => {
   const item = event.target.closest(".item");
   if (!item || event.button !== 0) return;
+  if (items.find((entry) => entry.id === item.dataset.id)?.offlinePending === "delete") return;
   if (event.target.closest("button:not(.drag-handle), input, select, textarea, a")) return;
   cancelLongPress();
   try { item.setPointerCapture(event.pointerId); } catch { /* starsza przeglądarka */ }
@@ -3034,6 +3453,12 @@ document.addEventListener("touchmove", (event) => {
 }, { passive: false });
 
 clearButton.addEventListener("click", async () => {
+  if (!isDemoMode && !navigator.onLine) {
+    items.filter((item) => item.done).forEach((item) => markItemWaitingForSync(item, "delete"));
+    renderItemsPreservingScroll();
+    await enqueueOfflineOperation({ type: "clear-purchased", listId: currentList.id });
+    return;
+  }
   items = items.filter((item) => !item.done);
   saveItems();
   renderItemsPreservingScroll();
@@ -3238,6 +3663,7 @@ window.addEventListener("offline", () => {
 });
 window.addEventListener("online", () => {
   if (!isDemoMode && !appView.classList.contains("is-hidden")) void reconnectDatabase();
+  void syncPendingAccentColor({ notify: true });
   void checkForAppUpdate();
 });
 

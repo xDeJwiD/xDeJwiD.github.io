@@ -261,17 +261,18 @@
     const listId = requireActiveList();
     const { data: userData, error: userError } = await client.auth.getUser();
     if (userError || !userData.user) throw userError || new Error("Brak sesji użytkownika.");
-    assertNoError(await client.from("shopping_items").insert({
+    return assertNoError(await client.from("shopping_items").insert({
+      ...(item.id ? { id: item.id } : {}),
       list_id: listId,
       product_id: item.productId || null,
       custom_name: item.productId ? null : item.customName,
       custom_icon: item.productId ? null : (item.customIcon || "🛒"),
       store_id: item.storeId,
       quantity: item.quantity,
-      is_purchased: false,
+      is_purchased: Boolean(item.isPurchased),
       position: item.position,
       added_by: userData.user.id
-    }));
+    }).select("id").single());
   }
 
   async function updateItem(id, changes) {
@@ -335,12 +336,13 @@
     }));
   }
 
-  async function promoteCustomItem(itemId, categoryId, name, icon) {
+  async function promoteCustomItem(itemId, categoryId, name, icon, defaultStoreId) {
     return assertNoError(await client.rpc("promote_custom_shopping_item", {
       p_item_id: itemId,
       p_category_id: categoryId,
       p_name: name.trim(),
-      p_icon: icon.trim() || "🛒"
+      p_icon: icon.trim() || "🛒",
+      p_default_store_id: defaultStoreId
     }));
   }
 
@@ -370,10 +372,16 @@
     if (!/^#[0-9a-f]{6}$/i.test(accentColor)) throw new Error("Nieprawidłowy kolor.");
     const { data: userData, error: userError } = await client.auth.getUser();
     if (userError || !userData.user) throw userError || new Error("Brak sesji użytkownika.");
-    assertNoError(await client
+    const updatedProfile = assertNoError(await client
       .from("profiles")
       .update({ accent_color: accentColor.toLowerCase() })
-      .eq("user_id", userData.user.id));
+      .eq("user_id", userData.user.id)
+      .select("user_id, accent_color")
+      .maybeSingle());
+    if (!updatedProfile || updatedProfile.accent_color !== accentColor.toLowerCase()) {
+      throw new Error("Nie udało się zapisać koloru w profilu użytkownika.");
+    }
+    return updatedProfile;
   }
 
   async function loadManageableUsers() {
