@@ -3,6 +3,7 @@ const PREVIOUS_STORAGE_KEY = "razem-shopping-items-v2";
 const THEME_KEY = "razem-theme";
 const ACCENT_COLOR_KEY = "razem-accent-color";
 const ACCENT_COLOR_PENDING_KEY = "razem-accent-color-pending";
+const OFFLINE_LAST_SESSION_KEY = "razem-offline-last-session";
 const OFFLINE_DATABASE_NAME = "razem-shopping-offline";
 const OFFLINE_DATABASE_VERSION = 1;
 const OFFLINE_STORE_NAME = "records";
@@ -294,6 +295,23 @@ async function enqueueOfflineOperation(operation) {
 async function initializeOfflineState(session) {
   offlineUserId = session?.user?.id || null;
   offlineQueue = offlineUserId ? (await offlineRead(offlineQueueKey(offlineUserId)) || []) : [];
+}
+
+async function getOfflineLaunchSession() {
+  if (navigator.onLine) return null;
+  try {
+    const saved = JSON.parse(localStorage.getItem(OFFLINE_LAST_SESSION_KEY) || "null");
+    if (!saved?.userId || !await offlineRead(offlineContextKey(saved.userId))) return null;
+    return {
+      user: {
+        id: saved.userId,
+        email: saved.email || `${saved.username || "uzytkownik"}@offline.local`
+      },
+      offlineCachedSession: true
+    };
+  } catch {
+    return null;
+  }
 }
 
 function isTemporaryOfflineId(id) {
@@ -1119,6 +1137,11 @@ async function enterDatabaseMode(session) {
     usingOfflineContext = true;
   }
   if (!context.profile) throw new Error("Użytkownik nie ma profilu aplikacji.");
+  localStorage.setItem(OFFLINE_LAST_SESSION_KEY, JSON.stringify({
+    userId: session.user.id,
+    email: session.user.email || "",
+    username: context.profile.username || ""
+  }));
   currentProfile = context.profile;
   currentUserIsDev = currentProfile.role === "dev";
   createListMenuButton.classList.toggle("is-hidden", !currentUserIsDev);
@@ -2764,6 +2787,7 @@ loginForm.addEventListener("submit", async (event) => {
     else {
       loginMessage.textContent = "Nieprawidłowy login lub hasło albo brak dostępu do aplikacji.";
       await window.ShoppingDB.signOut().catch(() => {});
+      localStorage.removeItem(OFFLINE_LAST_SESSION_KEY);
     }
   } finally {
     submitButton.disabled = false;
@@ -2793,6 +2817,7 @@ document.querySelector("#logoutButton").addEventListener("click", async () => {
   window.clearTimeout(realtimeReconnectTimer);
   realtimeReconnectTimer = null;
   if (!isDemoMode && window.ShoppingDB) await window.ShoppingDB.signOut().catch(console.error);
+  localStorage.removeItem(OFFLINE_LAST_SESSION_KEY);
   currentSession = null;
   closeApp();
 });
@@ -3740,13 +3765,14 @@ async function restoreDatabaseSession(session) {
     return;
   }
   try {
-    const session = await window.ShoppingDB.getSession();
-    if (!session) return;
+    const session = await window.ShoppingDB.getSession().catch(() => null);
+    const sessionToRestore = session || await getOfflineLaunchSession();
+    if (!sessionToRestore) return;
     try {
-      await restoreDatabaseSession(session);
+      await restoreDatabaseSession(sessionToRestore);
     } catch (error) {
       console.error(error);
-      showDatabaseRecovery(session);
+      showDatabaseRecovery(sessionToRestore);
     }
   } catch (error) {
     console.error(error);
