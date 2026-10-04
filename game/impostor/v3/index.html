@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="pl"><head>
+<html lang="pl">
+
+<head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link rel="icon" type="image/png" href="impostor_icon.png">
@@ -8,7 +10,7 @@
   <link rel="stylesheet" href="impostor.css">
   <title>Impostor Party</title>
 
-  
+
   <meta name="theme-color" content="#102D35" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#102D35" media="(prefers-color-scheme: dark)">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,11 +18,12 @@
   <meta name="apple-mobile-web-app-title" content="Impostor Party">
 </head>
 
-<body><p id="storage-notice" class="storage-notice" role="status" hidden=""></p>
+<body>
+  <p id="storage-notice" class="storage-notice" role="status" hidden=""></p>
   <div class="wrap">
-    
 
-    
+
+
     <section id="view-menu" class="menu screen">
       <div class="menu-logo">
         <img src="./impostor_logo.png" alt="Impostor Logo">
@@ -30,22 +33,23 @@
         <button class="btn secondary full" id="btn-test">Nowa gra</button>
         <a class="btn secondary full" href="time.html" style="text-align:center;text-decoration:none">Time Impostor</a>
         <br>
-        
+
         <br>
-        <button class="btn ghost full" id="btn-continue" disabled="">Kontynuuj poprzednią grę</button><button class="btn ghost full" id="btn-import" hidden="">Przenieś graczy i punkty z V2</button>
+        <button class="btn ghost full" id="btn-continue" disabled="">Kontynuuj poprzednią grę</button><button
+          class="btn ghost full" id="btn-import" hidden="">Przenieś graczy i punkty z V2</button>
 
         <br>
 
       </div>
 
-      
+
 
     </section>
 
-    
+
     <section id="view-setup" class="menu screen" style="display: none">
       <div>
-        
+
 
 
         <div class="settings-section">
@@ -101,7 +105,8 @@
             </label>
 
           </div>
-          <label id="role-option" class="role-option" for="impostor-knows-role" hidden><input id="impostor-knows-role" type="checkbox" checked> Impostor zna swoją rolę</label>
+          <label id="role-option" class="role-option" for="impostor-knows-role" hidden><input id="impostor-knows-role"
+              type="checkbox" checked> Impostor zna swoją rolę</label>
         </div>
         <div class="divider"></div>
 
@@ -111,11 +116,17 @@
             Kategorie słów
           </div>
 
-          <div class="checkbox-group"><input type="checkbox" id="words-absurd" name="wordSet" value="absurd"><label for="words-absurd" class="radio-btn"><span class="category-name">Absurd</span><span class="category-count" id="words-count-absurd"></span></label>
+          <div class="checkbox-group">
 
-            <input type="checkbox" id="words-objects" name="wordSet" value="objects"><label for="words-objects" class="radio-btn"><span class="category-name">Przedmioty</span><span class="category-count" id="words-count-objects"></span></label>
-            <input type="checkbox" id="words-places" name="wordSet" value="places"><label for="words-places" class="radio-btn"><span class="category-name">Miejsca</span><span class="category-count" id="words-count-places"></span></label>
-            <input type="checkbox" id="words-holidays" name="wordSet" value="holidays"><label for="words-holidays" class="radio-btn"><span class="category-name">Wakacje</span><span class="category-count" id="words-count-holidays"></span></label>
+            <input type="checkbox" id="words-objects" name="wordSet" value="objects"><label for="words-objects"
+              class="radio-btn"><span class="category-name">Przedmioty</span><span class="category-count"
+                id="words-count-objects"></span></label>
+            <input type="checkbox" id="words-places" name="wordSet" value="places"><label for="words-places"
+              class="radio-btn"><span class="category-name">Miejsca</span><span class="category-count"
+                id="words-count-places"></span></label>
+            <input type="checkbox" id="words-holidays" name="wordSet" value="holidays"><label for="words-holidays"
+              class="radio-btn"><span class="category-name">Wakacje</span><span class="category-count"
+                id="words-count-holidays"></span></label>
             <input type="checkbox" id="words-default" name="wordSet" value="default" checked="">
 
             <label for="words-default" class="radio-btn">
@@ -167,15 +178,15 @@
 
 
 
-            
-
-            
 
 
 
-            
 
-            
+
+
+
+
+
 
 
 
@@ -197,7 +208,7 @@
             5 graczy
           </div>
 
-          
+
           <div id="playerDots" class="player-dots"></div>
 
 
@@ -218,12 +229,12 @@
 
       <br>
 
-      
+
     </section>
 
 
 
-    
+
     <section id="view-entry" class="menu screen" style="display: none">
       <div>
         <h2 class="title">
@@ -231,7 +242,8 @@
           <span id="entry-total">1</span>
         </h2>
         <label>Imię gracza</label>
-        <p class="muted">Telefon dla: <strong id="entry-person"></strong></p><input id="entry-name" type="text" placeholder="np. Ola" autocomplete="off" autocapitalize="sentences" maxlength="40">
+        <p class="muted">Telefon dla: <strong id="entry-person"></strong></p><input id="entry-name" type="text"
+          placeholder="np. Ola" autocomplete="off" autocapitalize="sentences" maxlength="40">
         <div class="row" style="margin-top: 8px">
           <button class="btn full" id="entry-confirm">
             Zatwierdź imię i pokaż rolę
@@ -245,13 +257,13 @@
       </div>
     </section>
 
-    
+
     <section id="view-start" class="menu screen" style="display: none">
       <h2 class="title">Losowanie kto zaczyna…</h2>
       <div class="wheel" id="start-wheel"></div>
     </section>
 
-    
+
     <section id="view-lobby" class="menu screen" style="display: none">
 
 
@@ -267,7 +279,7 @@
           <tr>
             <th>Gracz</th>
             <th>Punkty</th>
-            
+
           </tr>
         </thead>
         <tbody id="stats-body"></tbody>
@@ -300,31 +312,59 @@
 
 
     </section>
-  <section id="view-order" class="menu screen" style="display:none" aria-labelledby="order-title">
+    <section id="view-order" class="menu screen" style="display:none" aria-labelledby="order-title">
       <h2 id="order-title" class="title">Kolejność osób</h2>
       <div id="order-list" class="list"></div>
-      
-      
-      <div class="row"><button class="btn full" id="order-confirm">Zatwierdź kolejność</button><button class="btn ghost full" id="order-back">Wróć do ustawień</button></div>
-    </section><section id="view-manage" class="menu screen" style="display:none" aria-labelledby="manage-title">
-      <h2 id="manage-title" class="title">Gracze</h2>
-      <label class="avatar-toggle"><input id="manage-beach" type="checkbox" role="switch" aria-label="Odsłoń Beach w następnej rundzie"><span class="toggle-track" aria-hidden="true"></span><span>Odsłoń Beach w następnej rundzie</span></label>
-      <div id="manage-list" class="list"></div>
-      
-      <div class="row"><input id="manage-name" maxlength="40" placeholder="Imię nowej osoby" enterkeyhint="done"><button class="btn secondary" id="manage-add">Dodaj</button></div>
-      
-      <button class="btn ghost full" id="reset-stats">Wyzeruj statystyki</button><button class="btn ghost full" id="reset-words">Wyczyść historię haseł</button>
-      <div class="row"><button class="btn full" id="manage-save">Zapisz</button><button class="btn ghost full" id="manage-cancel">Anuluj</button></div>
-    </section></div>
 
-  
+
+      <div class="row"><button class="btn full" id="order-confirm">Zatwierdź kolejność</button><button
+          class="btn ghost full" id="order-back">Wróć do ustawień</button></div>
+    </section>
+    <section id="view-manage" class="menu screen" style="display:none" aria-labelledby="manage-title">
+      <h2 id="manage-title" class="title">Gracze</h2>
+      <label class="avatar-toggle"><input id="manage-beach" type="checkbox" role="switch"
+          aria-label="Odsłoń Beach w następnej rundzie"><span class="toggle-track"
+          aria-hidden="true"></span><span>Odsłoń Beach w następnej rundzie</span></label>
+      <div id="manage-list" class="list"></div>
+
+      <div class="row"><input id="manage-name" maxlength="40" placeholder="Imię nowej osoby" enterkeyhint="done"><button
+          class="btn secondary" id="manage-add">Dodaj</button></div>
+
+      <button class="btn ghost full" id="reset-stats">Wyzeruj statystyki</button><button class="btn ghost full"
+        id="reset-words">Wyczyść historię haseł</button>
+      <div class="row"><button class="btn full" id="manage-save">Zapisz</button><button class="btn ghost full"
+          id="manage-cancel">Anuluj</button></div>
+    </section>
+  </div>
+
+
   <div id="overlay-secret" class="overlay" role="dialog" aria-modal="true" aria-labelledby="secret-player">
     <div class="modal">
-      <div class="secret-hero"><div id="hero-current" class="hero-img"></div><div id="hero-next" class="hero-img"></div><div id="hero-banner" class="hero-banner" aria-hidden="true"><span>Przekaż telefon do:</span><strong id="hero-next-name">—</strong></div></div>
-      <div class="row secret-meta"><div class="chip for">DLA: <strong id="secret-player">–</strong></div><div class="chip" id="secret-pos">1 / 1</div></div>
-      <div class="card center"><div id="secret-word-label" class="muted">Twoje hasło:</div><div id="secret-content" hidden=""><div id="secret-imp-hint" class="muted" hidden=""></div><div id="secret-category-label" class="muted" hidden=""></div><div id="secret-category" hidden=""></div><div id="secret-value" class="huge" hidden=""></div></div><div id="secret-instruction" class="muted">PRZYTRZYMAJ, aby zobaczyć</div></div>
-      <div class="row secret-actions"><button class="btn hold full" id="secret-show" aria-controls="secret-content" aria-expanded="false"><span class="label">Przytrzymaj, by odsłonić</span></button><button class="btn secondary full" id="secret-hide" hidden="">Ukryj i podaj dalej</button></div>
-      <div id="handoff-inline" class="handoff-inline" hidden="">Przekaż telefon do: <strong id="handoff-next">—</strong></div>
+      <div class="secret-hero">
+        <div id="hero-current" class="hero-img"></div>
+        <div id="hero-next" class="hero-img"></div>
+        <div id="hero-banner" class="hero-banner" aria-hidden="true"><span>Przekaż telefon do:</span><strong
+            id="hero-next-name">—</strong></div>
+      </div>
+      <div class="row secret-meta">
+        <div class="chip for">DLA: <strong id="secret-player">–</strong></div>
+        <div class="chip" id="secret-pos">1 / 1</div>
+      </div>
+      <div class="card center">
+        <div id="secret-word-label" class="muted">Twoje hasło:</div>
+        <div id="secret-content" hidden="">
+          <div id="secret-imp-hint" class="muted" hidden=""></div>
+          <div id="secret-category-label" class="muted" hidden=""></div>
+          <div id="secret-category" hidden=""></div>
+          <div id="secret-value" class="huge" hidden=""></div>
+        </div>
+        <div id="secret-instruction" class="muted">PRZYTRZYMAJ, aby zobaczyć</div>
+      </div>
+      <div class="row secret-actions"><button class="btn hold full" id="secret-show" aria-controls="secret-content"
+          aria-expanded="false"><span class="label">Przytrzymaj, by odsłonić</span></button><button
+          class="btn secondary full" id="secret-hide" hidden="">Ukryj i podaj dalej</button></div>
+      <div id="handoff-inline" class="handoff-inline" hidden="">Przekaż telefon do: <strong id="handoff-next">—</strong>
+      </div>
     </div>
   </div>
 
@@ -334,11 +374,12 @@
       <div class="row">
         <button class="btn" id="res-yes">Tak</button>
         <button class="btn secondary" id="res-no">Nie</button>
-      <button class="btn ghost" id="res-cancel">Anuluj</button></div>
+        <button class="btn ghost" id="res-cancel">Anuluj</button>
+      </div>
     </div>
   </div>
 
-  
+
   <script src="words/words_default.js"></script>
 
   <script src="words/words_country.js"></script>
@@ -346,11 +387,16 @@
   <script src="words/words_animal.js"></script>
   <script src="words/words_objects.js"></script>
   <script src="words/words_places.js"></script>
-  <script src="words/words_holidays.js"></script><script src="words/words_absurd.js"></script>
+  <script src="words/words_holidays.js"></script>
 
 
 
-  <script src="game-core.js"></script><script src="avatar-reveal.js"></script><script src="impostor.js"></script>
+
+  <script src="game-core.js"></script>
+  <script src="avatar-reveal.js"></script>
+  <script src="impostor.js"></script>
 
 
-</body></html>
+</body>
+
+</html>

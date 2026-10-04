@@ -2,17 +2,21 @@
 (() => {
   'use strict';
   const Core = ImpostorCore;
-  const WORD_SETS = { default: WORDS_DEFAULT, country: WORDS_COUNTRY,
-    food: WORDS_FOOD, animal: WORDS_ANIMAL, objects: WORDS_OBJECTS, places: WORDS_PLACES, holidays: WORDS_HOLIDAYS, absurd: WORDS_ABSURD };
+  const WORD_SETS = {
+    default: WORDS_DEFAULT, country: WORDS_COUNTRY,
+    food: WORDS_FOOD, animal: WORDS_ANIMAL, objects: WORDS_OBJECTS, places: WORDS_PLACES, holidays: WORDS_HOLIDAYS,
+  };
   const el = id => document.getElementById(id);
   const copy = Core.clone;
   const escapeHtml = value => String(value).replace(/[&<>"']/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[c]);
   let sequence = 0;
   const uuid = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${++sequence}-${Math.random().toString(36).slice(2)}`;
-  const AVATARS = { adrian: 'avatars/normal/av_adi.png', kuba: 'avatars/normal/av_kub.png',
+  const AVATARS = {
+    adrian: 'avatars/normal/av_adi.png', kuba: 'avatars/normal/av_kub.png',
     wanessa: 'avatars/normal/av_wan.png', jula: 'avatars/normal/av_jul.png',
-    dawid: 'avatars/normal/av_daw.png', nikt: 'avatars/normal/av_nikt.png' };
+    dawid: 'avatars/normal/av_daw.png', nikt: 'avatars/normal/av_nikt.png'
+  };
   const styledAvatar = (src, style) => (style || state.settings.avatarStyle) === 'beach' ? src.replace('/normal/av_', '/beach/avb_') : src;
   const NAME_HINTS = {
     wanessa: ['wanessa', 'vanessa', 'wanes', 'vanes', 'wane', 'waneska', 'vannes', 'wan', 'wa'],
@@ -37,7 +41,7 @@
     return styledAvatar(Object.values(AVATARS).find(src => src.split('/').pop() === savedFile) || AVATARS.nikt, style);
   }
   const img = (player, cls, style) => `<img class="${cls}" src="${avatarFor(player, style)}" alt="" decoding="async">`;
-  function vibrate(ms) { try { navigator.vibrate?.(ms); } catch {} }
+  function vibrate(ms) { try { navigator.vibrate?.(ms); } catch { } }
   let state = Core.emptyState();
   let hasSave = false, storageDisabled = false;
   let setupDraft = null, manageDraft = null, resetHistoryDraft = false;
@@ -66,13 +70,13 @@
       const raw = localStorage.getItem(Core.STORAGE_KEY);
       if (raw) {
         let parsed = null;
-        try { parsed = Core.validateSave(JSON.parse(raw), WORD_SETS); } catch {}
+        try { parsed = Core.validateSave(JSON.parse(raw), WORD_SETS); } catch { }
         if (parsed) { state = parsed; hasSave = true; }
         else storageNotice('Nie udało się odczytać poprzedniego zapisu V3. Rozpocznij nową grę.');
       }
       if (!hasSave) {
         let legacy = null;
-        try { legacy = Core.migrateLegacy(JSON.parse(localStorage.getItem('impostorParty_v10')), WORD_SETS, uuid); } catch {}
+        try { legacy = Core.migrateLegacy(JSON.parse(localStorage.getItem('impostorParty_v10')), WORD_SETS, uuid); } catch { }
         if (legacy) {
           el('btn-import').hidden = false;
           el('btn-import').onclick = () => {
@@ -137,11 +141,13 @@
   }
   document.querySelectorAll('input[name="impostorInfo"]').forEach(n => n.addEventListener('change', updateRoleOption));
   function readSettings() {
-    const settings = { impostorInfo: document.querySelector('input[name="impostorInfo"]:checked')?.value,
+    const settings = {
+      impostorInfo: document.querySelector('input[name="impostorInfo"]:checked')?.value,
       avatarStyle: state.settings.avatarStyle || 'normal', beachNextRound: state.settings.beachNextRound === true,
       impostorKnowsRole: el('impostor-knows-role').checked,
       impostorCount: document.querySelector('input[name="impostorCount"]:checked')?.value,
-      selectedWordSets: [...document.querySelectorAll('input[name="wordSet"]:checked')].map(n => n.value) };
+      selectedWordSets: [...document.querySelectorAll('input[name="wordSet"]:checked')].map(n => n.value)
+    };
     if (!Core.settingsValid(settings, WORD_SETS)) throw new Error('Wybierz przynajmniej jeden dostępny zestaw haseł.');
     return settings;
   }
@@ -497,7 +503,7 @@
       el('btn-continue').disabled = false;
       storageNotice('Gra została zaktualizowana w innej karcie. Wybierz „Kontynuuj”, aby wrócić do aktualnej rundy.');
       show('view-menu');
-    } catch {}
+    } catch { }
   });
   load(); syncSettings(state.settings); updateSlider(); show('view-menu');
 })();
