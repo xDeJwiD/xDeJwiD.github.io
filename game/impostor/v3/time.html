@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pl"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="icon" type="image/png" href="impostor_icon.png">
+  <link rel="apple-touch-icon" href="impostor_icon.png">
+
+  <link rel="stylesheet" href="impostor.css">
+  <title>Time Impostor</title>
+
+  
+  <meta name="theme-color" content="#102D35" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#102D35" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Impostor Party">
+<link rel="stylesheet" href="time.css"></head>
+
+<body><p id="storage-notice" class="storage-notice" role="status" hidden=""></p>
+  <div class="wrap">
+    
+
+    
+    <section id="view-menu" class="menu screen">
+      <div class="menu-logo">
+        <img src="./impostor_logo.png" alt="Impostor Logo">
+      </div><h2 class="title">Time Impostor</h2>
+
+      <div class="row">
+        <button class="btn secondary full" id="btn-test">Nowa gra</button>
+        <a class="btn secondary full" href="index.html" style="text-align:center;text-decoration:none">Zwykły Impostor</a>
+        <br>
+        
+        <br>
+        <button class="btn ghost full" id="btn-continue" disabled="">Kontynuuj poprzednią grę</button>
+
+        <br>
+
+      </div>
+
+      
+
+    </section>
+
+    
+    <section id="view-setup" class="menu screen" style="display: none">
+      <div>
+        
+
+
+        <div class="settings-section">
+          <div class="settings-title">
+            Ilość impostorów
+          </div>
+
+          <div class="radio-group">
+
+            <input type="radio" id="count-default" name="impostorCount" value="default" checked="">
+            <label for="count-default" class="radio-btn">
+              Default
+            </label>
+
+            <input type="radio" id="count-1" name="impostorCount" value="1">
+            <label for="count-1" class="radio-btn">
+              1
+            </label>
+
+            <input type="radio" id="count-2" name="impostorCount" value="2">
+            <label for="count-2" class="radio-btn">
+              2
+            </label>
+
+            <input type="radio" id="count-many" name="impostorCount" value="many">
+            <label for="count-many" class="radio-btn">2+</label>
+
+          </div>
+        </div>
+        <div class="divider"></div>
+
+
+        <div class="settings-section">
+          <div class="settings-title">
+            Wiedza impostora
+          </div>
+
+          <div class="radio-group">
+
+            <input type="radio" id="info-none" name="impostorInfo" value="none">
+            <label for="info-none" class="radio-btn">
+              Brak
+            </label>
+
+            <input type="radio" id="info-category" name="impostorInfo" value="category" checked="">
+            <label for="info-category" class="radio-btn">Przedział</label>
+
+            <input type="radio" id="info-hint" name="impostorInfo" value="hint">
+            <label for="info-hint" class="radio-btn">XX,XX</label>
+
+          </div>
+          
+        </div>
+        <div class="divider"></div>
+
+        <div class="settings-section"><div class="settings-title">Zakres czasu (0–60 sekund)</div><div class="time-range"><label>Od<input id="timeMin" type="number" min="0" max="60" step="0.01" value="3"></label><label>Do<input id="timeMax" type="number" min="0" max="60" step="0.01" value="15"></label></div><div class="settings-title">Miejsca po przecinku</div><div class="radio-group"><input id="precision-0" name="timePrecision" type="radio" value="0"><label class="radio-btn" for="precision-0">0</label><input id="precision-1" name="timePrecision" type="radio" value="1" checked=""><label class="radio-btn" for="precision-1">1</label><input id="precision-2" name="timePrecision" type="radio" value="2"><label class="radio-btn" for="precision-2">2</label></div></div>
+        <div class="divider"></div>
+
+
+        <label class="avatar-toggle"><input id="time-live" type="checkbox" role="switch" aria-label="Pokazuj czas na żywo"><span class="toggle-track" aria-hidden="true"></span><span>Pokazuj czas na żywo</span></label><div class="divider"></div><div id="player-count-section">
+
+          <div class="settings-title">
+            Ilość graczy
+          </div>
+
+          <div id="playerCountValue" class="player-count-value">
+            5 graczy
+          </div>
+
+          
+          <div id="playerDots" class="player-dots"></div>
+
+
+          <input id="playerCount" class="player-range" type="range" min="3" max="12" value="5">
+
+        </div>
+
+
+      </div>
+      <div class="divider"></div>
+      <div class="row" style="margin-top: 8px">
+        <button class="btn full" id="btn-begin-entry">Wpisz gracza 1</button>
+        <button class="btn ghost full" id="back-to-menu">◀ Wróć</button>
+
+        <button class="btn full" id="setup-save" hidden="">Zapisz i wróć</button>
+        <button class="btn ghost full" id="setup-cancel" hidden="">Anuluj</button>
+      </div>
+
+      <br>
+
+      
+    </section>
+
+
+
+    
+    <section id="view-entry" class="menu screen" style="display: none">
+      <div>
+        <h2 class="title">
+          Gracz <span id="entry-index">1</span> /
+          <span id="entry-total">1</span>
+        </h2>
+        <label>Imię gracza</label>
+        <p class="muted">Telefon dla: <strong id="entry-person"></strong></p><input id="entry-name" type="text" placeholder="np. Ola" autocomplete="off" autocapitalize="sentences" maxlength="40">
+        <div class="row" style="margin-top: 8px">
+          <button class="btn full" id="entry-confirm">
+            Zatwierdź imię i pokaż rolę
+          </button>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div>
+        <label>Dodani</label>
+        <div id="entry-list" class="list"></div>
+      </div>
+    </section>
+
+    
+    
+
+    
+    <section id="view-lobby" class="menu screen" style="display: none"><button id="time-pad" class="btn full"><strong id="time-value">START</strong><span id="time-help">Dotknij, aby rozpocząć pomiar</span></button>
+
+
+      <div class="row" style="margin-bottom: 0px" hidden="">
+        <span class="chip">Zaczyna: <strong id="starter-name">–</strong></span>
+      </div>
+
+      <div class="divider"></div>
+
+      <details><summary>Statystyki</summary><table class="table">
+        <thead id="stats-head">
+          <tr>
+            <th>Gracz</th>
+            <th>Punkty</th>
+            
+          </tr>
+        </thead>
+        <tbody id="stats-body"></tbody>
+      </table></details>
+      
+
+      <div class="divider"></div>
+
+      <div class="row">
+        <button class="btn full" id="btn-new-round">Zakończ rundę</button>
+      </div>
+
+
+
+
+      <div class="row">
+
+        <button class="btn ghost full radio-btn" id="btn-settings">
+          Zmień tryb
+        </button>
+
+        <button class="btn ghost full radio-btn" id="btn-manage">
+          Zmień graczy
+        </button>
+
+      </div>
+
+
+
+
+    </section>
+  <section id="view-order" class="menu screen" style="display:none" aria-labelledby="order-title">
+      <h2 id="order-title" class="title">Kolejność osób</h2>
+      <div id="order-list" class="list"></div>
+      
+      
+      <div class="row"><button class="btn full" id="order-confirm">Zatwierdź kolejność</button><button class="btn ghost full" id="order-back">Wróć do ustawień</button></div>
+    </section><section id="view-manage" class="menu screen" style="display:none" aria-labelledby="manage-title">
+      <h2 id="manage-title" class="title">Gracze</h2>
+      <label class="avatar-toggle"><input id="manage-beach" type="checkbox" role="switch" aria-label="Odsłoń Beach w następnej rundzie"><span class="toggle-track" aria-hidden="true"></span><span>Odsłoń Beach w następnej rundzie</span></label>
+      <div id="manage-list" class="list"></div>
+      
+      <div class="row"><input id="manage-name" maxlength="40" placeholder="Imię nowej osoby" enterkeyhint="done"><button class="btn secondary" id="manage-add">Dodaj</button></div>
+      
+      <button class="btn ghost full" id="reset-stats">Wyzeruj statystyki</button><button class="btn ghost full" id="reset-words">Wyczyść historię czasów</button>
+      <div class="row"><button class="btn full" id="manage-save">Zapisz</button><button class="btn ghost full" id="manage-cancel">Anuluj</button></div>
+    </section></div>
+
+  
+  <div id="overlay-secret" class="overlay" role="dialog" aria-modal="true" aria-labelledby="secret-player">
+    <div class="modal">
+      <div class="secret-hero"><div id="hero-current" class="hero-img"></div><div id="hero-next" class="hero-img"></div><div id="hero-banner" class="hero-banner" aria-hidden="true"><span>Przekaż telefon do:</span><strong id="hero-next-name">—</strong></div></div>
+      <div class="row secret-meta"><div class="chip for">DLA: <strong id="secret-player">–</strong></div><div class="chip" id="secret-pos">1 / 1</div></div>
+      <div class="card center"><div id="secret-word-label" class="muted">Twój czas:</div><div id="secret-content" hidden=""><div id="secret-imp-hint" class="muted" hidden=""></div><div id="secret-category-label" class="muted" hidden=""></div><div id="secret-category" hidden=""></div><div id="secret-value" class="huge" hidden=""></div></div><div id="secret-instruction" class="muted">PRZYTRZYMAJ, aby zobaczyć</div></div>
+      <div class="row secret-actions"><button class="btn hold full" id="secret-show" aria-controls="secret-content" aria-expanded="false"><span class="label">Przytrzymaj, by odsłonić</span></button><button class="btn secondary full" id="secret-hide" hidden="">Ukryj i podaj dalej</button></div>
+      <div id="handoff-inline" class="handoff-inline" hidden="">Przekaż telefon do: <strong id="handoff-next">—</strong></div>
+    </div>
+  </div>
+
+  <div id="overlay-result" class="overlay" role="dialog" aria-modal="true" aria-labelledby="result-title">
+    <div class="modal">
+      <h3 class="title" id="result-title">Czy impostor wygrał właśnie zakończoną grę?</h3>
+      <div class="row">
+        <button class="btn" id="res-yes">Tak</button>
+        <button class="btn secondary" id="res-no">Nie</button>
+      <button class="btn ghost" id="res-cancel">Anuluj</button></div>
+    </div>
+  </div>
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+
+
+  
+
+
+
+<script src="time-core.js"></script><script src="avatar-reveal.js"></script><script src="time.js"></script></body></html>
